@@ -10,7 +10,6 @@ from routes.rota_usuarios import usuarios_rota
 from routes.rota_pedido import pedido_rota
 from routes.rota_emprestimos import emprestimos_rota
 
-
 app = FastAPI(
     title="Minha API",
     description="API de exemplo com FastAPI",
