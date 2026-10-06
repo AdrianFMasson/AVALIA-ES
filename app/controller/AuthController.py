@@ -3,7 +3,7 @@ from datetime import datetime
 from sqlmodel import Session, select
 from sqlalchemy.exc import OperationalError, IntegrityError
 from entities.models import UsuarioLogin,UsuarioLogado,Usuarios,Perfil
-from core.security import verifica_senha,create_token
+from core.secutity import verifica_senha,create_token
 
 def fazer_login(db:Session,username:str,password:str):
     try:
