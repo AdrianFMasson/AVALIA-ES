@@ -1,8 +1,6 @@
 from typing import List
-
 from sqlmodel import Session, select
 from sqlalchemy.exc import OperationalError, IntegrityError
-
 from entities.models import Equipamentos, EquipamentoPublico, Estoque
 
 

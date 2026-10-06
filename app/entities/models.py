@@ -1,7 +1,7 @@
 from sqlmodel import SQLModel, Field
 from datetime import datetime
 from enum import Enum
-
+from pydantic import BaseModel, EmailStr
 
 class StatusPerfil(str, Enum):
     DISCENTE = "DISCENTE"
@@ -86,3 +86,12 @@ class Emprestimos(SQLModel, table=True):
     status_solicitacao: StatusSolicitacao = Field(
         default=StatusSolicitacao.SOLICITADO
     )
+
+class UsuarioLogin(BaseModel):
+    usuario: EmailStr 
+    senha: str
+class UsuarioLogado(BaseModel):
+    id: int
+    nome: str
+    roles:list[str]
+    
