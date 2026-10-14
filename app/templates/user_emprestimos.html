@@ -1,0 +1,171 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Meus Empréstimos | The Iron Compass</title>
+    <link rel="stylesheet" href="/static/css/user_emprestimos.css">
+</head>
+<body>
+    <div class="layout">
+        <aside class="menu-lateral">
+            <a href="/dashboard-user" class="marca">
+                <img src="/static/imagens/compasso.svg" alt="" class="logo">
+                <div class="marca-texto">
+                    <h2>THE IRON COMPASS</h2>
+                    <span>GESTÃO DE EQUIPAMENTOS</span>
+                </div>
+            </a>
+
+            <nav class="navegacao" aria-label="Menu principal">
+                <a href="/dashboard-user" class="item-menu">
+                    <span class="icone">⌂</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/user_pedidos" class="item-menu">
+                    <span class="icone">▤</span>
+                    <span>Meus Pedidos</span>
+                </a>
+                <a href="/user_emprestimos" class="item-menu ativo" aria-current="page">
+                    <span class="icone">⚒</span>
+                    <span>Meus Empréstimos</span>
+                </a>
+            </nav>
+
+            <div class="rodape-menu">
+                <span>THE IRON COMPASS</span>
+                <small>Sistema de empréstimos</small>
+            </div>
+        </aside>
+
+        <main class="conteudo-principal">
+            <header class="cabecalho">
+                <div class="titulo-pagina">
+                    <span class="subtitulo">ÁREA DO USUÁRIO</span>
+                    <h1>Meus Empréstimos</h1>
+                    <p>Consulte as informações dos seus empréstimos.</p>
+                </div>
+                <div class="acoes-cabecalho">
+                    <span class="nome-usuario">{{ usuario.nome if usuario and usuario.nome else "Usuário" }}</span>
+                    <form action="/logout" method="post">
+                        <button type="submit" class="botao-sair">Sair</button>
+                    </form>
+                </div>
+            </header>
+
+            <section class="painel-emprestimos">
+                <div class="cabecalho-painel">
+                    <div>
+                        <h2>Histórico de empréstimos</h2>
+                        <p>Registros associados à sua conta.</p>
+                    </div>
+                    <div class="contador">
+                        <span id="totalEmprestimos">{{ emprestimos|length }}</span>
+                        <span>empréstimo(s)</span>
+                    </div>
+                </div>
+
+                
+                <div class="filtros">
+                    <div class="campo-pesquisa">
+                        <label for="pesquisaEmprestimos">Pesquisar empréstimos</label>
+                        <input type="search" id="pesquisaEmprestimos" placeholder="Pesquisar pelo ID ou status...">
+                    </div>
+                    <div class="campo-filtro">
+                        <label for="filtroStatus">Status da solicitação</label>
+                        <select id="filtroStatus">
+                            <option value="">Todos os status</option>
+                            <option value="SOLICITADO">Solicitado</option>
+                            <option value="APROVADO">Aprovado</option>
+                            <option value="NEGADO">Negado</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="tabela-responsiva">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID do empréstimo</th>
+                                <th>Status</th>
+                                <th>Data de aprovação</th>
+                                <th>Data de retirada</th>
+                                <th>Devolução prevista</th>
+                                <th>Data de devolução</th>
+                            </tr>
+                        </thead>
+                        <tbody id="corpoTabelaEmprestimos">
+                            {% for emprestimo in emprestimos %}
+                            {% set status = emprestimo.status_solicitacao.value if emprestimo.status_solicitacao.value is defined else emprestimo.status_solicitacao %}
+                            <tr data-status="{{ status }}">
+                                <td>#{{ emprestimo.id_emprestimo }}</td>
+                                <td>
+                                    {% if status == "SOLICITADO" %}
+                                        <span class="status status-solicitado">Solicitado</span>
+                                    {% elif status == "APROVADO" %}
+                                        <span class="status status-aprovado">Aprovado</span>
+                                    {% elif status == "NEGADO" %}
+                                        <span class="status status-negado">Negado</span>
+                                    {% else %}
+                                        <span class="status">{{ status }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ emprestimo.data_aprovacao.strftime("%d/%m/%Y") if emprestimo.data_aprovacao else "—" }}</td>
+                                <td>{{ emprestimo.data_retirada.strftime("%d/%m/%Y") if emprestimo.data_retirada else "—" }}</td>
+                                <td>{{ emprestimo.data_prevista_devolucao.strftime("%d/%m/%Y") if emprestimo.data_prevista_devolucao else "—" }}</td>
+                                <td>{{ emprestimo.data_devolucao.strftime("%d/%m/%Y") if emprestimo.data_devolucao else "—" }}</td>
+                            </tr>
+                            {% else %}
+                            <tr class="linha-vazia">
+                                <td colspan="6" class="sem-registros">Nenhum empréstimo encontrado para sua conta.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <p id="mensagemFiltro" class="mensagem-filtro" hidden>Nenhum empréstimo corresponde à pesquisa.</p>
+            </section>
+
+            <footer class="rodape-conteudo">
+                <span>THE IRON COMPASS</span>
+                <span>Sistema de gerenciamento de empréstimos</span>
+            </footer>
+        </main>
+    </div>
+
+    <script>
+    (() => {
+        const pesquisa = document.getElementById("pesquisaEmprestimos");
+        const filtro = document.getElementById("filtroStatus");
+        const corpo = document.getElementById("corpoTabelaEmprestimos");
+        const contador = document.getElementById("totalEmprestimos");
+        const mensagem = document.getElementById("mensagemFiltro");
+
+        function filtrarEmprestimos() {
+            const termo = pesquisa.value.trim().toLocaleLowerCase("pt-BR");
+            const statusSelecionado = filtro.value;
+            const linhas = Array.from(corpo.querySelectorAll("tr[data-status]"));
+            let totalVisivel = 0;
+
+            linhas.forEach((linha) => {
+                const correspondeTexto = linha.textContent.toLocaleLowerCase("pt-BR").includes(termo);
+                const correspondeStatus = !statusSelecionado || linha.dataset.status === statusSelecionado;
+                const visivel = correspondeTexto && correspondeStatus;
+                linha.hidden = !visivel;
+                if (visivel) totalVisivel++;
+            });
+
+            contador.textContent = totalVisivel;
+            mensagem.hidden = totalVisivel > 0 || linhas.length === 0;
+        }
+
+        pesquisa.addEventListener("input", filtrarEmprestimos);
+        filtro.addEventListener("change", filtrarEmprestimos);
+    })();
+    </script>
+</body>
+</html>

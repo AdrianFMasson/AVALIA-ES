@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -11,35 +10,9 @@
     <link rel="stylesheet" href="/static/css/dashboard_user.css">
     <script>
         (() => {
-            let verificandoHistorico = false;
-
-            window.addEventListener("pageshow", async (evento) => {
-                const navegacao = performance.getEntriesByType("navigation")[0];
-                const restauradaPeloHistorico = evento.persisted || (navegacao && navegacao.type === "back_forward");
-
-                if (!restauradaPeloHistorico || verificandoHistorico) return;
-
-                verificandoHistorico = true;
-
-                try {
-                    const resposta = await fetch("/encerrar-sessao", {
-                        method: "POST",
-                        credentials: "same-origin",
-                        cache: "no-store",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: "{}"
-                    });
-
-                    if (resposta.redirected) {
-                        window.location.replace("/login");
-                        return;
-                    }
-
-                    window.location.replace("/login");
-                } catch (erro) {
-                    window.location.replace("/login");
+            window.addEventListener("pageshow", (evento) => {
+                if (evento.persisted) {
+                    window.location.reload();
                 }
             });
         })();
@@ -59,11 +32,11 @@
                     <span class="icone">⌂</span>
                     <span>Dashboard</span>
                 </a>
-                <a href="/pedidos" class="item-menu">
+                <a href="/user_pedidos" class="item-menu">
                     <span class="icone">▤</span>
                     <span>Meus Pedidos</span>
                 </a>
-                <a href="/emprestimos" class="item-menu">
+                <a href="/user_emprestimos" class="item-menu">
                     <span class="icone">⚙</span>
                     <span>Meus Empréstimos</span>
                 </a>

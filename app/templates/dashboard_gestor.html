@@ -3,8 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, private">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>Dashboard do Gestor | The Iron Compass</title>
     <link rel="stylesheet" href="/static/css/dashboard_gestor.css">
+    <script>
+        (() => {
+            window.addEventListener("pageshow", (evento) => {
+                if (evento.persisted) {
+                    window.location.reload();
+                }
+            });
+        })();
+    </script>
 </head>
 <body>
     <div class="layout">

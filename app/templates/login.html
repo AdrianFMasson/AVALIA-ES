@@ -28,7 +28,7 @@
                     <label for="senha">Senha</label>
                     <div class="campo-senha">
                         <input type="password" id="senha" name="senha" placeholder="Digite sua senha" autocomplete="current-password" required>
-                        <button class="botao-visualizar-senha" type="button" id="alternar-senha" aria-label="Mostrar senha" aria-controls="senha">◉</button>
+                        <button class="botao-visualizar-senha" type="button" id="alternar-senha" aria-label="Mostrar senha" aria-controls="senha" aria-pressed="false">◉</button>
                     </div>
                 </div>
 
@@ -59,6 +59,8 @@
             const mostrar = campoSenha.type === "password";
             campoSenha.type = mostrar ? "text" : "password";
             botaoSenha.setAttribute("aria-label", mostrar ? "Ocultar senha" : "Mostrar senha");
+            botaoSenha.setAttribute("aria-pressed", String(mostrar));
+            campoSenha.focus();
         });
 
         formulario.addEventListener("submit", async (evento) => {
@@ -76,16 +78,12 @@
                         "Accept": "application/json"
                     },
                     credentials: "same-origin",
+                    cache: "no-store",
                     body: JSON.stringify({
                         usuario: campoEmail.value.trim(),
                         senha: campoSenha.value
                     })
                 });
-
-                if (resposta.redirected) {
-                    window.location.href = resposta.url;
-                    return;
-                }
 
                 const resultado = await resposta.json().catch(() => ({}));
 
@@ -98,7 +96,12 @@
                 }
 
                 if (resultado.url) {
-                    window.location.href = resultado.url;
+                    window.location.replace(resultado.url);
+                    return;
+                }
+
+                if (resposta.redirected) {
+                    window.location.replace(resposta.url);
                     return;
                 }
 
