@@ -1,0 +1,45 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#102D32">
+    <title>Login | THE IRON COMPASS</title>
+    <link rel="stylesheet" href="/static/css/login.css">
+</head>
+<body>
+    <main class="pagina-login">
+        <section class="painel-login" aria-labelledby="titulo-login">
+            <header class="cabecalho-login">
+                <img class="simbolo-bussola" src="/static/imagens/compasso.svg" alt="Compasso ornamental do The Iron Compass">
+                <p class="nome-sistema">THE IRON COMPASS</p>
+                <h1 id="titulo-login">Acessar sua conta</h1>
+                <p class="descricao-login">Entre para acessar o sistema de empréstimo de equipamentos.</p>
+            </header>
+            <form class="formulario-login" id="formulario-login" method="post">
+                <div class="campo-formulario">
+                    <label for="email">E-mail</label>
+                    <input type="email" id="email" name="email" placeholder="Digite seu e-mail" autocomplete="username" required>
+                </div>
+                <div class="campo-formulario">
+                    <label for="senha">Senha</label>
+                    <div class="campo-senha">
+                        <input type="password" id="senha" name="senha" placeholder="Digite sua senha" autocomplete="current-password" required>
+                        <button class="botao-visualizar-senha" type="button" id="alternar-senha" aria-label="Mostrar senha" aria-controls="senha">◉</button>
+                    </div>
+                </div>
+                <div class="opcoes-login">
+                    <a class="link-recuperar-senha" href="/recuperar-senha">Esqueci minha senha</a>
+                </div>
+                <p class="mensagem-login" id="mensagem-login" role="alert" aria-live="polite" hidden></p>
+                <button class="botao-entrar" type="submit">ENTRAR</button>
+            </form>
+            <footer class="rodape-login">
+                <p>Não possui uma conta?</p>
+                <a class="link-cadastro" href="/cadastro">Criar uma conta</a>
+            </footer>
+        </section>
+    </main>
+</body>
+</html>

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard do Gestor | The Iron Compass</title>
+    <link rel="stylesheet" href="/static/css/dashboard_gestor.css">
+</head>
+<body>
+    <div class="layout">
+        <aside class="menu-lateral">
+            <div class="identidade">
+                <img src="/static/imagens/compasso.svg" alt="Compasso The Iron Compass" class="logo">
+                <h2>THE IRON COMPASS</h2>
+                <p>Sistema de Empréstimos</p>
+            </div>
+
+            <nav class="navegacao">
+                <a href="/dashboard-gestor" class="item-menu ativo">
+                    <span class="icone">⌂</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/usuarios" class="item-menu">
+                    <span class="icone">♙</span>
+                    <span>Usuários</span>
+                </a>
+                <a href="/equipamentos" class="item-menu">
+                    <span class="icone">⚙</span>
+                    <span>Equipamentos</span>
+                </a>
+                <a href="/emprestimos" class="item-menu">
+                    <span class="icone">⚒</span>
+                    <span>Empréstimos</span>
+                </a>
+                <a href="/pedidos" class="item-menu">
+                    <span class="icone">▤</span>
+                    <span>Pedidos</span>
+                </a>
+                <a href="/gestor_relatorios" class="item-menu">
+                    <span class="icone">▥</span>
+                    <span>Relatórios</span>
+                </a>
+            </nav>
+
+            <div class="rodape-menu">
+                <a href="/logout" class="item-menu sair">
+                    <span class="icone">⇥</span>
+                    <span>Sair</span>
+                </a>
+            </div>
+        </aside>
+
+        <main class="conteudo-principal">
+            <header class="cabecalho">
+                <div class="titulo-pagina">
+                    <p class="subtitulo">CENTRAL DE GESTÃO</p>
+                    <h1>Dashboard</h1>
+                    <p>Acompanhe os equipamentos, pedidos e empréstimos do sistema.</p>
+                </div>
+
+                <div class="informacoes-usuario">
+                    <div class="avatar-usuario">♙</div>
+                    <div class="dados-usuario">
+                        <span id="nomeUsuario">Gestor</span>
+                        <small id="perfilUsuario">Gestor</small>
+                    </div>
+                </div>
+            </header>
+
+            <section class="secao-indicadores">
+                <article class="cartao-indicador">
+                    <div class="indicador-topo">
+                        <span>Equipamentos cadastrados</span>
+                        <span class="icone-indicador">⚙</span>
+                    </div>
+                    <strong id="totalEquipamentos">0</strong>
+                    <p>Total de equipamentos no sistema</p>
+                </article>
+
+                <article class="cartao-indicador">
+                    <div class="indicador-topo">
+                        <span>Pedidos pendentes</span>
+                        <span class="icone-indicador">◷</span>
+                    </div>
+                    <strong id="pedidosPendentes">0</strong>
+                    <p>Solicitações aguardando análise</p>
+                </article>
+
+                <article class="cartao-indicador">
+                    <div class="indicador-topo">
+                        <span>Empréstimos ativos</span>
+                        <span class="icone-indicador">⚒</span>
+                    </div>
+                    <strong id="emprestimosAtivos">0</strong>
+                    <p>Equipamentos atualmente emprestados</p>
+                </article>
+
+                <article class="cartao-indicador">
+                    <div class="indicador-topo">
+                        <span>Devoluções atrasadas</span>
+                        <span class="icone-indicador">◴</span>
+                    </div>
+                    <strong id="devolucoesAtrasadas">0</strong>
+                    <p>Empréstimos fora do prazo previsto</p>
+                </article>
+            </section>
+
+            <section class="secao-conteudo">
+                <article class="painel painel-pedidos">
+                    <div class="cabecalho-painel">
+                        <div>
+                            <h2>Pedidos recentes</h2>
+                            <p>Acompanhe as solicitações dos usuários.</p>
+                        </div>
+                        <a href="/gestor_pedidos" class="link-painel">Ver todos</a>
+                    </div>
+
+                    <div class="area-tabela">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Nº do pedido</th>
+                                    <th>Solicitante</th>
+                                    <th>Equipamento</th>
+                                    <th>Data</th>
+                                    <th>Status</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="listaPedidos">
+                                <tr>
+                                    <td colspan="6" class="mensagem-vazia">
+                                        Nenhum pedido encontrado.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </article>
+
+                <article class="painel painel-emprestimos">
+                    <div class="cabecalho-painel">
+                        <div>
+                            <h2>Empréstimos recentes</h2>
+                            <p>Consulte os empréstimos e os prazos de devolução.</p>
+                        </div>
+                        <a href="/gestor_emprestimos" class="link-painel">Ver todos</a>
+                    </div>
+
+                    <div class="area-tabela">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Nº do empréstimo</th>
+                                    <th>Usuário</th>
+                                    <th>Equipamento</th>
+                                    <th>Devolução prevista</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="listaEmprestimos">
+                                <tr>
+                                    <td colspan="5" class="mensagem-vazia">
+                                        Nenhum empréstimo encontrado.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </article>
+            </section>
+
+            <footer class="rodape-pagina">
+                <p>THE IRON COMPASS — Sistema de Gerenciamento de Empréstimos</p>
+            </footer>
+        </main>
+    </div>
+</body>
+</html>

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | The Iron Compass</title>
+    <link rel="stylesheet" href="/static/css/dashboard_user.css">
+</head>
+<body>
+    <div class="layout">
+        <aside class="menu-lateral">
+            <div class="identidade">
+                <img src="/static/imagens/compasso.svg" alt="Compasso The Iron Compass" class="logo">
+                <h2>THE IRON COMPASS</h2>
+                <p>Sistema de Empréstimos</p>
+            </div>
+
+            <nav class="navegacao">
+                <a href="/dashboard-user" class="item-menu ativo">
+                    <span class="icone">⌂</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/pedidos" class="item-menu">
+                    <span class="icone">▤</span>
+                    <span>Meus Pedidos</span>
+                </a>
+                <a href="/emprestimos" class="item-menu">
+                    <span class="icone">⚙</span>
+                    <span>Meus Empréstimos</span>
+                </a>
+                <a href="#" class="item-menu" onclick="event.preventDefault();" aria-disabled="true">
+                    <span class="icone">♙</span>
+                    <span>Meu Perfil</span>
+                </a>
+            </nav>
+
+            <div class="rodape-menu">
+                <a href="/logout" class="item-menu sair">
+                    <span class="icone">⇥</span>
+                    <span>Sair</span>
+                </a>
+            </div>
+        </aside>
+
+        <main class="conteudo-principal">
+            <header class="cabecalho">
+                <div class="titulo-pagina">
+                    <p class="subtitulo">CENTRAL DO USUÁRIO</p>
+                    <h1>Dashboard</h1>
+                    <p>Acompanhe seus pedidos e empréstimos de equipamentos.</p>
+                </div>
+
+                <div class="informacoes-usuario">
+                    <div class="avatar-usuario">♙</div>
+                    <div class="dados-usuario">
+                        <span id="nomeUsuario">Usuário</span>
+                        <small id="perfilUsuario">Discente</small>
+                    </div>
+                </div>
+            </header>
+
+            <section class="secao-indicadores">
+                <article class="cartao-indicador">
+                    <div class="indicador-topo">
+                        <span>Meus pedidos</span>
+                        <span class="icone-indicador">▤</span>
+                    </div>
+                    <strong id="totalPedidos">0</strong>
+                    <p>Total de pedidos realizados</p>
+                </article>
+
+                <article class="cartao-indicador">
+                    <div class="indicador-topo">
+                        <span>Pedidos em análise</span>
+                        <span class="icone-indicador">◷</span>
+                    </div>
+                    <strong id="pedidosEmAnalise">0</strong>
+                    <p>Aguardando avaliação</p>
+                </article>
+
+                <article class="cartao-indicador">
+                    <div class="indicador-topo">
+                        <span>Empréstimos ativos</span>
+                        <span class="icone-indicador">⚒</span>
+                    </div>
+                    <strong id="emprestimosAtivos">0</strong>
+                    <p>Empréstimos ainda não devolvidos</p>
+                </article>
+
+                <article class="cartao-indicador">
+                    <div class="indicador-topo">
+                        <span>Devoluções pendentes</span>
+                        <span class="icone-indicador">◴</span>
+                    </div>
+                    <strong id="devolucoesPendentes">0</strong>
+                    <p>Equipamentos a devolver</p>
+                </article>
+            </section>
+
+            <section class="secao-conteudo">
+                <article class="painel painel-pedidos">
+                    <div class="cabecalho-painel">
+                        <div>
+                            <h2>Meus pedidos recentes</h2>
+                            <p>Acompanhe o andamento das suas solicitações.</p>
+                        </div>
+                        <a href="/pedidos" class="link-painel">Ver todos</a>
+                    </div>
+
+                    <div class="area-tabela">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Nº do pedido</th>
+                                    <th>Equipamento</th>
+                                    <th>Data do pedido</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="listaPedidos">
+                                <tr>
+                                    <td colspan="4" class="mensagem-vazia">
+                                        Nenhum pedido encontrado.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </article>
+
+                <article class="painel painel-emprestimos">
+                    <div class="cabecalho-painel">
+                        <div>
+                            <h2>Meus empréstimos</h2>
+                            <p>Consulte os equipamentos sob sua responsabilidade.</p>
+                        </div>
+                        <a href="/emprestimos" class="link-painel">Ver todos</a>
+                    </div>
+
+                    <div class="area-tabela">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Equipamento</th>
+                                    <th>Retirada</th>
+                                    <th>Devolução prevista</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="listaEmprestimos">
+                                <tr>
+                                    <td colspan="4" class="mensagem-vazia">
+                                        Nenhum empréstimo encontrado.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </article>
+            </section>
+
+            <footer class="rodape-pagina">
+                <p>THE IRON COMPASS — Sistema de Gerenciamento de Empréstimos</p>
+            </footer>
+        </main>
+    </div>
+</body>
+</html>

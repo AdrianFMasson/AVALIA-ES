@@ -1,0 +1,360 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap');
+
+:root{
+    --azul-profundo:#102d32;
+    --azul-escuro:#07191c;
+    --azul-petroleo:#19464a;
+    --cobre:#b87548;
+    --cobre-claro:#d69a6c;
+    --dourado:#c5a15a;
+    --marfim:#f3e8d0;
+    --marfim-escuro:#d8c8aa;
+    --texto-secundario:#c9c0ad;
+    --erro:#ff9b8f;
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+html{
+    min-height:100%;
+    font-size:16px;
+}
+
+body{
+    position:relative;
+    isolation:isolate;
+    min-height:100vh;
+    min-height:100dvh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:32px 20px;
+    color:var(--marfim);
+    background:var(--azul-profundo);
+    font-family:'Roboto',Arial,sans-serif;
+}
+
+body::before{
+    position:fixed;
+    inset:0;
+    z-index:-1;
+    content:"";
+    background:
+        linear-gradient(135deg,rgba(5,20,23,.48),rgba(5,20,23,.72)),
+        url("/static/imagens/fundo.png") center center/cover no-repeat;
+    pointer-events:none;
+}
+
+.pagina-login{
+    position:relative;
+    z-index:1;
+    width:100%;
+    min-height:calc(100vh - 64px);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.painel-login{
+    position:relative;
+    width:100%;
+    max-width:460px;
+    padding:38px 40px 30px;
+    overflow:hidden;
+    background:rgba(7,25,28,.78);
+    border:1px solid rgba(197,161,90,.58);
+    border-radius:8px;
+    box-shadow:0 18px 55px rgba(0,0,0,.45),inset 0 0 28px rgba(184,117,72,.07);
+    backdrop-filter:blur(9px);
+    -webkit-backdrop-filter:blur(9px);
+}
+
+.painel-login::before,
+.painel-login::after{
+    position:absolute;
+    width:46px;
+    height:46px;
+    content:"";
+    pointer-events:none;
+}
+
+.painel-login::before{
+    top:9px;
+    left:9px;
+    border-top:2px solid var(--cobre);
+    border-left:2px solid var(--cobre);
+}
+
+.painel-login::after{
+    right:9px;
+    bottom:9px;
+    border-right:2px solid var(--cobre);
+    border-bottom:2px solid var(--cobre);
+}
+
+.cabecalho-login{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    text-align:center;
+    margin-bottom:30px;
+}
+
+.simbolo-bussola{
+    width:76px;
+    height:76px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin-bottom:14px;
+    color:var(--dourado);
+    border:1px solid rgba(197,161,90,.7);
+    border-radius:50%;
+    background:rgba(16,45,50,.65);
+    box-shadow:0 0 22px rgba(197,161,90,.12),inset 0 0 15px rgba(197,161,90,.08);
+    font-size:42px;
+}
+
+.simbolo-bussola img{
+    width:66%;
+    height:66%;
+    object-fit:contain;
+}
+
+.nome-sistema{
+    color:var(--dourado);
+    font-family:'Cinzel',Georgia,serif;
+    font-size:clamp(20px,5vw,25px);
+    font-weight:700;
+    letter-spacing:2px;
+    line-height:1.4;
+}
+
+.descricao-login{
+    margin-top:8px;
+    color:var(--texto-secundario);
+    font-size:13px;
+    font-weight:300;
+    letter-spacing:1.2px;
+}
+
+.painel-login h1{
+    margin-bottom:25px;
+    color:var(--marfim);
+    font-family:'Cinzel',Georgia,serif;
+    font-size:23px;
+    font-weight:500;
+    text-align:center;
+}
+
+.formulario-login{
+    display:flex;
+    flex-direction:column;
+    gap:19px;
+}
+
+.campo-formulario{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+
+.campo-formulario label{
+    color:var(--marfim-escuro);
+    font-size:13px;
+    font-weight:500;
+    letter-spacing:.5px;
+}
+
+.campo-formulario input{
+    width:100%;
+    min-height:48px;
+    padding:12px 14px;
+    color:var(--marfim);
+    background:rgba(4,17,19,.66);
+    border:1px solid rgba(197,161,90,.4);
+    border-radius:4px;
+    outline:none;
+    font-family:'Roboto',Arial,sans-serif;
+    font-size:15px;
+    font-weight:400;
+    text-transform:none;
+    transition:border-color .2s ease,box-shadow .2s ease,background .2s ease;
+}
+
+.campo-formulario input::placeholder{
+    color:rgba(243,232,208,.48);
+    text-transform:none;
+}
+
+.campo-formulario input:focus{
+    background:rgba(4,17,19,.88);
+    border-color:var(--dourado);
+    box-shadow:0 0 0 3px rgba(197,161,90,.12);
+}
+
+.campo-senha{
+    position:relative;
+    display:flex;
+    align-items:center;
+}
+
+.campo-senha input{
+    padding-right:52px;
+}
+
+.botao-visualizar-senha{
+    position:absolute;
+    top:50%;
+    right:8px;
+    width:36px;
+    height:36px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transform:translateY(-50%);
+    color:var(--dourado);
+    background:transparent;
+    border:0;
+    border-radius:4px;
+    cursor:pointer;
+    font-size:18px;
+}
+
+.botao-visualizar-senha:hover{
+    color:var(--cobre-claro);
+    background:rgba(197,161,90,.08);
+}
+
+.botao-visualizar-senha:focus-visible,
+.link-recuperar-senha:focus-visible,
+.link-cadastro:focus-visible,
+.botao-entrar:focus-visible{
+    outline:2px solid var(--dourado);
+    outline-offset:3px;
+}
+
+.opcoes-login{
+    display:flex;
+    justify-content:flex-end;
+    align-items:center;
+    margin-top:-7px;
+}
+
+.link-recuperar-senha,
+.link-cadastro{
+    color:var(--cobre-claro);
+    font-size:13px;
+    text-decoration:none;
+    transition:color .2s ease;
+}
+
+.link-recuperar-senha:hover,
+.link-cadastro:hover{
+    color:var(--dourado);
+    text-decoration:underline;
+}
+
+.mensagem-login{
+    display:none;
+    padding:11px 12px;
+    color:var(--erro);
+    background:rgba(120,31,25,.2);
+    border:1px solid rgba(255,155,143,.4);
+    border-radius:4px;
+    font-size:13px;
+    line-height:1.5;
+}
+
+.mensagem-login.visivel{
+    display:block;
+}
+
+.botao-entrar{
+    width:100%;
+    min-height:49px;
+    margin-top:3px;
+    padding:13px 18px;
+    color:#17130c;
+    background:linear-gradient(135deg,var(--dourado),var(--cobre-claro));
+    border:1px solid var(--dourado);
+    border-radius:4px;
+    cursor:pointer;
+    font-family:'Cinzel',Georgia,serif;
+    font-size:14px;
+    font-weight:700;
+    letter-spacing:1.5px;
+    transition:filter .2s ease,transform .2s ease,box-shadow .2s ease;
+}
+
+.botao-entrar:hover{
+    filter:brightness(1.1);
+    box-shadow:0 5px 18px rgba(184,117,72,.22);
+    transform:translateY(-1px);
+}
+
+.botao-entrar:active{
+    transform:translateY(0);
+}
+
+.botao-entrar:disabled{
+    opacity:.65;
+    cursor:not-allowed;
+    transform:none;
+}
+
+.rodape-login{
+    margin-top:25px;
+    padding-top:20px;
+    color:var(--texto-secundario);
+    border-top:1px solid rgba(197,161,90,.22);
+    font-size:13px;
+    line-height:1.7;
+    text-align:center;
+}
+
+.link-cadastro{
+    margin-left:4px;
+    font-weight:500;
+}
+
+@media(max-width:520px){
+    body{
+        padding:18px 12px;
+    }
+    .pagina-login{
+        min-height:calc(100vh - 36px);
+    }
+    .painel-login{
+        padding:32px 23px 25px;
+    }
+    .cabecalho-login{
+        margin-bottom:25px;
+    }
+    .simbolo-bussola{
+        width:66px;
+        height:66px;
+        font-size:36px;
+    }
+    .painel-login h1{
+        font-size:21px;
+    }
+    .nome-sistema{
+        letter-spacing:1.4px;
+    }
+}
+
+@media(prefers-reduced-motion:reduce){
+    *,
+    *::before,
+    *::after{
+        scroll-behavior:auto!important;
+        transition:none!important;
+        animation:none!important;
+    }
+}

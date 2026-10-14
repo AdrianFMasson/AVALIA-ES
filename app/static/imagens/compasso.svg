@@ -1,0 +1,31 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <defs>
+    <linearGradient id="ouro" x1="20" y1="10" x2="80" y2="90" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E6C783"></stop>
+      <stop offset=".5" stop-color="#B87548"></stop>
+      <stop offset="1" stop-color="#F0D9A0"></stop>
+    </linearGradient>
+    <linearGradient id="metal" x1="30" y1="20" x2="70" y2="80" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F3E8D0"></stop>
+      <stop offset="1" stop-color="#B87548"></stop>
+    </linearGradient>
+  </defs>
+  <circle cx="50" cy="50" r="45" stroke="url(#ouro)" stroke-width="2.4"></circle>
+  <circle cx="50" cy="50" r="39" stroke="url(#ouro)" stroke-width=".8" stroke-dasharray="2 3"></circle>
+  <circle cx="50" cy="50" r="33" stroke="url(#ouro)" stroke-width="1.2"></circle>
+  <path d="M50 12 54 43 50 50 46 43 50 12Z" fill="url(#ouro)"></path>
+  <path d="M50 88 46 57 50 50 54 57 50 88Z" fill="url(#metal)"></path>
+  <path d="M12 50 43 46 50 50 43 54 12 50Z" fill="url(#ouro)"></path>
+  <path d="M88 50 57 54 50 50 57 46 88 50Z" fill="url(#metal)"></path>
+  <path d="M50 24 56 44 76 50 56 56 50 76 44 56 24 50 44 44 50 24Z" stroke="url(#ouro)" stroke-width="1.4" fill="#102D32"></path>
+  <path d="M50 35 54 47 50 50 46 47 50 35Z" fill="#D69A6C"></path>
+  <path d="M50 65 46 53 50 50 54 53 50 65Z" fill="#F3E8D0"></path>
+  <circle cx="50" cy="50" r="5" fill="#102D32" stroke="url(#ouro)" stroke-width="2"></circle>
+  <circle cx="50" cy="50" r="1.6" fill="#F3E8D0"></circle>
+  <path d="M50 3V9 M50 91V97 M3 50H9 M91 50H97" stroke="url(#ouro)" stroke-width="2" stroke-linecap="round"></path>
+  <circle cx="50" cy="5" r="1.8" fill="#D69A6C"></circle>
+  <circle cx="50" cy="95" r="1.8" fill="#D69A6C"></circle>
+  <circle cx="5" cy="50" r="1.8" fill="#D69A6C"></circle>
+  <circle cx="95" cy="50" r="1.8" fill="#D69A6C"></circle>
+</svg>
