@@ -17,11 +17,13 @@
                 <h1 id="titulo-login">Acessar sua conta</h1>
                 <p class="descricao-login">Entre para acessar o sistema de empréstimo de equipamentos.</p>
             </header>
-            <form class="formulario-login" id="formulario-login" method="post">
+
+            <form class="formulario-login" id="formulario-login">
                 <div class="campo-formulario">
                     <label for="email">E-mail</label>
-                    <input type="email" id="email" name="email" placeholder="Digite seu e-mail" autocomplete="username" required>
+                    <input type="email" id="email" name="usuario" placeholder="Digite seu e-mail" autocomplete="username" required>
                 </div>
+
                 <div class="campo-formulario">
                     <label for="senha">Senha</label>
                     <div class="campo-senha">
@@ -29,17 +31,87 @@
                         <button class="botao-visualizar-senha" type="button" id="alternar-senha" aria-label="Mostrar senha" aria-controls="senha">◉</button>
                     </div>
                 </div>
+
                 <div class="opcoes-login">
                     <a class="link-recuperar-senha" href="/recuperar-senha">Esqueci minha senha</a>
                 </div>
+
                 <p class="mensagem-login" id="mensagem-login" role="alert" aria-live="polite" hidden></p>
-                <button class="botao-entrar" type="submit">ENTRAR</button>
+                <button class="botao-entrar" id="botao-entrar" type="submit">ENTRAR</button>
             </form>
+
             <footer class="rodape-login">
                 <p>Não possui uma conta?</p>
                 <a class="link-cadastro" href="/cadastro">Criar uma conta</a>
             </footer>
         </section>
     </main>
+
+    <script>
+        const formulario = document.getElementById("formulario-login");
+        const campoEmail = document.getElementById("email");
+        const campoSenha = document.getElementById("senha");
+        const botaoSenha = document.getElementById("alternar-senha");
+        const botaoEntrar = document.getElementById("botao-entrar");
+        const mensagem = document.getElementById("mensagem-login");
+
+        botaoSenha.addEventListener("click", () => {
+            const mostrar = campoSenha.type === "password";
+            campoSenha.type = mostrar ? "text" : "password";
+            botaoSenha.setAttribute("aria-label", mostrar ? "Ocultar senha" : "Mostrar senha");
+        });
+
+        formulario.addEventListener("submit", async (evento) => {
+            evento.preventDefault();
+            mensagem.hidden = true;
+            mensagem.textContent = "";
+            botaoEntrar.disabled = true;
+            botaoEntrar.textContent = "ENTRANDO...";
+
+            try {
+                const resposta = await fetch("/api/login", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Accept": "application/json"
+                    },
+                    credentials: "same-origin",
+                    body: JSON.stringify({
+                        usuario: campoEmail.value.trim(),
+                        senha: campoSenha.value
+                    })
+                });
+
+                if (resposta.redirected) {
+                    window.location.href = resposta.url;
+                    return;
+                }
+
+                const resultado = await resposta.json().catch(() => ({}));
+
+                if (!resposta.ok) {
+                    mensagem.textContent = typeof resultado.detail === "string"
+                        ? resultado.detail
+                        : "Não foi possível entrar. Verifique seu e-mail e sua senha.";
+                    mensagem.hidden = false;
+                    return;
+                }
+
+                if (resultado.url) {
+                    window.location.href = resultado.url;
+                    return;
+                }
+
+                mensagem.textContent = "Login processado, mas o servidor não informou a página de destino.";
+                mensagem.hidden = false;
+            } catch (erro) {
+                mensagem.textContent = "Não foi possível conectar ao servidor. Tente novamente.";
+                mensagem.hidden = false;
+            } finally {
+                botaoEntrar.disabled = false;
+                botaoEntrar.textContent = "ENTRAR";
+            }
+        });
+    </script>
 </body>
 </html>

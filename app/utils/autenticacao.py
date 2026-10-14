@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta, timezone
 import secrets
 import jwt
-from sqlalchemy.exc import OperationalError
+from sqlalchemy.exc import SQLAlchemyError
 from sqlmodel import Session, select
 from config.Config import settings
 from entities.sessoes import Sessoes
@@ -9,9 +9,7 @@ from entities.sessoes import Sessoes
 
 def gerar_token_acesso(id_usuario: int, id_sessao: str) -> str:
     agora = datetime.now(timezone.utc)
-    expiracao = agora + timedelta(
-        minutes=settings.JWT_ACCESS_EXPIRE_MINUTES
-    )
+    expiracao = agora + timedelta(minutes=settings.JWT_ACCESS_EXPIRE_MINUTES)
     payload = {
         "sub": str(id_usuario),
         "sid": id_sessao,
@@ -42,16 +40,13 @@ def validar_token_acesso(token: str) -> dict:
 
 def criar_sessao(db: Session, id_usuario: int) -> tuple[Sessoes, str]:
     agora = datetime.now(timezone.utc)
-    expiracao = agora + timedelta(
-        minutes=settings.JWT_ACCESS_EXPIRE_MINUTES
-    )
+    expiracao = agora + timedelta(minutes=settings.JWT_ACCESS_EXPIRE_MINUTES)
 
     try:
-        # Invalida todas as sessões anteriores desse usuário.
         sessoes_anteriores = db.exec(
             select(Sessoes).where(
                 Sessoes.id_usuario == id_usuario,
-                Sessoes.ativa == True
+                Sessoes.ativa.is_(True)
             )
         ).all()
 
@@ -75,7 +70,7 @@ def criar_sessao(db: Session, id_usuario: int) -> tuple[Sessoes, str]:
         token = gerar_token_acesso(id_usuario, id_sessao)
         return nova_sessao, token
 
-    except OperationalError:
+    except SQLAlchemyError:
         db.rollback()
         raise
 
@@ -92,9 +87,13 @@ def obter_sessao_ativa(db: Session, id_sessao: str, id_usuario: int):
     agora = datetime.now(timezone.utc).replace(tzinfo=None)
 
     if sessao.dt_expiracao <= agora:
-        sessao.ativa = False
-        db.add(sessao)
-        db.commit()
+        try:
+            sessao.ativa = False
+            db.add(sessao)
+            db.commit()
+        except SQLAlchemyError:
+            db.rollback()
+            raise
         return None
 
     return sessao
@@ -106,7 +105,43 @@ def encerrar_sessao(db: Session, id_sessao: str) -> bool:
     if sessao is None or not sessao.ativa:
         return False
 
-    sessao.ativa = False
-    db.add(sessao)
-    db.commit()
-    return True
+    try:
+        sessao.ativa = False
+        db.add(sessao)
+        db.commit()
+        return True
+    except SQLAlchemyError:
+        db.rollback()
+        raise
+
+
+def encerrar_sessao_por_token(db: Session, token: str) -> bool:
+    if not token:
+        return False
+
+    try:
+        payload = validar_token_acesso(token)
+        id_sessao = payload.get("sid")
+        id_usuario = int(payload.get("sub"))
+
+        if not id_sessao:
+            return False
+
+        sessao = db.get(Sessoes, id_sessao)
+
+        if sessao is None or sessao.id_usuario != id_usuario:
+            return False
+
+        if not sessao.ativa:
+            return False
+
+        sessao.ativa = False
+        db.add(sessao)
+        db.commit()
+        return True
+
+    except (jwt.InvalidTokenError, ValueError, TypeError, KeyError):
+        return False
+    except SQLAlchemyError:
+        db.rollback()
+        raise

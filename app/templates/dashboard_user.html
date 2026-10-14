@@ -1,10 +1,49 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, private">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>Dashboard | The Iron Compass</title>
     <link rel="stylesheet" href="/static/css/dashboard_user.css">
+    <script>
+        (() => {
+            let verificandoHistorico = false;
+
+            window.addEventListener("pageshow", async (evento) => {
+                const navegacao = performance.getEntriesByType("navigation")[0];
+                const restauradaPeloHistorico = evento.persisted || (navegacao && navegacao.type === "back_forward");
+
+                if (!restauradaPeloHistorico || verificandoHistorico) return;
+
+                verificandoHistorico = true;
+
+                try {
+                    const resposta = await fetch("/encerrar-sessao", {
+                        method: "POST",
+                        credentials: "same-origin",
+                        cache: "no-store",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: "{}"
+                    });
+
+                    if (resposta.redirected) {
+                        window.location.replace("/login");
+                        return;
+                    }
+
+                    window.location.replace("/login");
+                } catch (erro) {
+                    window.location.replace("/login");
+                }
+            });
+        })();
+    </script>
 </head>
 <body>
     <div class="layout">
