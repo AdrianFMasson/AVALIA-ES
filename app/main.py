@@ -217,6 +217,28 @@ def dashboard_gestor(request: Request, db: Session = Depends(database.get_db)):
     )
     return resposta_sem_cache(resposta)
 
+
+@app.get("/user_perfil")
+def user_perfil(request: Request, db: Session = Depends(database.get_db)):
+    autenticacao = obter_usuario_autenticado(request, db)
+
+    if autenticacao is None:
+        return redirecionar_para_login()
+
+    if autenticacao["perfil"] != "DISCENTE":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Seu perfil não tem permissão para acessar seu perfil de usuário."
+        )
+
+    resposta = templates.TemplateResponse(
+        request=request,
+        name="user_perfil.html",
+        context={"usuario": autenticacao["usuario"]}
+    )
+    return resposta_sem_cache(resposta)
+
+
 @app.post("/encerrar-sessao")
 def encerrar_sessao(request: Request, db: Session = Depends(database.get_db)):
     token = request.cookies.get("access_token")

@@ -1,5 +1,6 @@
+
 from fastapi import APIRouter, Depends, HTTPException, Request, status
-from fastapi.responses import RedirectResponse
+from fastapi.responses import JSONResponse
 from sqlmodel import Session
 from dependencies.dependencies import database
 from controller import LoginController
@@ -51,10 +52,11 @@ def realizar_login(
 
         _, token = criar_sessao(db, usuario["id_usuario"])
 
-        resposta = RedirectResponse(
-            url=destino,
-            status_code=status.HTTP_303_SEE_OTHER
+        resposta = JSONResponse(
+            content={"url": destino},
+            status_code=status.HTTP_200_OK
         )
+
         resposta.set_cookie(
             key="access_token",
             value=token,
@@ -64,11 +66,17 @@ def realizar_login(
             max_age=settings.JWT_ACCESS_EXPIRE_MINUTES * 60,
             path="/"
         )
-        resposta.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, private"
+
+        resposta.headers["Cache-Control"] = (
+            "no-store, no-cache, must-revalidate, private, max-age=0"
+        )
         resposta.headers["Pragma"] = "no-cache"
         resposta.headers["Expires"] = "0"
+
         return resposta
 
+    except HTTPException:
+        raise
     except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

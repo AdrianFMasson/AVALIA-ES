@@ -95,17 +95,12 @@
                     return;
                 }
 
-                if (resultado.url) {
-                    window.location.replace(resultado.url);
+                if (typeof resultado.url === "string" && resultado.url.startsWith("/")) {
+                    window.location.href = resultado.url;
                     return;
                 }
 
-                if (resposta.redirected) {
-                    window.location.replace(resposta.url);
-                    return;
-                }
-
-                mensagem.textContent = "Login processado, mas o servidor não informou a página de destino.";
+                mensagem.textContent = "Login processado, mas o servidor não informou uma página de destino válida.";
                 mensagem.hidden = false;
             } catch (erro) {
                 mensagem.textContent = "Não foi possível conectar ao servidor. Tente novamente.";

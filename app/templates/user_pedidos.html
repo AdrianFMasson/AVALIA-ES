@@ -13,12 +13,13 @@
     <div class="layout">
         <aside class="menu-lateral">
             <div class="marca">
-                <div class="marca-icone">⚙</div>
+                <img src="/static/imagens/compasso.svg" alt="Símbolo do The Iron Compass" class="simbolo-sistema">
                 <div class="marca-texto">
                     <h2>THE IRON COMPASS</h2>
                     <span>GESTÃO DE EQUIPAMENTOS</span>
                 </div>
             </div>
+
             <nav class="navegacao">
                 <a href="/dashboard-user" class="item-menu">
                     <span class="icone">⌂</span>
@@ -32,7 +33,12 @@
                     <span class="icone">▤</span>
                     <span>Meus Pedidos</span>
                 </a>
+                <a href="/user_perfil" class="item-menu">
+                    <span class="icone">♙</span>
+                    <span>Meu Perfil</span>
+                </a>
             </nav>
+
             <div class="rodape-menu">
                 <span>THE IRON COMPASS</span>
                 <small>Sistema de empréstimos</small>
@@ -46,6 +52,7 @@
                     <h1>Meus Pedidos</h1>
                     <p>Consulte os pedidos vinculados à sua conta.</p>
                 </div>
+
                 <div class="acoes-cabecalho">
                     <span class="nome-usuario">{{ usuario.nome if usuario and usuario.nome else "Usuário" }}</span>
                     <form action="/logout" method="post">
@@ -66,13 +73,12 @@
                     </div>
                 </div>
 
-            
-
                 <div class="filtros">
                     <div class="campo-pesquisa">
                         <label for="pesquisaPedidos">Pesquisar</label>
                         <input type="search" id="pesquisaPedidos" placeholder="Pesquisar nos pedidos...">
                     </div>
+
                     <div class="campo-filtro">
                         <label for="filtroStatus">Filtrar por status</label>
                         <select id="filtroStatus">
@@ -125,6 +131,7 @@
                         </tbody>
                     </table>
                 </div>
+
                 <p id="mensagemFiltro" class="mensagem-filtro" hidden>Nenhum pedido corresponde à pesquisa.</p>
             </section>
 
@@ -153,8 +160,12 @@
                 const correspondeTexto = linha.textContent.toLocaleLowerCase("pt-BR").includes(termo);
                 const correspondeStatus = !statusSelecionado || linha.dataset.status === statusSelecionado;
                 const mostrar = correspondeTexto && correspondeStatus;
+
                 linha.hidden = !mostrar;
-                if (mostrar) visiveis++;
+
+                if (mostrar) {
+                    visiveis++;
+                }
             });
 
             contador.textContent = visiveis;

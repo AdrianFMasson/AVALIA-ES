@@ -1,0 +1,136 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#102b33">
+    <title>Meu Perfil | THE IRON COMPASS</title>
+    <link rel="stylesheet" href="/static/css/user_perfil.css">
+</head>
+<body>
+    <div class="estrutura-pagina">
+        <aside class="menu-lateral">
+            <div class="identidade-sistema">
+                <img src="/static/imagens/compasso.svg" alt="Símbolo do The Iron Compass" class="simbolo-sistema">
+                <div>
+                    <h1>THE IRON COMPASS</h1>
+                    <p>Sistema de Equipamentos</p>
+                </div>
+            </div>
+
+            <div class="divisor-menu"></div>
+
+            <p class="titulo-menu">MENU PRINCIPAL</p>
+
+            <nav class="navegacao">
+                <a href="/dashboard-user" class="item-menu">
+                    <span class="icone-menu">⌂</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/user_pedidos" class="item-menu">
+                    <span class="icone-menu">▤</span>
+                    <span>Meus Pedidos</span>
+                </a>
+                <a href="/user_emprestimos" class="item-menu">
+                    <span class="icone-menu">⚒</span>
+                    <span>Meus Empréstimos</span>
+                </a>
+                <a href="/user_perfil" class="item-menu ativo" aria-current="page">
+                    <span class="icone-menu">♙</span>
+                    <span>Meu Perfil</span>
+                </a>
+            </nav>
+
+            <div class="rodape-menu">
+                <div class="detalhe-ornamental">✦ ━━━━━━━━━ ✦</div>
+                <p>Conhecimento, precisão e confiança.</p>
+                <span>THE IRON COMPASS</span>
+            </div>
+        </aside>
+
+        <main class="conteudo-principal">
+            <header class="cabecalho-pagina">
+                <div class="titulo-pagina">
+                    <span class="sobretitulo">CONTA DO USUÁRIO</span>
+                    <h2>Meu Perfil</h2>
+                    <p>Consulte suas informações pessoais.</p>
+                </div>
+
+                <div class="acoes-cabecalho">
+                    <div class="identificacao-usuario">
+                        <span class="avatar-usuario">♙</span>
+                        <div>
+                            <span class="rotulo-usuario">Usuário conectado</span>
+                            <strong>{{ usuario.nome }}</strong>
+                        </div>
+                    </div>
+
+                    <form action="/logout" method="post">
+                        <button type="submit" class="botao-sair">Sair <span>↗</span></button>
+                    </form>
+                </div>
+            </header>
+
+            <section class="cartao-perfil">
+                <div class="cabecalho-cartao">
+                    <div class="icone-identificacao">♙</div>
+                    <div>
+                        <h3>Informações pessoais</h3>
+                        <p>Dados associados à sua conta no sistema.</p>
+                    </div>
+                </div>
+
+                <div class="linha-ornamental">
+                    <span></span>
+                    <span>✦</span>
+                    <span></span>
+                </div>
+
+                <div class="resumo-perfil">
+                    <div class="avatar-perfil">♙</div>
+                    <div>
+                        <h4>{{ usuario.nome }}</h4>
+                        <p>Discente</p>
+                    </div>
+                    <span class="selo-perfil"><span></span> Conta ativa</span>
+                </div>
+
+                <form class="formulario-perfil" id="formulario-perfil">
+                    <div class="campo-perfil">
+                        <label for="nome">Nome completo</label>
+                        <input type="text" id="nome" name="nome" value="{{ usuario.nome }}" autocomplete="name" readonly>
+                        <small>Para alterar seu nome, entre em contato com o responsável pelo sistema.</small>
+                    </div>
+
+                    <div class="campo-perfil">
+                        <label for="email">E-mail</label>
+                        <input type="email" id="email" name="email" value="{{ usuario.email }}" autocomplete="email" readonly>
+                        <small>Seu e-mail está associado à sua conta de acesso.</small>
+                    </div>
+
+                    <div class="campo-perfil">
+                        <label for="contato">Contato</label>
+                        <input type="tel" id="contato" name="contato" placeholder="Contato não cadastrado" autocomplete="tel" readonly>
+                        <small>O contato será exibido quando estiver disponível no cadastro.</small>
+                    </div>
+
+                    <div class="aviso-perfil">
+                        <span class="icone-aviso">ⓘ</span>
+                        <p>Suas informações são exibidas conforme os dados cadastrados no sistema. A edição ainda não está habilitada nesta tela.</p>
+                    </div>
+
+                    <div class="acoes-formulario">
+                        <button type="button" class="botao-salvar" disabled>Salvar alterações</button>
+                    </div>
+                </form>
+            </section>
+
+            <footer class="rodape-pagina">
+                <span>THE IRON COMPASS</span>
+                <span>Sistema de gerenciamento de equipamentos</span>
+            </footer>
+        </main>
+    </div>
+</body>
+</html>
