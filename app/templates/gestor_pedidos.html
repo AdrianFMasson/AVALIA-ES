@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão de Pedidos | The Iron Compass</title>
+    <link rel="stylesheet" href="/static/css/gestor_pedidos.css">
+</head>
+<body>
+    <aside class="menu-lateral">
+        <div class="identidade">
+            <img src="/static/imagens/compasso.svg" alt="Logo The Iron Compass" class="logo">
+            <div class="identidade-texto">
+                <h1>THE IRON COMPASS</h1>
+                <p>Sistema de Gestão</p>
+            </div>
+        </div>
+        <div class="separador-menu"></div>
+        <p class="titulo-menu">MENU PRINCIPAL</p>
+        <nav class="navegacao">
+            <a href="/dashboard-gestor" class="item-menu"><span class="icone">⌂</span><span>Dashboard</span></a>
+            <a href="/gestor_users" class="item-menu"><span class="icone">♙</span><span>Usuários</span></a>
+            <a href="/pedidos" class="item-menu ativo"><span class="icone">▤</span><span>Pedidos</span></a>
+            <a href="/equipamentos" class="item-menu"><span class="icone">⚙</span><span>Equipamentos</span></a>
+            <a href="/emprestimos" class="item-menu"><span class="icone">⇄</span><span>Empréstimos</span></a>
+            <a href="/gestor_relatorios" class="item-menu"><span class="icone">▥</span><span>Relatórios</span></a>
+        </nav>
+        <div class="rodape-menu">
+            <div class="separador-menu"></div>
+            <p>THE IRON COMPASS</p>
+            <span>Gestão de pedidos</span>
+        </div>
+    </aside>
+
+    <main class="conteudo-principal">
+        <header class="cabecalho-pagina">
+            <div>
+                <p class="caminho-pagina">Gestão / Pedidos</p>
+                <h2>Gestão de Pedidos</h2>
+                <p class="descricao-pagina">Consulte os pedidos cadastrados e atualize seus status.</p>
+            </div>
+        </header>
+
+        <section class="painel">
+            <div class="resumo">
+                <div>
+                    <span>Total de pedidos</span>
+                    <strong id="totalPedidos">0</strong>
+                </div>
+                <div>
+                    <span>Pedidos abertos</span>
+                    <strong id="totalAbertos">0</strong>
+                </div>
+                <div>
+                    <span>Em análise</span>
+                    <strong id="totalAnalise">0</strong>
+                </div>
+                <div>
+                    <span>Encerrados</span>
+                    <strong id="totalEncerrados">0</strong>
+                </div>
+            </div>
+
+            <div id="mensagemTela" class="mensagem" role="status" aria-live="polite"></div>
+
+            <div class="filtros">
+                <div class="campo">
+                    <label for="busca">Buscar pedido</label>
+                    <input type="search" id="busca" placeholder="Digite o ID do pedido...">
+                </div>
+                <div class="campo">
+                    <label for="filtroStatus">Filtrar por status</label>
+                    <select id="filtroStatus">
+                        <option value="">Todos os status</option>
+                        <option value="ABERTO">Aberto</option>
+                        <option value="EM_ANALISE">Em análise</option>
+                        <option value="ENCERRADO">Encerrado</option>
+                    </select>
+                </div>
+                <button type="button" id="botaoAtualizar" class="botao botao-principal">Atualizar lista</button>
+            </div>
+
+            <div class="tabela-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Discente (ID)</th>
+                            <th>Equipamento (ID)</th>
+                            <th>Data do pedido</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="listaPedidos">
+                        <tr><td colspan="6" class="vazio">Carregando pedidos...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="rodape-tabela" id="quantidadeExibida">Carregando...</p>
+        </section>
+    </main>
+
+    <script>
+        const listaPedidos = document.getElementById("listaPedidos");
+        const mensagemTela = document.getElementById("mensagemTela");
+        const busca = document.getElementById("busca");
+        const filtroStatus = document.getElementById("filtroStatus");
+        const quantidadeExibida = document.getElementById("quantidadeExibida");
+        let pedidos = [];
+
+        function mostrarMensagem(texto, tipo = "") {
+            mensagemTela.textContent = texto;
+            mensagemTela.className = tipo ? `mensagem ${tipo}` : "mensagem";
+        }
+
+        function escaparHTML(valor) {
+            return String(valor ?? "").replace(/[&<>"']/g, caractere => ({
+                "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
+            })[caractere]);
+        }
+
+        function nomeStatus(status) {
+            return ({
+                ABERTO: "Aberto",
+                EM_ANALISE: "Em análise",
+                ENCERRADO: "Encerrado"
+            })[status] || status || "Não informado";
+        }
+
+        function formatarData(valor) {
+            if (!valor) return "—";
+            const data = new Date(valor);
+            return Number.isNaN(data.getTime()) ? escaparHTML(valor) : data.toLocaleString("pt-BR");
+        }
+
+        function atualizarResumo() {
+            document.getElementById("totalPedidos").textContent = pedidos.length;
+            document.getElementById("totalAbertos").textContent = pedidos.filter(p => p.status === "ABERTO").length;
+            document.getElementById("totalAnalise").textContent = pedidos.filter(p => p.status === "EM_ANALISE").length;
+            document.getElementById("totalEncerrados").textContent = pedidos.filter(p => p.status === "ENCERRADO").length;
+        }
+
+        function renderizarPedidos() {
+            const termo = busca.value.trim();
+            const status = filtroStatus.value;
+            const filtrados = pedidos.filter(p => {
+                const correspondeId = !termo || String(p.id_pedido).includes(termo);
+                const correspondeStatus = !status || p.status === status;
+                return correspondeId && correspondeStatus;
+            });
+
+            if (!filtrados.length) {
+                listaPedidos.innerHTML = '<tr><td colspan="6" class="vazio">Nenhum pedido encontrado.</td></tr>';
+                quantidadeExibida.textContent = "Nenhum registro para exibir.";
+                return;
+            }
+
+            listaPedidos.innerHTML = filtrados.map(p => `
+                <tr>
+                    <td>#${escaparHTML(p.id_pedido)}</td>
+                    <td>${escaparHTML(p.id_usuario)}</td>
+                    <td>${escaparHTML(p.id_equipamento)}</td>
+                    <td>${formatarData(p.data_pedido)}</td>
+                    <td><span class="etiqueta-status status-${escaparHTML(p.status)}">${escaparHTML(nomeStatus(p.status))}</span></td>
+                    <td><a class="botao botao-secundario" href="/gestor/pedidos/editar/${encodeURIComponent(p.id_pedido)}">Editar</a></td>
+                </tr>
+            `).join("");
+
+            quantidadeExibida.textContent = `Exibindo ${filtrados.length} de ${pedidos.length} pedidos.`;
+        }
+
+        async function carregarPedidos() {
+            listaPedidos.innerHTML = '<tr><td colspan="6" class="vazio">Carregando pedidos...</td></tr>';
+            mostrarMensagem("");
+
+            try {
+                const resposta = await fetch("/pedido");
+                const resultado = await resposta.json().catch(() => []);
+
+                if (!resposta.ok) {
+                    throw new Error(typeof resultado.detail === "string" ? resultado.detail : "Não foi possível carregar os pedidos.");
+                }
+
+                if (!Array.isArray(resultado)) {
+                    throw new Error("A API não retornou uma lista válida de pedidos.");
+                }
+
+                pedidos = resultado;
+                atualizarResumo();
+                renderizarPedidos();
+            } catch (erro) {
+                listaPedidos.innerHTML = '<tr><td colspan="6" class="vazio">Erro ao carregar os pedidos.</td></tr>';
+                quantidadeExibida.textContent = "";
+                mostrarMensagem(erro.message || "Erro de conexão com o servidor.", "mensagem-erro");
+            }
+        }
+
+        busca.addEventListener("input", renderizarPedidos);
+        filtroStatus.addEventListener("change", renderizarPedidos);
+        document.getElementById("botaoAtualizar").addEventListener("click", carregarPedidos);
+        carregarPedidos();
+    </script>
+</body>
+</html>

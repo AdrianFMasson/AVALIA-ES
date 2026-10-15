@@ -1,0 +1,94 @@
+:root {
+    --azul-petroleo: #173b46;
+    --azul-escuro: #102b33;
+    --cobre: #bd6b3c;
+    --cobre-escuro: #8f4828;
+    --cobre-claro: #e6a16f;
+    --marfim: #f4efe3;
+    --papel: #fffdf7;
+    --texto: #26383b;
+    --texto-suave: #718084;
+    --borda: #ded5c2;
+}
+* {margin:0;padding:0;box-sizing:border-box}
+body {min-height:100vh;display:flex;background:var(--marfim);color:var(--texto);font-family:"Segoe UI",Arial,sans-serif}
+a {color:inherit;text-decoration:none}
+.menu-lateral {width:270px;min-width:270px;min-height:100vh;display:flex;flex-direction:column;padding:25px 17px 20px;color:var(--marfim);background:linear-gradient(180deg,var(--azul-petroleo),var(--azul-escuro));border-right:4px solid var(--cobre)}
+.identidade {display:flex;align-items:center;gap:11px;padding:0 5px 20px}
+.logo {width:48px;height:48px;flex-shrink:0;object-fit:contain}
+.identidade-texto h1 {color:var(--cobre-claro);font:bold 15px Georgia,serif;letter-spacing:1.2px;line-height:1.4}
+.identidade-texto p {margin-top:4px;color:#d5d8d2;font-size:11px}
+.separador-menu {height:2px;margin:0 3px 22px;background:linear-gradient(90deg,transparent,var(--cobre),transparent)}
+.titulo-menu {margin:0 10px 12px;color:var(--cobre-claro);font-size:10px;font-weight:700;letter-spacing:1.5px}
+.navegacao {display:flex;flex-direction:column;gap:5px}
+.item-menu {min-height:49px;display:flex;align-items:center;gap:12px;padding:10px 13px;color:#e2e7e4;border-left:3px solid transparent;border-radius:5px;font-size:13px;transition:background .2s,color .2s}
+.item-menu:hover {color:#fff;background:rgba(255,255,255,.08)}
+.item-menu.ativo {color:#fff;background:rgba(189,107,60,.17);border-left-color:var(--cobre-claro)}
+.icone {width:25px;flex-shrink:0;color:var(--cobre-claro);font-size:22px;text-align:center}
+.rodape-menu {margin-top:auto;padding-top:30px;text-align:center}
+.rodape-menu .separador-menu {margin-bottom:15px}
+.rodape-menu p {color:var(--cobre-claro);font:bold 11px Georgia,serif;letter-spacing:1px}
+.rodape-menu span {display:block;margin-top:6px;color:#b8c4c2;font-size:10px}
+.conteudo-principal {width:calc(100% - 270px);min-width:0;padding:38px clamp(20px,4vw,55px)}
+.cabecalho-pagina {display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:30px}
+.caminho-pagina {margin-bottom:10px;color:var(--cobre-escuro);font-size:12px;font-weight:600}
+.cabecalho-pagina h2 {color:var(--azul-petroleo);font:bold clamp(25px,3vw,34px) Georgia,serif}
+.descricao-pagina {margin-top:9px;color:var(--texto-suave);font-size:14px;line-height:1.6}
+.painel {width:100%;padding:26px;background:var(--papel);border:1px solid var(--borda);border-top:4px solid var(--cobre);border-radius:10px;box-shadow:0 8px 25px rgba(16,43,51,.07)}
+.resumo {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px;margin-bottom:28px}
+.resumo div {display:flex;flex-direction:column;gap:9px;padding:18px;background:#f8f2e7;border:1px solid var(--borda);border-radius:7px}
+.resumo span {color:var(--texto-suave);font-size:12px}
+.resumo strong {color:var(--azul-petroleo);font:bold 27px Georgia,serif}
+.filtros {display:flex;align-items:flex-end;gap:15px;flex-wrap:wrap;margin-bottom:22px}
+.campo {display:flex;flex:1;min-width:180px;flex-direction:column;gap:8px}
+.campo label {color:var(--azul-petroleo);font-size:13px;font-weight:700}
+.campo input,.campo select {width:100%;min-height:45px;padding:11px 13px;color:var(--texto);background:#fff;border:1px solid var(--borda);border-radius:6px;font:14px "Segoe UI",Arial,sans-serif;outline:none}
+.campo input:focus,.campo select:focus {border-color:var(--cobre);box-shadow:0 0 0 3px rgba(189,107,60,.13)}
+.botao {min-height:42px;display:inline-flex;align-items:center;justify-content:center;padding:10px 15px;border:1px solid transparent;border-radius:6px;cursor:pointer;font:600 12px "Segoe UI",Arial,sans-serif;white-space:nowrap;transition:background .2s}
+.botao-principal {color:#fff;background:var(--azul-petroleo);border-color:var(--azul-petroleo)}
+.botao-principal:hover {background:var(--azul-escuro)}
+.botao-secundario {color:var(--azul-petroleo);background:transparent;border-color:var(--borda)}
+.botao-secundario:hover {background:#f2eadc;border-color:var(--cobre)}
+.tabela-container {width:100%;overflow-x:auto;border:1px solid var(--borda);border-radius:7px}
+table {width:100%;border-collapse:collapse;text-align:left;white-space:nowrap}
+thead {color:var(--marfim);background:var(--azul-petroleo)}
+th {padding:15px 14px;font-size:11px;letter-spacing:.4px;text-transform:uppercase}
+td {padding:14px;border-bottom:1px solid #ebe4d7;font-size:12px}
+tbody tr:hover {background:#fbf5ea}
+tbody tr:last-child td {border-bottom:0}
+.vazio {padding:35px;text-align:center;color:var(--texto-suave)}
+.etiqueta-status {display:inline-block;padding:6px 9px;border-radius:5px;font-size:10px;font-weight:700}
+.status-ABERTO {color:#8f4828;background:#f8e9dc}
+.status-EM_ANALISE {color:#24515b;background:#e3eff0}
+.status-ENCERRADO {color:#315b40;background:#e5f1e6}
+.rodape-tabela {margin-top:15px;color:var(--texto-suave);font-size:12px}
+.mensagem {display:none;margin-bottom:20px;padding:12px 15px;border-radius:6px;font-size:13px;line-height:1.5}
+.mensagem:not(:empty) {display:block}
+.mensagem-erro {color:#852d25;background:#fbe9e6;border:1px solid #e8bcb5}
+.mensagem-sucesso {color:#315b40;background:#e8f3e9;border:1px solid #bdd9c1}
+@media(max-width:1050px) {
+    .menu-lateral {width:235px;min-width:235px;padding-right:12px;padding-left:12px}
+    .conteudo-principal {width:calc(100% - 235px);padding:30px 22px}
+    .painel {padding:20px}
+    .resumo {grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:700px) {
+    body {display:block}
+    .menu-lateral {width:100%;min-width:0;min-height:auto;padding:15px;border-right:0;border-bottom:4px solid var(--cobre)}
+    .identidade {padding-bottom:12px}
+    .separador-menu {margin-bottom:13px}
+    .titulo-menu {margin-bottom:9px}
+    .navegacao {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}
+    .item-menu {min-height:43px;gap:7px;padding:8px;font-size:12px}
+    .icone {width:22px;font-size:19px}
+    .rodape-menu {display:none}
+    .conteudo-principal {width:100%;padding:25px 15px}
+    .cabecalho-pagina {align-items:flex-start;flex-direction:column;gap:12px;margin-bottom:22px}
+    .painel {padding:16px}
+    .resumo {gap:9px}
+    .resumo div {padding:13px}
+    .resumo strong {font-size:23px}
+    .filtros {align-items:stretch;flex-direction:column}
+    .campo {min-width:0}
+    .filtros .botao {width:100%}
+}

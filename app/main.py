@@ -358,6 +358,38 @@ def editar_usuario(
 
     return resposta_sem_cache(resposta)
 
+@app.get("/gestor_pedidos")
+def gestor_pedidos(request: Request, db: Session = Depends(database.get_db)):
+    autenticacao = obter_usuario_autenticado(request, db)
+    if autenticacao is None:
+        return redirecionar_para_login()
+    if autenticacao["perfil"] != "GESTOR":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Seu perfil não tem permissão para acessar a gestão de pedidos.")
+    resposta = templates.TemplateResponse(
+        request=request,
+        name="gestor_pedidos.html",
+        context={"usuario": autenticacao["usuario"]}
+    )
+    return resposta_sem_cache(resposta)
+
+
+@app.get("/gestor/pedidos/editar/{pedido_id}")
+def gestor_pedidos_editar(pedido_id: int, request: Request, db: Session = Depends(database.get_db)):
+    autenticacao = obter_usuario_autenticado(request, db)
+    if autenticacao is None:
+        return redirecionar_para_login()
+    if autenticacao["perfil"] != "GESTOR":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Seu perfil não tem permissão para editar pedidos.")
+    resposta = templates.TemplateResponse(
+        request=request,
+        name="gestor_pedidos_editar.html",
+        context={
+            "usuario": autenticacao["usuario"],
+            "pedido_id": pedido_id
+        }
+    )
+    return resposta_sem_cache(resposta)
+
 @app.post("/logout")
 def logout(request: Request, db: Session = Depends(database.get_db)):
     token = request.cookies.get("access_token")

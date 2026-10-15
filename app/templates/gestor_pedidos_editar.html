@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Pedido | The Iron Compass</title>
+    <link rel="stylesheet" href="/static/css/gestor_pedidos_editar.css">
+</head>
+<body>
+    <aside class="menu-lateral">
+        <div class="identidade">
+            <img src="/static/imagens/compasso.svg" alt="Logo The Iron Compass" class="logo">
+            <div class="identidade-texto">
+                <h1>THE IRON COMPASS</h1>
+                <p>Sistema de Gestão</p>
+            </div>
+        </div>
+        <div class="separador-menu"></div>
+        <p class="titulo-menu">MENU PRINCIPAL</p>
+        <nav class="navegacao">
+            <a href="/dashboard-gestor" class="item-menu"><span class="icone">⌂</span><span>Dashboard</span></a>
+            <a href="/gestor_pedidos" class="item-menu ativo"><span class="icone">▤</span><span>Pedidos</span></a>
+            <a href="/equipamentos" class="item-menu"><span class="icone">⚙</span><span>Equipamentos</span></a>
+            <a href="/emprestimos" class="item-menu"><span class="icone">⇄</span><span>Empréstimos</span></a>
+            <a href="/gestor_users" class="item-menu"><span class="icone">♙</span><span>Usuários</span></a>
+            <a href="/gestor_relatorios" class="item-menu"><span class="icone">▥</span><span>Relatórios</span></a>
+        </nav>
+        <div class="rodape-menu">
+            <div class="separador-menu"></div>
+            <p>THE IRON COMPASS</p>
+            <span>Gestão de pedidos</span>
+        </div>
+    </aside>
+
+    <main class="conteudo-principal">
+        <header class="cabecalho-pagina">
+            <div>
+                <p class="caminho-pagina">Gestão / Pedidos / Editar</p>
+                <h2>Editar Pedido</h2>
+                <p class="descricao-pagina">Consulte os dados e atualize o status do pedido.</p>
+            </div>
+            <a href="/gestor_pedidos" class="botao botao-secundario">Voltar à listagem</a>
+        </header>
+
+        <section class="painel-edicao">
+            <div class="cabecalho-painel">
+                <div>
+                    <h3>Dados do pedido</h3>
+                    <p>Identificador: <strong id="identificadorPedido">#{{ pedido_id }}</strong></p>
+                </div>
+                <span class="etiqueta-perfil">PEDIDO</span>
+            </div>
+
+            <div id="mensagemTela" class="mensagem" role="status" aria-live="polite" hidden></div>
+            <div id="carregamento" class="aviso">Carregando dados do pedido...</div>
+
+            <form id="formEditarPedido" hidden>
+                <input type="hidden" id="id_pedido" value="{{ pedido_id }}">
+                <input type="hidden" id="id_usuario">
+                <input type="hidden" id="id_equipamento">
+
+                <div class="grade-campos">
+                    <div class="campo">
+                        <label for="discente">ID do discente</label>
+                        <input type="text" id="discente" readonly>
+                    </div>
+                    <div class="campo">
+                        <label for="equipamento">ID do equipamento</label>
+                        <input type="text" id="equipamento" readonly>
+                    </div>
+                    <div class="campo">
+                        <label for="dataPedido">Data do pedido</label>
+                        <input type="text" id="dataPedido" readonly>
+                    </div>
+                    <div class="campo">
+                        <label for="status">Status do pedido</label>
+                        <select id="status" required>
+                            <option value="ABERTO">Aberto</option>
+                            <option value="EM_ANALISE">Em análise</option>
+                            <option value="ENCERRADO">Encerrado</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="acoes-formulario">
+                    <a href="/gestor_pedidos" class="botao botao-secundario">Cancelar</a>
+                    <button type="submit" id="botaoSalvar" class="botao botao-principal">Salvar alterações</button>
+                </div>
+            </form>
+        </section>
+    </main>
+
+    <script>
+        const pedidoId = document.getElementById("id_pedido").value;
+        const formulario = document.getElementById("formEditarPedido");
+        const mensagemTela = document.getElementById("mensagemTela");
+        const botaoSalvar = document.getElementById("botaoSalvar");
+        const carregamento = document.getElementById("carregamento");
+        const campoStatus = document.getElementById("status");
+        let pedidoOriginal = null;
+
+        function mostrarMensagem(texto, tipo = "") {
+            mensagemTela.textContent = texto;
+            mensagemTela.className = tipo ? `mensagem ${tipo}` : "mensagem";
+            mensagemTela.hidden = !texto;
+        }
+
+        function formatarData(valor) {
+            if (!valor) return "—";
+            const data = new Date(valor);
+            return Number.isNaN(data.getTime()) ? valor : data.toLocaleString("pt-BR");
+        }
+
+        function normalizarMensagemErro(detalhe) {
+            const mensagem = String(detalhe || "").toLowerCase();
+
+            if (
+                mensagem.includes("pedido encerrado não pode ser reaberto") ||
+                mensagem.includes("pedido encerrado nao pode ser reaberto") ||
+                mensagem.includes("1644")
+            ) {
+                return "Não foi possível atualizar o pedido. Este pedido já foi encerrado e não pode ser reaberto. A alteração não foi realizada.";
+            }
+
+            return "Não foi possível salvar as alterações do pedido. Verifique os dados e tente novamente.";
+        }
+
+        async function carregarPedido() {
+            try {
+                const resposta = await fetch("/pedido");
+                const pedidos = await resposta.json().catch(() => []);
+
+                if (!resposta.ok || !Array.isArray(pedidos)) {
+                    throw new Error("Não foi possível consultar os pedidos.");
+                }
+
+                pedidoOriginal = pedidos.find(p => String(p.id_pedido) === String(pedidoId));
+
+                if (!pedidoOriginal) {
+                    throw new Error("Pedido não encontrado.");
+                }
+
+                document.getElementById("id_usuario").value = pedidoOriginal.id_usuario;
+                document.getElementById("id_equipamento").value = pedidoOriginal.id_equipamento;
+                document.getElementById("discente").value = pedidoOriginal.id_usuario;
+                document.getElementById("equipamento").value = pedidoOriginal.id_equipamento;
+                document.getElementById("dataPedido").value = formatarData(pedidoOriginal.data_pedido);
+                campoStatus.value = pedidoOriginal.status;
+
+                carregamento.hidden = true;
+                formulario.hidden = false;
+            } catch (erro) {
+                carregamento.textContent = erro.message || "Erro ao carregar o pedido.";
+                mostrarMensagem(carregamento.textContent, "mensagem-erro");
+            }
+        }
+
+        formulario.addEventListener("submit", async evento => {
+            evento.preventDefault();
+
+            if (!pedidoOriginal) {
+                mostrarMensagem("Não foi possível identificar o pedido.", "mensagem-erro");
+                return;
+            }
+
+            mostrarMensagem("");
+            botaoSalvar.disabled = true;
+            botaoSalvar.textContent = "Salvando...";
+
+            const dados = {
+                status: campoStatus.value,
+                id_usuario: Number(pedidoOriginal.id_usuario),
+                id_equipamento: Number(pedidoOriginal.id_equipamento)
+            };
+
+            try {
+                const resposta = await fetch(`/pedido/${encodeURIComponent(pedidoId)}`, {
+                    method: "PUT",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify(dados)
+                });
+
+                const resultado = await resposta.json().catch(() => ({}));
+
+                if (!resposta.ok) {
+                    mostrarMensagem(normalizarMensagemErro(resultado.detail), "mensagem-erro");
+                    return;
+                }
+
+                mostrarMensagem("Status do pedido atualizado com sucesso.", "mensagem-sucesso");
+
+                setTimeout(() => {
+                    window.location.href = "/gestor_pedidos";
+                }, 1000);
+            } catch {
+                mostrarMensagem(
+                    "Não foi possível conectar ao servidor. Verifique sua conexão e tente novamente.",
+                    "mensagem-erro"
+                );
+            } finally {
+                botaoSalvar.disabled = false;
+                botaoSalvar.textContent = "Salvar alterações";
+            }
+        });
+
+        carregarPedido();
+    </script>
+</body>
+</html>
