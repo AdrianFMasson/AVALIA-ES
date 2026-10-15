@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Discente | The Iron Compass</title>
+    <link rel="stylesheet" href="/static/css/gestor_users_editar.css">
+</head>
+<body>
+    <aside class="menu-lateral">
+        <div class="identidade">
+            <img src="/static/imagens/compasso.svg" alt="Logo The Iron Compass" class="logo">
+            <div class="identidade-texto">
+                <h1>THE IRON COMPASS</h1>
+                <p>Sistema de Gestão</p>
+            </div>
+        </div>
+        <div class="separador-menu"></div>
+        <p class="titulo-menu">MENU PRINCIPAL</p>
+        <nav class="navegacao">
+            <a href="/dashboard-gestor" class="item-menu"><span class="icone">⌂</span><span>Dashboard</span></a>
+            <a href="/pedidos" class="item-menu"><span class="icone">▤</span><span>Pedidos</span></a>
+            <a href="/equipamentos" class="item-menu"><span class="icone">⚙</span><span>Equipamentos</span></a>
+            <a href="/emprestimos" class="item-menu"><span class="icone">⇄</span><span>Empréstimos</span></a>
+            <a href="/gestor_users" class="item-menu ativo"><span class="icone">♙</span><span>Usuários</span></a>
+            <a href="/gestor_relatorios" class="item-menu"><span class="icone">▥</span><span>Relatórios</span></a>
+        </nav>
+        <div class="rodape-menu">
+            <div class="separador-menu"></div>
+            <p>THE IRON COMPASS</p>
+            <span>Gestão de usuários</span>
+        </div>
+    </aside>
+
+    <main class="conteudo-principal">
+        <header class="cabecalho-pagina">
+            <div>
+                <p class="caminho-pagina">Gestão / Usuários / Editar</p>
+                <h2>Editar Discente</h2>
+                <p class="descricao-pagina">Atualize os dados cadastrais e o status do usuário selecionado.</p>
+            </div>
+            <a href="/gestor_users" class="botao botao-secundario">Voltar à listagem</a>
+        </header>
+
+        <section class="painel-edicao">
+            <div class="cabecalho-painel">
+                <div>
+                    <h3>Dados do discente</h3>
+                    <p>Identificador do usuário: <strong>{{ discente.id_usuario }}</strong></p>
+                </div>
+                <span class="etiqueta-perfil">DISCENTE</span>
+            </div>
+
+            <div id="mensagemTela" class="mensagem" role="status" aria-live="polite"></div>
+
+            <form id="formEditarUsuario">
+                <input type="hidden" id="id_usuario" value="{{ discente.id_usuario }}">
+                <input type="hidden" id="id_perfil" value="{{ discente.id_perfil }}">
+
+                <div class="grade-campos">
+                    <div class="campo">
+                        <label for="nome">Nome completo</label>
+                        <input type="text" id="nome" name="nome" maxlength="100" value="{{ discente.nome }}" autocomplete="name" required>
+                    </div>
+
+                    <div class="campo">
+                        <label for="contato">Contato</label>
+                        <input type="tel" id="contato" name="contato" maxlength="14" value="{{ discente.contato or '' }}" placeholder="(XX)XXXXX-XXXX" autocomplete="tel" inputmode="numeric">
+                    </div>
+
+                    <div class="campo">
+                        <label for="email">E-mail</label>
+                        <input type="email" id="email" name="email" maxlength="100" value="{{ discente.email }}" autocomplete="email" required>
+                    </div>
+
+                    <div class="campo">
+                        <label for="status">Status da conta</label>
+                        <select id="status" name="status" required>
+                            <option value="true" {% if discente.ativo %}selected{% endif %}>Ativo</option>
+                            <option value="false" {% if not discente.ativo %}selected{% endif %}>Inativo</option>
+                        </select>
+                    </div>
+
+                    <div class="campo campo-completo">
+                        <label for="senha">Nova senha (opcional)</label>
+                        <input type="password" id="senha" name="senha" autocomplete="new-password" placeholder="Deixe em branco para manter a senha atual">
+                        <small>Preencha somente se desejar alterar a senha. A nova senha deve ter pelo menos 6 caracteres, uma letra maiúscula, uma minúscula e um caractere especial.</small>
+                    </div>
+                </div>
+
+                <div class="acoes-formulario">
+                    <a href="/gestor_users" class="botao botao-secundario">Cancelar</a>
+                    <button type="submit" id="botaoSalvar" class="botao botao-principal">Salvar alterações</button>
+                </div>
+            </form>
+        </section>
+    </main>
+
+    <script>
+        const formEditarUsuario = document.getElementById("formEditarUsuario");
+        const mensagemTela = document.getElementById("mensagemTela");
+        const botaoSalvar = document.getElementById("botaoSalvar");
+        const usuarioId = document.getElementById("id_usuario").value;
+        const campoContato = document.getElementById("contato");
+
+        function mostrarMensagem(texto, tipo = "") {
+            mensagemTela.textContent = texto;
+            mensagemTela.className = tipo ? `mensagem ${tipo}` : "mensagem";
+        }
+
+        function formatarContato(valor) {
+            const numeros = valor.replace(/\D/g, "").slice(0, 11);
+
+            if (numeros.length === 0) return "";
+            if (numeros.length <= 2) return `(${numeros}`;
+            if (numeros.length <= 7) return `(${numeros.slice(0, 2)})${numeros.slice(2)}`;
+
+            return `(${numeros.slice(0, 2)})${numeros.slice(2, 7)}-${numeros.slice(7)}`;
+        }
+
+        campoContato.value = formatarContato(campoContato.value);
+
+        campoContato.addEventListener("input", () => {
+            campoContato.value = formatarContato(campoContato.value);
+        });
+
+        formEditarUsuario.addEventListener("submit", async evento => {
+            evento.preventDefault();
+            mostrarMensagem("");
+
+            const nome = document.getElementById("nome").value.trim();
+            const contato = campoContato.value.replace(/\D/g, "");
+            const email = document.getElementById("email").value.trim();
+            const idPerfil = Number(document.getElementById("id_perfil").value);
+            const ativo = document.getElementById("status").value === "true";
+            const senha = document.getElementById("senha").value;
+
+            if (!nome || !email) {
+                mostrarMensagem("Preencha o nome e o e-mail.", "mensagem-erro");
+                return;
+            }
+
+            if (contato && contato.length !== 11) {
+                mostrarMensagem("Informe o contato com DDD e 11 dígitos, no formato (XX)XXXXX-XXXX.", "mensagem-erro");
+                campoContato.focus();
+                return;
+            }
+
+            if (senha && senha.trim()) {
+                const senhaValida = senha.length >= 6 &&
+                    /[A-Z]/.test(senha) &&
+                    /[a-z]/.test(senha) &&
+                    /[^A-Za-z0-9]/.test(senha);
+
+                if (!senhaValida) {
+                    mostrarMensagem("A nova senha deve ter pelo menos 6 caracteres, uma letra maiúscula, uma minúscula e um caractere especial.", "mensagem-erro");
+                    return;
+                }
+            }
+
+            const dados = {
+                nome,
+                contato: contato || null,
+                email,
+                id_perfil: idPerfil,
+                ativo
+            };
+
+            if (senha && senha.trim()) {
+                dados.senha = senha;
+            }
+
+            botaoSalvar.disabled = true;
+            botaoSalvar.textContent = "Salvando...";
+
+            try {
+                const resposta = await fetch(`/usuarios/${encodeURIComponent(usuarioId)}`, {
+                    method: "PUT",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify(dados)
+                });
+
+                const resultado = await resposta.json().catch(() => ({}));
+
+                if (!resposta.ok) {
+                    const detalhe = typeof resultado.detail === "string"
+                        ? resultado.detail
+                        : `Não foi possível salvar as alterações (HTTP ${resposta.status}).`;
+                    throw new Error(detalhe);
+                }
+
+                mostrarMensagem("Alterações salvas com sucesso.", "mensagem-sucesso");
+                setTimeout(() => {
+                    window.location.href = "/gestor_users";
+                }, 1000);
+            } catch (erro) {
+                mostrarMensagem(erro.message || "Erro de conexão com o servidor.", "mensagem-erro");
+            } finally {
+                botaoSalvar.disabled = false;
+                botaoSalvar.textContent = "Salvar alterações";
+            }
+        });
+    </script>
+</body>
+</html>

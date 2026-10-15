@@ -1,25 +1,26 @@
 from fastapi import APIRouter, Depends, status, HTTPException
-from entities.models import Usuarios
+from entities.models import Usuarios, UsuarioAtualizacao
 from sqlmodel import Session
 from dependencies.dependencies import database
 from controller import UsuariosController
 
 usuarios_rota = APIRouter()
 
-@usuarios_rota.get("/usuarios", status_code=status.HTTP_200_OK)
+@usuarios_rota.get("/usuarios", status_code=status.HTTP_200_OK, response_model=list[Usuarios])
 def buscar_usuarios(db: Session = Depends(database.get_db)):
     try:
-        usuarios = UsuariosController.buscar_usuarios(db)
-        return usuarios
+        return UsuariosController.buscar_usuarios(db)
     except RuntimeError as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=str(e)
         )
 
-@usuarios_rota.post("/usuarios",
+@usuarios_rota.post(
+    "/usuarios",
     response_model=Usuarios,
-    status_code=status.HTTP_201_CREATED)
+    status_code=status.HTTP_201_CREATED
+)
 def criar_usuario(dados: Usuarios, db: Session = Depends(database.get_db)):
     try:
         return UsuariosController.cadastrar_usuario(db, dados)
@@ -35,7 +36,11 @@ def criar_usuario(dados: Usuarios, db: Session = Depends(database.get_db)):
         )
 
 @usuarios_rota.put("/usuarios/{usuario_id}", response_model=Usuarios)
-def atualizar_usuario(usuario_id: int, dados: Usuarios, db: Session = Depends(database.get_db)):
+def atualizar_usuario(
+    usuario_id: int,
+    dados: UsuarioAtualizacao,
+    db: Session = Depends(database.get_db)
+):
     try:
         return UsuariosController.atualizar_usuario(db, usuario_id, dados)
     except KeyError as e:
@@ -54,7 +59,10 @@ def atualizar_usuario(usuario_id: int, dados: Usuarios, db: Session = Depends(da
             detail=str(e)
         )
 
-@usuarios_rota.delete("/usuarios/{usuario_id}", status_code=status.HTTP_204_NO_CONTENT)
+@usuarios_rota.delete(
+    "/usuarios/{usuario_id}",
+    status_code=status.HTTP_204_NO_CONTENT
+)
 def deletar_usuario(usuario_id: int, db: Session = Depends(database.get_db)):
     try:
         UsuariosController.deletar_usuario(db, usuario_id)

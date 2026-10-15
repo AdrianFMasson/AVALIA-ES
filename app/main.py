@@ -1,4 +1,3 @@
-
 from fastapi import FastAPI, Request, Depends, HTTPException, status
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -31,16 +30,19 @@ app.include_router(rota_pedido.pedido_rota)
 app.include_router(rota_emprestimos.emprestimos_rota)
 app.include_router(rota_login.login_rota)
 
+
 def resposta_sem_cache(resposta):
     resposta.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, private, max-age=0"
     resposta.headers["Pragma"] = "no-cache"
     resposta.headers["Expires"] = "0"
     return resposta
 
+
 @app.middleware("http")
 async def impedir_cache_respostas(request: Request, call_next):
     resposta = await call_next(request)
     return resposta_sem_cache(resposta)
+
 
 def obter_usuario_autenticado(request: Request, db: Session):
     token = request.cookies.get("access_token")
@@ -90,14 +92,17 @@ def obter_usuario_autenticado(request: Request, db: Session):
         "perfil": perfil.perfil.value
     }
 
+
 def redirecionar_para_login():
     resposta = RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
     resposta.delete_cookie("access_token", path="/")
     return resposta_sem_cache(resposta)
 
+
 @app.get("/")
 def root():
     return redirecionar_para_login()
+
 
 @app.get("/login")
 def pagina_login(request: Request, db: Session = Depends(database.get_db)):
@@ -121,6 +126,7 @@ def pagina_login(request: Request, db: Session = Depends(database.get_db)):
     resposta.delete_cookie("access_token", path="/")
     return resposta_sem_cache(resposta)
 
+
 @app.get("/dashboard-user")
 def dashboard_user(request: Request, db: Session = Depends(database.get_db)):
     autenticacao = obter_usuario_autenticado(request, db)
@@ -141,6 +147,7 @@ def dashboard_user(request: Request, db: Session = Depends(database.get_db)):
     )
     return resposta_sem_cache(resposta)
 
+
 @app.get("/user_pedidos")
 def user_pedidos(request: Request, db: Session = Depends(database.get_db)):
     autenticacao = obter_usuario_autenticado(request, db)
@@ -160,6 +167,7 @@ def user_pedidos(request: Request, db: Session = Depends(database.get_db)):
         context={"usuario": autenticacao["usuario"]}
     )
     return resposta_sem_cache(resposta)
+
 
 @app.get("/user_emprestimos")
 def user_emprestimos(request: Request, db: Session = Depends(database.get_db)):
@@ -197,6 +205,7 @@ def user_emprestimos(request: Request, db: Session = Depends(database.get_db)):
     )
     return resposta_sem_cache(resposta)
 
+
 @app.get("/dashboard-gestor")
 def dashboard_gestor(request: Request, db: Session = Depends(database.get_db)):
     autenticacao = obter_usuario_autenticado(request, db)
@@ -213,6 +222,27 @@ def dashboard_gestor(request: Request, db: Session = Depends(database.get_db)):
     resposta = templates.TemplateResponse(
         request=request,
         name="dashboard_gestor.html",
+        context={"usuario": autenticacao["usuario"]}
+    )
+    return resposta_sem_cache(resposta)
+
+
+@app.get("/gestor_users")
+def gestor_users(request: Request, db: Session = Depends(database.get_db)):
+    autenticacao = obter_usuario_autenticado(request, db)
+
+    if autenticacao is None:
+        return redirecionar_para_login()
+
+    if autenticacao["perfil"] != "GESTOR":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Seu perfil não tem permissão para acessar a gestão de usuários."
+        )
+
+    resposta = templates.TemplateResponse(
+        request=request,
+        name="gestor_users.html",
         context={"usuario": autenticacao["usuario"]}
     )
     return resposta_sem_cache(resposta)
@@ -238,6 +268,33 @@ def user_perfil(request: Request, db: Session = Depends(database.get_db)):
     )
     return resposta_sem_cache(resposta)
 
+@app.get("/gestor/usuarios/editar/{usuario_id}")
+def editar_usuario(
+    usuario_id: int,
+    request: Request,
+    db: Session = Depends(database.get_db)
+):
+    autenticacao = obter_usuario_autenticado(request, db)
+    if autenticacao is None:
+        return redirecionar_para_login()
+    if autenticacao["perfil"] != "GESTOR":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Seu perfil não tem permissão para editar usuários."
+        )
+    usuario = db.get(Usuarios, usuario_id)
+    if usuario is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Usuário não encontrado."
+        )
+    resposta = templates.TemplateResponse(
+        request=request,
+        name="gestor_users_editar.html",
+        context={"usuario": autenticacao["usuario"], "discente": usuario}
+    )
+    return resposta_sem_cache(resposta)
+
 
 @app.post("/encerrar-sessao")
 def encerrar_sessao(request: Request, db: Session = Depends(database.get_db)):
@@ -257,6 +314,50 @@ def encerrar_sessao(request: Request, db: Session = Depends(database.get_db)):
     resposta.delete_cookie("access_token", path="/")
     return resposta_sem_cache(resposta)
 
+@app.get("/gestor/usuarios/editar/{id_usuario}")
+def editar_usuario(
+    id_usuario: int,
+    request: Request,
+    db: Session = Depends(database.get_db)
+):
+    autenticacao = obter_usuario_autenticado(request, db)
+
+    if autenticacao is None:
+        return redirecionar_para_login()
+
+    if autenticacao["perfil"] != "GESTOR":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Seu perfil não tem permissão para editar usuários."
+        )
+
+    usuario = db.get(Usuarios, id_usuario)
+
+    if usuario is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Usuário não encontrado."
+        )
+
+    perfil = db.get(Perfil, usuario.id_perfil)
+
+    if perfil is None or perfil.perfil.value != "DISCENTE":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Somente usuários com perfil DISCENTE podem ser editados nesta página."
+        )
+
+    resposta = templates.TemplateResponse(
+        request=request,
+        name="gestor_users_editar.html",
+        context={
+            "usuario": autenticacao["usuario"],
+            "discente": usuario
+        }
+    )
+
+    return resposta_sem_cache(resposta)
+
 @app.post("/logout")
 def logout(request: Request, db: Session = Depends(database.get_db)):
     token = request.cookies.get("access_token")
@@ -274,6 +375,7 @@ def logout(request: Request, db: Session = Depends(database.get_db)):
     resposta = RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
     resposta.delete_cookie("access_token", path="/")
     return resposta_sem_cache(resposta)
+
 
 @app.get("/config")
 def config():

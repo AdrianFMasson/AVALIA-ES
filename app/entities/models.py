@@ -8,29 +8,36 @@ class StatusPerfil(str, Enum):
     GESTOR = "GESTOR"
     ADMINISTRADOR = "ADMINISTRADOR"
 
-class Perfil(SQLModel,table=True):
-    __tablename__="perfil"
-    id_perfil:int | None = Field(default=None, primary_key=True)
+class Perfil(SQLModel, table=True):
+    __tablename__ = "perfil"
+    id_perfil: int | None = Field(default=None, primary_key=True)
     perfil: StatusPerfil = Field(default=StatusPerfil.DISCENTE)
     descricao_adicional: str = Field(max_length=100)
 
-class Usuarios(SQLModel,table=True):
-    __tablename__="usuarios"
+class Usuarios(SQLModel, table=True):
+    __tablename__ = "usuarios"
     id_usuario: int | None = Field(default=None, primary_key=True)
     nome: str = Field(max_length=100)
+    contato: str | None = Field(default=None, max_length=20)
     email: str = Field(max_length=100, unique=True)
-    senha_hash: str =Field(max_length=255)
+    senha_hash: str = Field(max_length=255)
     id_perfil: int = Field(foreign_key="perfil.id_perfil")
     ativo: bool = Field(default=True)
     dt_cad_user: datetime = Field(default_factory=datetime.now)
-    
 
-class Estoque(SQLModel,table=True):
-    __tablename__="estoque"
-    id_estoque: int | None = Field(default=None,primary_key=True)
+class UsuarioAtualizacao(SQLModel):
+    nome: str = Field(max_length=100)
+    contato: str | None = Field(default=None, max_length=20)
+    email: EmailStr
+    senha: str | None = Field(default=None, min_length=6, max_length=255)
+    id_perfil: int
+    ativo: bool = True
+
+class Estoque(SQLModel, table=True):
+    __tablename__ = "estoque"
+    id_estoque: int | None = Field(default=None, primary_key=True)
     descricao: str = Field(max_length=100)
     dt_cad_estoque: datetime = Field(default_factory=datetime.now)
-
 
 class StatusEquip(str, Enum):
     DISPONIVEL = "DISPONIVEL"
@@ -38,14 +45,13 @@ class StatusEquip(str, Enum):
     MANUTENCAO = "MANUTENCAO"
     INATIVO = "INATIVO"
 
-
-class Equipamentos(SQLModel,table=True):
-    __tablename__="equipamentos"
-    id_equipamento: int | None = Field(default=None,primary_key=True)
+class Equipamentos(SQLModel, table=True):
+    __tablename__ = "equipamentos"
+    id_equipamento: int | None = Field(default=None, primary_key=True)
     id_estoque: int = Field(foreign_key="estoque.id_estoque")
     nome: str = Field(max_length=100)
     categoria: str = Field(max_length=100)
-    descricao : str | None = Field(default=None)
+    descricao: str | None = Field(default=None)
     status_equip: StatusEquip = Field(default=StatusEquip.DISPONIVEL)
     dt_cad_equip: datetime = Field(default_factory=datetime.now)
 
@@ -83,15 +89,13 @@ class Emprestimos(SQLModel, table=True):
     data_retirada: datetime | None = None
     data_prevista_devolucao: datetime | None = None
     data_devolucao: datetime | None = None
-    status_solicitacao: StatusSolicitacao = Field(
-        default=StatusSolicitacao.SOLICITADO
-    )
+    status_solicitacao: StatusSolicitacao = Field(default=StatusSolicitacao.SOLICITADO)
 
 class UsuarioLogin(BaseModel):
-    usuario: EmailStr 
+    usuario: EmailStr
     senha: str
+
 class UsuarioLogado(BaseModel):
     id: int
     nome: str
-    roles:list[str]
-    
+    roles: list[str]
