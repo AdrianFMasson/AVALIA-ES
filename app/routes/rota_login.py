@@ -6,9 +6,8 @@ from dependencies.dependencies import database
 from controller import LoginController
 from entities.models import UsuarioLogin
 from utils.validacao_senha import validar_senha
-from utils.autenticacao import criar_sessao
+from dependencies.autenticacao import criar_sessao
 from config.Config import settings
-
 login_rota = APIRouter(tags=["Autenticação"])
 
 

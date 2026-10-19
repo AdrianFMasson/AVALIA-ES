@@ -1,7 +1,6 @@
 
 from datetime import datetime, timedelta, timezone
 import secrets
-
 import jwt
 from jwt import InvalidTokenError
 from fastapi import Request, HTTPException, status
