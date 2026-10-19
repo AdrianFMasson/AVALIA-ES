@@ -4,14 +4,9 @@ from fastapi.templating import Jinja2Templates
 from fastapi.responses import RedirectResponse
 from sqlmodel import Session
 from sqlalchemy.exc import SQLAlchemyError
-from fastapi.responses import RedirectResponse, JSONResponse
 
 from dependencies.dependencies import database
-from dependencies.autenticacao import (
-    obter_usuario_autenticado,
-    encerrar_sessao_por_token,
-)
-from entities.models import Usuarios, Perfil
+
 from routes import (
     rota_estoque,
     rota_equipamentos,
@@ -20,9 +15,20 @@ from routes import (
     rota_pedido,
     rota_emprestimos,
     rota_login,
+    rota_discente,
+    rota_gestor,
+    rota_admin,
 )
-from controller import EmprestimosController
 
+from dependencies.autenticacao import (
+    obter_usuario_autenticado,
+    encerrar_sessao_por_token,
+)
+
+
+# =========================================================
+# CONFIGURAÇÃO DA APLICAÇÃO
+# =========================================================
 
 app = FastAPI(
     title="THE IRON COMPASS",
@@ -30,12 +36,24 @@ app = FastAPI(
     version="1.0.0",
 )
 
-app.mount("/static", StaticFiles(directory="static"), name="static")
+
+# =========================================================
+# ARQUIVOS ESTÁTICOS E TEMPLATES
+# =========================================================
+
+app.mount(
+    "/static",
+    StaticFiles(directory="static"),
+    name="static",
+)
 
 templates = Jinja2Templates(directory="templates")
 
 
-# Registro das rotas
+# =========================================================
+# REGISTRO DAS ROTAS
+# =========================================================
+
 app.include_router(rota_estoque.estoque_rota)
 app.include_router(rota_equipamentos.equipamentos_rota)
 app.include_router(rota_perfil.perfil_rota)
@@ -44,9 +62,18 @@ app.include_router(rota_pedido.pedido_rota)
 app.include_router(rota_emprestimos.emprestimos_rota)
 app.include_router(rota_login.login_rota)
 
+# Rotas do discente
+app.include_router(rota_discente.discente_rota)
+
+# Rotas do gestor
+app.include_router(rota_gestor.gestor_rota)
+
+# Rotas do administrador
+app.include_router(rota_admin.admin_rota)
+
 
 # =========================================================
-# CONTROLE DE CACHE
+# PREVENÇÃO DE CACHE
 # =========================================================
 
 def resposta_sem_cache(resposta):
@@ -66,42 +93,39 @@ async def impedir_cache_respostas(request: Request, call_next):
 
 
 # =========================================================
-# AUTENTICAÇÃO E AUTORIZAÇÃO
+# REDIRECIONAMENTO PARA LOGIN
 # =========================================================
-
-def exigir_autenticacao(request: Request, db: Session):
-    autenticacao = obter_usuario_autenticado(request, db)
-
-    if autenticacao is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Autenticação necessária. Faça login para continuar.",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
-    return autenticacao
-
-
-def exigir_perfil(autenticacao: dict, perfil_esperado: str):
-    if autenticacao["perfil"] != perfil_esperado:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Seu perfil não tem permissão para acessar esta página.",
-        )
-
 
 def redirecionar_para_login():
     resposta = RedirectResponse(
         url="/login",
         status_code=status.HTTP_303_SEE_OTHER,
     )
-    resposta.delete_cookie("access_token", path="/")
+
+    resposta.delete_cookie(
+        key="access_token",
+        path="/",
+    )
 
     return resposta_sem_cache(resposta)
 
 
 # =========================================================
-# PÁGINA INICIAL
+# REDIRECIONAMENTO POR PERFIL
+# =========================================================
+
+def obter_dashboard_por_perfil(perfil: str):
+    destinos = {
+        "DISCENTE": "/dashboard-user",
+        "GESTOR": "/dashboard-gestor",
+        "ADMINISTRADOR": "/dashboard-admin",
+    }
+
+    return destinos.get(perfil)
+
+
+# =========================================================
+# ROTA INICIAL
 # =========================================================
 
 @app.get("/")
@@ -110,7 +134,7 @@ def root():
 
 
 # =========================================================
-# LOGIN
+# PÁGINA DE LOGIN
 # =========================================================
 
 @app.get("/login")
@@ -118,254 +142,34 @@ def pagina_login(
     request: Request,
     db: Session = Depends(database.get_db),
 ):
-    token = request.cookies.get("access_token")
+    autenticacao = obter_usuario_autenticado(request, db)
 
-    if token:
-        try:
-            encerrar_sessao_por_token(db, token)
-        except SQLAlchemyError:
-            db.rollback()
+    # Se já estiver autenticado, encaminha para o dashboard correto.
+    if autenticacao is not None:
+        destino = obter_dashboard_por_perfil(
+            autenticacao["perfil"]
+        )
 
-            raise HTTPException(
-                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-                detail="Não foi possível encerrar a sessão anterior.",
+        if destino:
+            resposta = RedirectResponse(
+                url=destino,
+                status_code=status.HTTP_303_SEE_OTHER,
             )
 
+            return resposta_sem_cache(resposta)
+
+    # Se não estiver autenticado, exibe a página de login.
     resposta = templates.TemplateResponse(
         request=request,
         name="login.html",
         context={},
     )
 
-    resposta.delete_cookie("access_token", path="/")
-
     return resposta_sem_cache(resposta)
 
 
 # =========================================================
-# DASHBOARD DO DISCENTE
-# =========================================================
-
-@app.get("/dashboard-user")
-def dashboard_user(
-    request: Request,
-    db: Session = Depends(database.get_db),
-):
-    autenticacao = exigir_autenticacao(request, db)
-    exigir_perfil(autenticacao, "DISCENTE")
-
-    resposta = templates.TemplateResponse(
-        request=request,
-        name="dashboard_user.html",
-        context={
-            "usuario": autenticacao["usuario"],
-        },
-    )
-
-    return resposta_sem_cache(resposta)
-
-
-# =========================================================
-# PEDIDOS DO DISCENTE
-# =========================================================
-
-@app.get("/user_pedidos")
-def user_pedidos(
-    request: Request,
-    db: Session = Depends(database.get_db),
-):
-    autenticacao = exigir_autenticacao(request, db)
-    exigir_perfil(autenticacao, "DISCENTE")
-
-    resposta = templates.TemplateResponse(
-        request=request,
-        name="user_pedidos.html",
-        context={
-            "usuario": autenticacao["usuario"],
-        },
-    )
-
-    return resposta_sem_cache(resposta)
-
-
-# =========================================================
-# EMPRÉSTIMOS DO DISCENTE
-# =========================================================
-
-@app.get("/user_emprestimos")
-def user_emprestimos(
-    request: Request,
-    db: Session = Depends(database.get_db),
-):
-    autenticacao = exigir_autenticacao(request, db)
-    exigir_perfil(autenticacao, "DISCENTE")
-
-    usuario = autenticacao["usuario"]
-
-    try:
-        emprestimos = EmprestimosController.buscar_emprestimos_usuario(
-            db,
-            usuario.id_usuario,
-        )
-    except RuntimeError:
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Não foi possível consultar seus empréstimos. Tente novamente.",
-        )
-
-    resposta = templates.TemplateResponse(
-        request=request,
-        name="user_emprestimos.html",
-        context={
-            "usuario": usuario,
-            "emprestimos": emprestimos,
-        },
-    )
-
-    return resposta_sem_cache(resposta)
-
-
-# =========================================================
-# DASHBOARD DO GESTOR
-# =========================================================
-
-@app.get("/dashboard-gestor")
-def dashboard_gestor(
-    request: Request,
-    db: Session = Depends(database.get_db),
-):
-    autenticacao = exigir_autenticacao(request, db)
-    exigir_perfil(autenticacao, "GESTOR")
-
-    resposta = templates.TemplateResponse(
-        request=request,
-        name="dashboard_gestor.html",
-        context={
-            "usuario": autenticacao["usuario"],
-        },
-    )
-
-    return resposta_sem_cache(resposta)
-
-
-# =========================================================
-# USUÁRIOS DO GESTOR
-# =========================================================
-
-@app.get("/gestor_users")
-def gestor_users(
-    request: Request,
-    db: Session = Depends(database.get_db),
-):
-    autenticacao = exigir_autenticacao(request, db)
-    exigir_perfil(autenticacao, "GESTOR")
-
-    resposta = templates.TemplateResponse(
-        request=request,
-        name="gestor_users.html",
-        context={
-            "usuario": autenticacao["usuario"],
-        },
-    )
-
-    return resposta_sem_cache(resposta)
-
-
-# =========================================================
-# PERFIL DO DISCENTE
-# =========================================================
-
-@app.get("/user_perfil")
-def user_perfil(
-    request: Request,
-    db: Session = Depends(database.get_db),
-):
-    autenticacao = exigir_autenticacao(request, db)
-    exigir_perfil(autenticacao, "DISCENTE")
-
-    resposta = templates.TemplateResponse(
-        request=request,
-        name="user_perfil.html",
-        context={
-            "usuario": autenticacao["usuario"],
-        },
-    )
-
-    return resposta_sem_cache(resposta)
-
-
-# =========================================================
-# EDIÇÃO DE USUÁRIO PELO GESTOR
-# =========================================================
-
-@app.get("/gestor/usuarios/editar/{usuario_id}")
-def editar_usuario(
-    usuario_id: int,
-    request: Request,
-    db: Session = Depends(database.get_db),
-):
-    autenticacao = exigir_autenticacao(request, db)
-    exigir_perfil(autenticacao, "GESTOR")
-
-    usuario = db.get(Usuarios, usuario_id)
-
-    if usuario is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Usuário não encontrado.",
-        )
-
-    perfil_usuario = db.get(Perfil, usuario.id_perfil)
-
-    if (
-        perfil_usuario is None
-        or perfil_usuario.perfil.value != "DISCENTE"
-    ):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail=(
-                "Somente usuários com perfil DISCENTE "
-                "podem ser editados nesta página."
-            ),
-        )
-
-    resposta = templates.TemplateResponse(
-        request=request,
-        name="gestor_users_editar.html",
-        context={
-            "usuario": autenticacao["usuario"],
-            "discente": usuario,
-        },
-    )
-
-    return resposta_sem_cache(resposta)
-
-
-# =========================================================
-# EQUIPAMENTOS DO GESTOR
-# =========================================================
-
-@app.get("/gestor_equipamentos")
-def gestor_equipamentos(
-    request: Request,
-    db: Session = Depends(database.get_db),
-):
-    autenticacao = exigir_autenticacao(request, db)
-    exigir_perfil(autenticacao, "GESTOR")
-
-    resposta = templates.TemplateResponse(
-        request=request,
-        name="gestor_equipamentos.html",
-        context={
-            "usuario": autenticacao["usuario"],
-        },
-    )
-
-    return resposta_sem_cache(resposta)
-
-
-# =========================================================
-# ENCERRAMENTO DE SESSÃO (LOGOUT)
+# ENCERRAMENTO DE SESSÃO
 # =========================================================
 
 @app.post("/encerrar-sessao")
@@ -378,12 +182,13 @@ def encerrar_sessao(
     if token:
         try:
             encerrar_sessao_por_token(db, token)
+
         except SQLAlchemyError:
             db.rollback()
 
             raise HTTPException(
                 status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-                detail="Não foi possível encerrar a sessão.",
+                detail="Não foi possível encerrar a sessão. Tente novamente.",
             )
 
     resposta = RedirectResponse(
@@ -391,76 +196,45 @@ def encerrar_sessao(
         status_code=status.HTTP_303_SEE_OTHER,
     )
 
-    resposta.delete_cookie("access_token", path="/")
-
-    return resposta_sem_cache(resposta)
-
-
-# =========================================================
-# PEDIDOS DO GESTOR
-# =========================================================
-
-@app.get("/gestor_pedidos")
-def gestor_pedidos(
-    request: Request,
-    db: Session = Depends(database.get_db),
-):
-    autenticacao = exigir_autenticacao(request, db)
-    exigir_perfil(autenticacao, "GESTOR")
-
-    resposta = templates.TemplateResponse(
-        request=request,
-        name="gestor_pedidos.html",
-        context={
-            "usuario": autenticacao["usuario"],
-        },
+    resposta.delete_cookie(
+        key="access_token",
+        path="/",
     )
 
     return resposta_sem_cache(resposta)
 
 
 # =========================================================
-# EDIÇÃO DE PEDIDO PELO GESTOR
+# COMPATIBILIDADE COM FORMULÁRIOS ANTIGOS DE LOGOUT
 # =========================================================
 
-@app.get("/gestor/pedidos/editar/{pedido_id}")
-def gestor_pedidos_editar(
-    pedido_id: int,
+@app.post("/logout")
+def logout(
     request: Request,
     db: Session = Depends(database.get_db),
 ):
-    autenticacao = exigir_autenticacao(request, db)
-    exigir_perfil(autenticacao, "GESTOR")
+    token = request.cookies.get("access_token")
 
-    resposta = templates.TemplateResponse(
-        request=request,
-        name="gestor_pedidos_editar.html",
-        context={
-            "usuario": autenticacao["usuario"],
-            "pedido_id": pedido_id,
-        },
+    if token:
+        try:
+            encerrar_sessao_por_token(db, token)
+
+        except SQLAlchemyError:
+            db.rollback()
+
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail="Não foi possível encerrar a sessão. Tente novamente.",
+            )
+
+    resposta = RedirectResponse(
+        url="/login",
+        status_code=status.HTTP_303_SEE_OTHER,
     )
 
-    return resposta_sem_cache(resposta)
-
-
-# =========================================================
-# CONFIGURAÇÕES — ADMINISTRADOR
-# =========================================================
-
-@app.get("/config")
-def config(
-    request: Request,
-    db: Session = Depends(database.get_db),
-):
-    autenticacao = exigir_autenticacao(request, db)
-    exigir_perfil(autenticacao, "ADMINISTRADOR")
-
-    resposta = JSONResponse(
-        content={
-            "aplicacao": "THE IRON COMPASS",
-            "versao": "1.0.0",
-        }
+    resposta.delete_cookie(
+        key="access_token",
+        path="/",
     )
 
     return resposta_sem_cache(resposta)
