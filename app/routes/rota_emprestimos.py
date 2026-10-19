@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status, HTTPException
+from fastapi import APIRouter, Depends, Request, status, HTTPException
 from entities.models import Emprestimos
 from sqlmodel import Session
 from dependencies.dependencies import database
@@ -11,7 +11,7 @@ PERFIS_AUTORIZADOS = {"DISCENTE", "GESTOR", "ADMINISTRADOR"}
 
 
 def validar_acesso_emprestimos(
-    request,
+    request: Request,
     db: Session
 ):
     autenticacao = obter_usuario_autenticado(request, db)
@@ -48,7 +48,7 @@ def validar_acesso_emprestimos(
     status_code=status.HTTP_200_OK
 )
 def buscar_emprestimos(
-    request,
+    request: Request,
     db: Session = Depends(database.get_db)
 ):
     validar_acesso_emprestimos(request, db)
@@ -69,7 +69,7 @@ def buscar_emprestimos(
 )
 def criar_emprestimo(
     dados: Emprestimos,
-    request,
+    request: Request,
     db: Session = Depends(database.get_db)
 ):
     validar_acesso_emprestimos(request, db)
@@ -95,7 +95,7 @@ def criar_emprestimo(
 def atualizar_emprestimo(
     emprestimo_id: int,
     dados: Emprestimos,
-    request,
+    request: Request,
     db: Session = Depends(database.get_db)
 ):
     validar_acesso_emprestimos(request, db)
@@ -129,7 +129,7 @@ def atualizar_emprestimo(
 )
 def deletar_emprestimo(
     emprestimo_id: int,
-    request,
+    request: Request,
     db: Session = Depends(database.get_db)
 ):
     validar_acesso_emprestimos(request, db)
