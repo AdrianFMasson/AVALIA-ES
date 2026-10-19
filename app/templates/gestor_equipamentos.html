@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão de Equipamentos | The Iron Compass</title>
+    <link rel="stylesheet" href="/static/css/gestor_equipamentos.css">
+    <script src="/static/js/gestor_equipamentos.js" defer></script>
+</head>
+<body>
+    <aside class="menu-lateral">
+        <div class="identidade">
+            <img src="/static/imagens/compasso.svg" alt="Logo The Iron Compass" class="logo">
+            <div class="identidade-texto">
+                <h1>THE IRON COMPASS</h1>
+                <p>Sistema de Gestão</p>
+            </div>
+        </div>
+        <div class="separador-menu"></div>
+        <p class="titulo-menu">MENU PRINCIPAL</p>
+        <nav class="navegacao">
+            <a href="/dashboard-gestor" class="item-menu"><span class="icone">⌂</span><span>Dashboard</span></a>
+            <a href="/gestor_users" class="item-menu"><span class="icone">♙</span><span>Usuários</span></a>
+            <a href="/pedidos" class="item-menu"><span class="icone">▤</span><span>Pedidos</span></a>
+            <a href="/gestor_equipamentos" class="item-menu ativo"><span class="icone">⚙</span><span>Equipamentos</span></a>
+            <a href="/emprestimos" class="item-menu"><span class="icone">⇄</span><span>Empréstimos</span></a>
+            <a href="/gestor_relatorios" class="item-menu"><span class="icone">▥</span><span>Relatórios</span></a>
+        </nav>
+        <div class="rodape-menu">
+            <div class="separador-menu"></div>
+            <p>THE IRON COMPASS</p>
+            <span>Consulta de equipamentos</span>
+        </div>
+    </aside>
+
+    <main class="conteudo-principal">
+        <header class="cabecalho-pagina">
+            <div>
+                <p class="caminho-pagina">Gestão / Equipamentos</p>
+                <h2>Gestão de Equipamentos</h2>
+                <p class="descricao-pagina">Consulte os equipamentos cadastrados e acompanhe seus status.</p>
+            </div>
+        </header>
+
+        <section class="painel">
+            <div class="resumo">
+                <div>
+                    <span>Total de equipamentos</span>
+                    <strong id="totalEquipamentos">0</strong>
+                </div>
+                <div>
+                    <span>Disponíveis</span>
+                    <strong id="totalDisponiveis">0</strong>
+                </div>
+                <div>
+                    <span>Emprestados</span>
+                    <strong id="totalEmprestados">0</strong>
+                </div>
+                <div>
+                    <span>Em manutenção</span>
+                    <strong id="totalManutencao">0</strong>
+                </div>
+                <div>
+                    <span>Inativos</span>
+                    <strong id="totalInativos">0</strong>
+                </div>
+            </div>
+
+            <div id="mensagemTela" class="mensagem" role="status" aria-live="polite"></div>
+
+            <div class="filtros">
+                <div class="campo">
+                    <label for="busca">Buscar equipamento</label>
+                    <input type="search" id="busca" placeholder="Digite o ID ou nome...">
+                </div>
+                <div class="campo">
+                    <label for="filtroStatus">Filtrar por status</label>
+                    <select id="filtroStatus">
+                        <option value="">Todos os status</option>
+                        <option value="DISPONIVEL">Disponível</option>
+                        <option value="EMPRESTADO">Emprestado</option>
+                        <option value="MANUTENCAO">Em manutenção</option>
+                        <option value="INATIVO">Inativo</option>
+                    </select>
+                </div>
+                <button type="button" id="botaoAtualizar" class="botao botao-principal">Atualizar lista</button>
+            </div>
+
+            <div class="tabela-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nome</th>
+                            <th>Categoria</th>
+                            <th>Descrição</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="listaEquipamentos">
+                        <tr><td colspan="5" class="vazio">Carregando equipamentos...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="rodape-tabela" id="quantidadeExibida">Carregando...</p>
+        </section>
+    </main>
+</body>
+</html>

@@ -2,16 +2,23 @@ from fastapi import FastAPI, Request, Depends, HTTPException, status
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import RedirectResponse
-from jwt import InvalidTokenError
 from sqlmodel import Session
 from sqlalchemy.exc import SQLAlchemyError
 
-from config.Config import settings
 from dependencies.dependencies import database
+from dependencies.autenticacao import obter_usuario_autenticado
 from entities.models import Usuarios, Perfil
-from routes import rota_estoque, rota_equipamentos, rota_perfil, rota_usuarios, rota_pedido, rota_emprestimos, rota_login
+from routes import (
+    rota_estoque,
+    rota_equipamentos,
+    rota_perfil,
+    rota_usuarios,
+    rota_pedido,
+    rota_emprestimos,
+    rota_login
+)
 from controller import EmprestimosController
-from utils.autenticacao import validar_token_acesso, obter_sessao_ativa, encerrar_sessao_por_token
+from utils.autenticacao import encerrar_sessao_por_token
 
 app = FastAPI(
     title="THE IRON COMPASS",
@@ -32,7 +39,9 @@ app.include_router(rota_login.login_rota)
 
 
 def resposta_sem_cache(resposta):
-    resposta.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, private, max-age=0"
+    resposta.headers["Cache-Control"] = (
+        "no-store, no-cache, must-revalidate, private, max-age=0"
+    )
     resposta.headers["Pragma"] = "no-cache"
     resposta.headers["Expires"] = "0"
     return resposta
@@ -44,57 +53,28 @@ async def impedir_cache_respostas(request: Request, call_next):
     return resposta_sem_cache(resposta)
 
 
-def obter_usuario_autenticado(request: Request, db: Session):
-    token = request.cookies.get("access_token")
-    if not token:
+def exigir_autenticacao(request: Request, db: Session):
+    autenticacao = obter_usuario_autenticado(request, db)
+
+    if autenticacao is None:
         return None
 
-    try:
-        payload = validar_token_acesso(token)
-        id_usuario = int(payload["sub"])
-        id_sessao = payload["sid"]
-    except (InvalidTokenError, ValueError, KeyError, TypeError):
-        return None
+    return autenticacao
 
-    try:
-        sessao = obter_sessao_ativa(db, id_sessao, id_usuario)
-    except SQLAlchemyError:
-        db.rollback()
+
+def exigir_perfil(autenticacao: dict, perfil_esperado: str):
+    if autenticacao["perfil"] != perfil_esperado:
         raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Não foi possível validar a sessão. Tente novamente."
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Seu perfil não tem permissão para acessar esta página."
         )
-
-    if sessao is None:
-        return None
-
-    usuario = db.get(Usuarios, id_usuario)
-
-    if usuario is None or not usuario.ativo:
-        sessao.ativa = False
-        db.add(sessao)
-        try:
-            db.commit()
-        except SQLAlchemyError:
-            db.rollback()
-            raise HTTPException(
-                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-                detail="Não foi possível validar a sessão. Tente novamente."
-            )
-        return None
-
-    perfil = db.get(Perfil, usuario.id_perfil)
-    if perfil is None:
-        return None
-
-    return {
-        "usuario": usuario,
-        "perfil": perfil.perfil.value
-    }
 
 
 def redirecionar_para_login():
-    resposta = RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
+    resposta = RedirectResponse(
+        url="/login",
+        status_code=status.HTTP_303_SEE_OTHER
+    )
     resposta.delete_cookie("access_token", path="/")
     return resposta_sem_cache(resposta)
 
@@ -105,7 +85,10 @@ def root():
 
 
 @app.get("/login")
-def pagina_login(request: Request, db: Session = Depends(database.get_db)):
+def pagina_login(
+    request: Request,
+    db: Session = Depends(database.get_db)
+):
     token = request.cookies.get("access_token")
 
     if token:
@@ -128,17 +111,16 @@ def pagina_login(request: Request, db: Session = Depends(database.get_db)):
 
 
 @app.get("/dashboard-user")
-def dashboard_user(request: Request, db: Session = Depends(database.get_db)):
-    autenticacao = obter_usuario_autenticado(request, db)
+def dashboard_user(
+    request: Request,
+    db: Session = Depends(database.get_db)
+):
+    autenticacao = exigir_autenticacao(request, db)
 
     if autenticacao is None:
         return redirecionar_para_login()
 
-    if autenticacao["perfil"] != "DISCENTE":
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Seu perfil não tem permissão para acessar este dashboard."
-        )
+    exigir_perfil(autenticacao, "DISCENTE")
 
     resposta = templates.TemplateResponse(
         request=request,
@@ -149,17 +131,16 @@ def dashboard_user(request: Request, db: Session = Depends(database.get_db)):
 
 
 @app.get("/user_pedidos")
-def user_pedidos(request: Request, db: Session = Depends(database.get_db)):
-    autenticacao = obter_usuario_autenticado(request, db)
+def user_pedidos(
+    request: Request,
+    db: Session = Depends(database.get_db)
+):
+    autenticacao = exigir_autenticacao(request, db)
 
     if autenticacao is None:
         return redirecionar_para_login()
 
-    if autenticacao["perfil"] != "DISCENTE":
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Seu perfil não tem permissão para acessar os pedidos do usuário."
-        )
+    exigir_perfil(autenticacao, "DISCENTE")
 
     resposta = templates.TemplateResponse(
         request=request,
@@ -170,18 +151,16 @@ def user_pedidos(request: Request, db: Session = Depends(database.get_db)):
 
 
 @app.get("/user_emprestimos")
-def user_emprestimos(request: Request, db: Session = Depends(database.get_db)):
-    autenticacao = obter_usuario_autenticado(request, db)
+def user_emprestimos(
+    request: Request,
+    db: Session = Depends(database.get_db)
+):
+    autenticacao = exigir_autenticacao(request, db)
 
     if autenticacao is None:
         return redirecionar_para_login()
 
-    if autenticacao["perfil"] != "DISCENTE":
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Seu perfil não tem permissão para acessar os empréstimos do usuário."
-        )
-
+    exigir_perfil(autenticacao, "DISCENTE")
     usuario = autenticacao["usuario"]
 
     try:
@@ -207,17 +186,16 @@ def user_emprestimos(request: Request, db: Session = Depends(database.get_db)):
 
 
 @app.get("/dashboard-gestor")
-def dashboard_gestor(request: Request, db: Session = Depends(database.get_db)):
-    autenticacao = obter_usuario_autenticado(request, db)
+def dashboard_gestor(
+    request: Request,
+    db: Session = Depends(database.get_db)
+):
+    autenticacao = exigir_autenticacao(request, db)
 
     if autenticacao is None:
         return redirecionar_para_login()
 
-    if autenticacao["perfil"] != "GESTOR":
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Seu perfil não tem permissão para acessar este dashboard."
-        )
+    exigir_perfil(autenticacao, "GESTOR")
 
     resposta = templates.TemplateResponse(
         request=request,
@@ -228,17 +206,16 @@ def dashboard_gestor(request: Request, db: Session = Depends(database.get_db)):
 
 
 @app.get("/gestor_users")
-def gestor_users(request: Request, db: Session = Depends(database.get_db)):
-    autenticacao = obter_usuario_autenticado(request, db)
+def gestor_users(
+    request: Request,
+    db: Session = Depends(database.get_db)
+):
+    autenticacao = exigir_autenticacao(request, db)
 
     if autenticacao is None:
         return redirecionar_para_login()
 
-    if autenticacao["perfil"] != "GESTOR":
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Seu perfil não tem permissão para acessar a gestão de usuários."
-        )
+    exigir_perfil(autenticacao, "GESTOR")
 
     resposta = templates.TemplateResponse(
         request=request,
@@ -249,17 +226,16 @@ def gestor_users(request: Request, db: Session = Depends(database.get_db)):
 
 
 @app.get("/user_perfil")
-def user_perfil(request: Request, db: Session = Depends(database.get_db)):
-    autenticacao = obter_usuario_autenticado(request, db)
+def user_perfil(
+    request: Request,
+    db: Session = Depends(database.get_db)
+):
+    autenticacao = exigir_autenticacao(request, db)
 
     if autenticacao is None:
         return redirecionar_para_login()
 
-    if autenticacao["perfil"] != "DISCENTE":
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Seu perfil não tem permissão para acessar seu perfil de usuário."
-        )
+    exigir_perfil(autenticacao, "DISCENTE")
 
     resposta = templates.TemplateResponse(
         request=request,
@@ -268,70 +244,21 @@ def user_perfil(request: Request, db: Session = Depends(database.get_db)):
     )
     return resposta_sem_cache(resposta)
 
+
 @app.get("/gestor/usuarios/editar/{usuario_id}")
 def editar_usuario(
     usuario_id: int,
     request: Request,
     db: Session = Depends(database.get_db)
 ):
-    autenticacao = obter_usuario_autenticado(request, db)
+    autenticacao = exigir_autenticacao(request, db)
+
     if autenticacao is None:
         return redirecionar_para_login()
-    if autenticacao["perfil"] != "GESTOR":
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Seu perfil não tem permissão para editar usuários."
-        )
+
+    exigir_perfil(autenticacao, "GESTOR")
+
     usuario = db.get(Usuarios, usuario_id)
-    if usuario is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Usuário não encontrado."
-        )
-    resposta = templates.TemplateResponse(
-        request=request,
-        name="gestor_users_editar.html",
-        context={"usuario": autenticacao["usuario"], "discente": usuario}
-    )
-    return resposta_sem_cache(resposta)
-
-
-@app.post("/encerrar-sessao")
-def encerrar_sessao(request: Request, db: Session = Depends(database.get_db)):
-    token = request.cookies.get("access_token")
-
-    if token:
-        try:
-            encerrar_sessao_por_token(db, token)
-        except SQLAlchemyError:
-            db.rollback()
-            raise HTTPException(
-                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-                detail="Não foi possível encerrar a sessão."
-            )
-
-    resposta = RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
-    resposta.delete_cookie("access_token", path="/")
-    return resposta_sem_cache(resposta)
-
-@app.get("/gestor/usuarios/editar/{id_usuario}")
-def editar_usuario(
-    id_usuario: int,
-    request: Request,
-    db: Session = Depends(database.get_db)
-):
-    autenticacao = obter_usuario_autenticado(request, db)
-
-    if autenticacao is None:
-        return redirecionar_para_login()
-
-    if autenticacao["perfil"] != "GESTOR":
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Seu perfil não tem permissão para editar usuários."
-        )
-
-    usuario = db.get(Usuarios, id_usuario)
 
     if usuario is None:
         raise HTTPException(
@@ -339,9 +266,9 @@ def editar_usuario(
             detail="Usuário não encontrado."
         )
 
-    perfil = db.get(Perfil, usuario.id_perfil)
+    perfil_usuario = db.get(Perfil, usuario.id_perfil)
 
-    if perfil is None or perfil.perfil.value != "DISCENTE":
+    if perfil_usuario is None or perfil_usuario.perfil.value != "DISCENTE":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Somente usuários com perfil DISCENTE podem ser editados nesta página."
@@ -355,43 +282,35 @@ def editar_usuario(
             "discente": usuario
         }
     )
-
     return resposta_sem_cache(resposta)
 
-@app.get("/gestor_pedidos")
-def gestor_pedidos(request: Request, db: Session = Depends(database.get_db)):
-    autenticacao = obter_usuario_autenticado(request, db)
+
+@app.get("/gestor_equipamentos")
+def gestor_equipamentos(
+    request: Request,
+    db: Session = Depends(database.get_db)
+):
+    autenticacao = exigir_autenticacao(request, db)
+
     if autenticacao is None:
         return redirecionar_para_login()
-    if autenticacao["perfil"] != "GESTOR":
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Seu perfil não tem permissão para acessar a gestão de pedidos.")
+
+    exigir_perfil(autenticacao, "GESTOR")
+
     resposta = templates.TemplateResponse(
         request=request,
-        name="gestor_pedidos.html",
+        name="gestor_equipamentos.html",
         context={"usuario": autenticacao["usuario"]}
     )
     return resposta_sem_cache(resposta)
 
 
-@app.get("/gestor/pedidos/editar/{pedido_id}")
-def gestor_pedidos_editar(pedido_id: int, request: Request, db: Session = Depends(database.get_db)):
-    autenticacao = obter_usuario_autenticado(request, db)
-    if autenticacao is None:
-        return redirecionar_para_login()
-    if autenticacao["perfil"] != "GESTOR":
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Seu perfil não tem permissão para editar pedidos.")
-    resposta = templates.TemplateResponse(
-        request=request,
-        name="gestor_pedidos_editar.html",
-        context={
-            "usuario": autenticacao["usuario"],
-            "pedido_id": pedido_id
-        }
-    )
-    return resposta_sem_cache(resposta)
-
+@app.post("/encerrar-sessao")
 @app.post("/logout")
-def logout(request: Request, db: Session = Depends(database.get_db)):
+def encerrar_sessao(
+    request: Request,
+    db: Session = Depends(database.get_db)
+):
     token = request.cookies.get("access_token")
 
     if token:
@@ -404,11 +323,71 @@ def logout(request: Request, db: Session = Depends(database.get_db)):
                 detail="Não foi possível encerrar a sessão."
             )
 
-    resposta = RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
+    resposta = RedirectResponse(
+        url="/login",
+        status_code=status.HTTP_303_SEE_OTHER
+    )
     resposta.delete_cookie("access_token", path="/")
     return resposta_sem_cache(resposta)
 
 
+@app.get("/gestor_pedidos")
+def gestor_pedidos(
+    request: Request,
+    db: Session = Depends(database.get_db)
+):
+    autenticacao = exigir_autenticacao(request, db)
+
+    if autenticacao is None:
+        return redirecionar_para_login()
+
+    exigir_perfil(autenticacao, "GESTOR")
+
+    resposta = templates.TemplateResponse(
+        request=request,
+        name="gestor_pedidos.html",
+        context={"usuario": autenticacao["usuario"]}
+    )
+    return resposta_sem_cache(resposta)
+
+
+@app.get("/gestor/pedidos/editar/{pedido_id}")
+def gestor_pedidos_editar(
+    pedido_id: int,
+    request: Request,
+    db: Session = Depends(database.get_db)
+):
+    autenticacao = exigir_autenticacao(request, db)
+
+    if autenticacao is None:
+        return redirecionar_para_login()
+
+    exigir_perfil(autenticacao, "GESTOR")
+
+    resposta = templates.TemplateResponse(
+        request=request,
+        name="gestor_pedidos_editar.html",
+        context={
+            "usuario": autenticacao["usuario"],
+            "pedido_id": pedido_id
+        }
+    )
+    return resposta_sem_cache(resposta)
+
+
 @app.get("/config")
-def config():
-    return settings
+def config(
+    request: Request,
+    db: Session = Depends(database.get_db)
+):
+    autenticacao = exigir_autenticacao(request, db)
+
+    if autenticacao is None:
+        return redirecionar_para_login()
+
+    exigir_perfil(autenticacao, "ADMINISTRADOR")
+
+    return {
+        "aplicacao": "THE IRON COMPASS",
+        "versao": "1.0.0"
+    }
