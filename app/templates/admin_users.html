@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Usuários | THE IRON COMPASS</title>
+    <link rel="stylesheet" href="/static/css/admin_users.css">
+    <script src="/static/js/admin_users.js" defer></script>
+</head>
+<body>
+<div class="layout">
+    <aside class="menu-lateral">
+        <div class="identidade">
+            <img src="/static/imagens/compasso.svg" alt="Compasso" class="logo">
+            <h2>THE IRON COMPASS</h2>
+            <p>Sistema de Empréstimos</p>
+        </div>
+
+        <nav class="navegacao">
+            <a class="item-menu" href="/dashboard-admin"><span class="icone">⌂</span> Dashboard</a>
+            <a class="item-menu ativo" href="/admin_users"><span class="icone">♙</span> Usuários</a>
+            <a class="item-menu" href="/admin_equipamentos"><span class="icone">▣</span> Equipamentos</a>
+            <a class="item-menu" href="/admin_pedidos"><span class="icone">▤</span> Pedidos</a>
+        </nav>
+
+        <div class="rodape-menu">
+            <form action="/encerrar-sessao" method="post">
+                <button class="item-menu sair" type="submit">↪ Encerrar sessão</button>
+            </form>
+        </div>
+    </aside>
+
+    <main class="conteudo-principal">
+        <header class="cabecalho">
+            <div>
+                <p class="subtitulo">ADMINISTRAÇÃO / CADASTROS</p>
+                <h1>Usuários</h1>
+                <p class="descricao">Gerencie os acessos e os dados dos usuários do sistema.</p>
+            </div>
+            <div class="informacoes-usuario">
+                <span class="avatar">♙</span>
+                <div>
+                    <strong>{{ usuario.nome if usuario and usuario.nome else "Administrador" }}</strong>
+                    <small>Administrador</small>
+                </div>
+            </div>
+        </header>
+
+        <section class="indicadores">
+            <article class="cartao">
+                <span>Total de usuários</span>
+                <strong id="totalUsuarios">—</strong>
+            </article>
+            <article class="cartao">
+                <span>Usuários ativos</span>
+                <strong id="usuariosAtivos">—</strong>
+            </article>
+            <article class="cartao">
+                <span>Usuários inativos</span>
+                <strong id="usuariosInativos">—</strong>
+            </article>
+        </section>
+
+        <section class="painel">
+            <div class="barra-acoes">
+                <div>
+                    <h2>Lista de usuários</h2>
+                    <p>Consulte e gerencie os cadastros.</p>
+                </div>
+                <button class="botao-principal" id="novoUsuario">+ Novo usuário</button>
+            </div>
+
+            <div class="filtros">
+                <input id="buscaUsuarios" type="search"
+                       placeholder="Buscar por nome ou e-mail..." aria-label="Buscar usuários">
+                <select id="filtroStatus" aria-label="Filtrar por status">
+                    <option value="">Todos os status</option>
+                    <option value="ativo">Ativos</option>
+                    <option value="inativo">Inativos</option>
+                </select>
+            </div>
+
+            <div id="mensagemUsuarios" class="mensagem" role="status">
+                Nenhum usuário carregado. Conecte esta tela à API para exibir os registros.
+            </div>
+
+            <div class="area-tabela">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Usuário</th>
+                            <th>E-mail</th>
+                            <th>Perfil</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="listaUsuarios"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <dialog id="modalUsuario">
+            <form id="formUsuario">
+                <div class="modal-cabecalho">
+                    <div>
+                        <p class="subtitulo">CADASTRO</p>
+                        <h2 id="tituloModal">Novo usuário</h2>
+                    </div>
+                    <button type="button" class="botao-fechar" id="fecharModal"
+                            aria-label="Fechar">×</button>
+                </div>
+
+                <input type="hidden" id="usuarioId">
+
+                <label for="nomeUsuario">Nome completo</label>
+                <input id="nomeUsuario" name="nome" required maxlength="120">
+
+                <label for="emailUsuario">E-mail</label>
+                <input id="emailUsuario" name="email" type="email" required maxlength="254">
+
+                <label for="perfilUsuario">Perfil</label>
+                <select id="perfilUsuario" name="perfil" required>
+                    <option value="usuario">Usuário</option>
+                    <option value="gestor">Gestor</option>
+                    <option value="administrador">Administrador</option>
+                </select>
+
+                <label for="statusUsuario">Status</label>
+                <select id="statusUsuario" name="ativo">
+                    <option value="true">Ativo</option>
+                    <option value="false">Inativo</option>
+                </select>
+
+                <label for="senhaUsuario">Senha <span>(obrigatória no cadastro)</span></label>
+                <input id="senhaUsuario" name="senha" type="password"
+                       minlength="8" autocomplete="new-password">
+
+                <p id="erroFormulario" class="erro" role="alert"></p>
+
+                <div class="modal-acoes">
+                    <button type="button" class="botao-secundario" id="cancelarUsuario">Cancelar</button>
+                    <button type="submit" class="botao-principal">Salvar usuário</button>
+                </div>
+            </form>
+        </dialog>
+
+        <footer class="rodape-pagina">THE IRON COMPASS · Administração de usuários</footer>
+    </main>
+</div>
+</body>
+</html>

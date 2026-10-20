@@ -3,402 +3,320 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="robots" content="noindex, nofollow">
 
-    <title>Painel Administrativo | THE IRON COMPASS</title>
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, private">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
 
-    <link
-        rel="stylesheet"
-        href="/static/css/dashboard_admin.css"
-    >
+    <title>Dashboard do Administrador | The Iron Compass</title>
 
-    <script
-        src="/static/js/dashboard_admin.js"
-        defer
-    ></script>
+    <link rel="stylesheet" href="/static/css/dashboard_admin.css">
+    <script src="/static/js/dashboard_admin.js" defer></script>
 </head>
 
 <body>
     <div class="layout">
 
-        <aside class="sidebar">
-            <a href="/dashboard-admin" class="brand">
-                <span class="brand-icon">◆</span>
-                <span>THE IRON COMPASS</span>
-            </a>
+        <!-- Menu lateral -->
+        <aside class="menu-lateral">
 
-            <p class="brand-subtitle">GESTÃO DE EQUIPAMENTOS</p>
-
-            <p class="nav-label">ADMINISTRAÇÃO</p>
-
-            <nav class="navigation" aria-label="Menu administrativo">
-                <button
-                    type="button"
-                    class="nav-button active"
-                    data-tab="visao-geral"
-                    aria-selected="true"
+            <div class="identidade">
+                <img
+                    src="/static/imagens/compasso.svg"
+                    alt="Compasso The Iron Compass"
+                    class="logo"
                 >
-                    <span class="nav-icon">◈</span>
-                    Visão geral
-                </button>
 
-                <button
-                    type="button"
-                    class="nav-button"
-                    data-tab="usuarios"
-                    aria-selected="false"
-                >
-                    <span class="nav-icon">♙</span>
-                    Usuários
-                </button>
+                <h2>THE IRON COMPASS</h2>
+                <p>Sistema de Empréstimos</p>
+            </div>
 
-                <button
-                    type="button"
-                    class="nav-button"
-                    data-tab="equipamentos"
-                    aria-selected="false"
-                >
-                    <span class="nav-icon">⚙</span>
-                    Equipamentos
-                </button>
+            <nav class="navegacao" aria-label="Menu administrativo">
 
-                <button
-                    type="button"
-                    class="nav-button"
-                    data-tab="pedidos"
-                    aria-selected="false"
+                <a
+                    href="/dashboard-admin"
+                    class="item-menu ativo"
+                    aria-current="page"
                 >
-                    <span class="nav-icon">▤</span>
-                    Pedidos
-                </button>
+                    <span class="icone">⌂</span>
+                    <span>Dashboard</span>
+                </a>
+
+                <a
+                    href="/admin_users"
+                    class="item-menu"
+                >
+                    <span class="icone">♙</span>
+                    <span>Usuários</span>
+                </a>
+
+                <a
+                    href="/admin_equipamentos"
+                    class="item-menu"
+                >
+                    <span class="icone">⚙</span>
+                    <span>Equipamentos</span>
+                </a>
+
+                <a
+                    href="/admin_pedidos"
+                    class="item-menu"
+                >
+                    <span class="icone">▤</span>
+                    <span>Pedidos</span>
+                </a>
+
             </nav>
 
-            <div class="sidebar-footer">
-                <div class="admin-profile">
-                    <div class="avatar">A</div>
-
-                    <div class="admin-info">
-                        <strong>
-                            {{ usuario.nome if usuario and usuario.nome else "Administrador" }}
-                        </strong>
-                        <span>Administrador</span>
-                    </div>
-                </div>
-
+            <!-- Rodapé do menu -->
+            <div class="rodape-menu">
                 <form action="/encerrar-sessao" method="post">
-                    <button class="logout-button" type="submit">
-                        <span>↪</span>
-                        Encerrar sessão
+                    <button
+                        type="submit"
+                        class="item-menu sair"
+                        aria-label="Encerrar sessão"
+                    >
+                        <span class="icone">⇥</span>
+                        <span>Sair</span>
                     </button>
                 </form>
             </div>
+
         </aside>
 
-        <main class="main-content">
+        <!-- Conteúdo principal -->
+        <main class="conteudo-principal">
 
-            <header class="topbar">
-                <div>
-                    <p class="eyebrow">CENTRAL DE CONTROLE</p>
-                    <h1 id="page-title">Visão geral</h1>
+            <!-- Cabeçalho -->
+            <header class="cabecalho">
 
-                    <p class="welcome-message">
-                        Bem-vindo(a) ao painel administrativo.
+                <div class="titulo-pagina">
+                    <p class="subtitulo">CENTRAL ADMINISTRATIVA</p>
+
+                    <h1>Dashboard</h1>
+
+                    <p>
+                        Gerencie os usuários, equipamentos e pedidos
+                        do sistema THE IRON COMPASS.
                     </p>
                 </div>
 
-                <span class="role-badge">
-                    <span class="status-dot"></span>
-                    ADMINISTRADOR
-                </span>
+                <div class="informacoes-usuario">
+
+                    <div class="avatar-usuario">
+                        ♙
+                    </div>
+
+                    <div class="dados-usuario">
+                        <span id="nomeUsuario">
+                            {{ usuario.nome if usuario and usuario.nome else "Administrador" }}
+                        </span>
+
+                        <small id="perfilUsuario">
+                            Administrador
+                        </small>
+                    </div>
+
+                </div>
+
             </header>
 
-            <div
-                id="feedback-message"
-                class="feedback-message"
-                role="status"
-                aria-live="polite"
-                hidden
-            ></div>
+            <!-- Indicadores administrativos -->
+            <section class="secao-indicadores">
 
-            <!-- VISÃO GERAL -->
-            <section
-                class="tab-panel active"
-                id="tab-visao-geral"
-                aria-labelledby="page-title"
-            >
-                <div class="stats-grid">
-
-                    <article class="stat-card">
-                        <div class="stat-heading">
-                            <span class="stat-label">Usuários</span>
-                            <span class="stat-icon">♙</span>
-                        </div>
-
-                        <p class="stat-value">—</p>
-                        <p class="stat-description">
-                            Aguardando integração com a API
-                        </p>
-                    </article>
-
-                    <article class="stat-card">
-                        <div class="stat-heading">
-                            <span class="stat-label">Equipamentos</span>
-                            <span class="stat-icon">⚙</span>
-                        </div>
-
-                        <p class="stat-value">—</p>
-                        <p class="stat-description">
-                            Aguardando integração com a API
-                        </p>
-                    </article>
-
-                    <article class="stat-card">
-                        <div class="stat-heading">
-                            <span class="stat-label">Pedidos</span>
-                            <span class="stat-icon">▤</span>
-                        </div>
-
-                        <p class="stat-value">—</p>
-                        <p class="stat-description">
-                            Aguardando integração com a API
-                        </p>
-                    </article>
-
-                </div>
-
-                <section class="content-card">
-                    <div class="section-heading">
-                        <div>
-                            <p class="eyebrow">SISTEMA</p>
-                            <h2>Central administrativa</h2>
-                        </div>
+                <article class="cartao-indicador">
+                    <div class="indicador-topo">
+                        <span>Usuários cadastrados</span>
+                        <span class="icone-indicador">♙</span>
                     </div>
 
-                    <p class="section-description">
-                        Gerencie os usuários, os equipamentos e os pedidos
-                        do sistema por meio das seções abaixo.
+                    <strong id="totalUsuarios">—</strong>
+
+                    <p>
+                        Total de usuários registrados no sistema
                     </p>
+                </article>
 
-                    <div class="quick-actions">
-                        <button
-                            type="button"
-                            class="quick-action"
-                            data-open-tab="usuarios"
-                        >
-                            <span class="quick-action-icon">♙</span>
-                            <span>
-                                <strong>Usuários</strong>
-                                <small>Cadastro e gerenciamento</small>
-                            </span>
-                            <span class="action-arrow">→</span>
-                        </button>
-
-                        <button
-                            type="button"
-                            class="quick-action"
-                            data-open-tab="equipamentos"
-                        >
-                            <span class="quick-action-icon">⚙</span>
-                            <span>
-                                <strong>Equipamentos</strong>
-                                <small>Registro e manutenção</small>
-                            </span>
-                            <span class="action-arrow">→</span>
-                        </button>
-
-                        <button
-                            type="button"
-                            class="quick-action"
-                            data-open-tab="pedidos"
-                        >
-                            <span class="quick-action-icon">▤</span>
-                            <span>
-                                <strong>Pedidos</strong>
-                                <small>Consulta e gerenciamento</small>
-                            </span>
-                            <span class="action-arrow">→</span>
-                        </button>
+                <article class="cartao-indicador">
+                    <div class="indicador-topo">
+                        <span>Equipamentos cadastrados</span>
+                        <span class="icone-indicador">⚙</span>
                     </div>
-                </section>
+
+                    <strong id="totalEquipamentos">—</strong>
+
+                    <p>
+                        Total de equipamentos registrados
+                    </p>
+                </article>
+
+                <article class="cartao-indicador">
+                    <div class="indicador-topo">
+                        <span>Pedidos registrados</span>
+                        <span class="icone-indicador">▤</span>
+                    </div>
+
+                    <strong id="totalPedidos">—</strong>
+
+                    <p>
+                        Total de solicitações registradas
+                    </p>
+                </article>
+
+                <article class="cartao-indicador">
+                    <div class="indicador-topo">
+                        <span>Empréstimos ativos</span>
+                        <span class="icone-indicador">⚒</span>
+                    </div>
+
+                    <strong id="emprestimosAtivos">—</strong>
+
+                    <p>
+                        Equipamentos atualmente emprestados
+                    </p>
+                </article>
+
             </section>
 
-            <!-- USUÁRIOS -->
-            <section
-                class="tab-panel"
-                id="tab-usuarios"
-                aria-labelledby="usuarios-title"
-                hidden
-            >
-                <div class="section-heading">
-                    <div>
-                        <p class="eyebrow">ADMINISTRAÇÃO</p>
-                        <h2 id="usuarios-title">Usuários</h2>
-                        <p class="section-description">
-                            Cadastre, edite e desative usuários.
-                        </p>
-                    </div>
+            <!-- Conteúdo do dashboard -->
+            <section class="secao-conteudo">
 
-                    <button
-                        type="button"
-                        class="primary-button"
-                        data-action="criar-usuario"
-                    >
-                        + Novo usuário
-                    </button>
-                </div>
+                <!-- Pedidos recentes -->
+                <article class="painel painel-pedidos">
 
-                <section class="content-card">
-                    <div class="table-toolbar">
-                        <input
-                            type="search"
-                            class="search-input"
-                            placeholder="Buscar usuário..."
-                            aria-label="Buscar usuário"
-                            data-search="tabela-usuarios"
+                    <div class="cabecalho-painel">
+                        <div>
+                            <h2>Pedidos recentes</h2>
+
+                            <p>
+                                Acompanhe as solicitações realizadas pelos usuários.
+                            </p>
+                        </div>
+
+                        <a
+                            href="/admin_pedidos"
+                            class="link-painel"
                         >
+                            Ver todos
+                        </a>
                     </div>
 
-                    <div class="table-container">
-                        <table id="tabela-usuarios">
+                    <div class="area-tabela">
+                        <table>
                             <thead>
                                 <tr>
-                                    <th>ID</th>
+                                    <th>Nº do pedido</th>
+                                    <th>Solicitante</th>
+                                    <th>Equipamento</th>
+                                    <th>Data</th>
+                                    <th>Status</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="listaPedidos">
+                                <tr>
+                                    <td colspan="6" class="mensagem-vazia">
+                                        Nenhum pedido encontrado.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </article>
+
+                <!-- Usuários recentes -->
+                <article class="painel painel-usuarios">
+
+                    <div class="cabecalho-painel">
+                        <div>
+                            <h2>Usuários</h2>
+
+                            <p>
+                                Acesse a área de gerenciamento de usuários.
+                            </p>
+                        </div>
+
+                        <a
+                            href="/admin_users"
+                            class="link-painel"
+                        >
+                            Gerenciar usuários
+                        </a>
+                    </div>
+
+                    <div class="area-tabela">
+                        <table>
+                            <thead>
+                                <tr>
                                     <th>Usuário</th>
                                     <th>Perfil</th>
                                     <th>Status</th>
-                                    <th>Ações</th>
                                 </tr>
                             </thead>
 
-                            <tbody>
+                            <tbody id="listaUsuarios">
                                 <tr>
-                                    <td colspan="5" class="empty-state">
-                                        Os usuários cadastrados serão
-                                        carregados pela API.
+                                    <td colspan="3" class="mensagem-vazia">
+                                        Os dados dos usuários serão exibidos aqui.
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
-                </section>
-            </section>
 
-            <!-- EQUIPAMENTOS -->
-            <section
-                class="tab-panel"
-                id="tab-equipamentos"
-                aria-labelledby="equipamentos-title"
-                hidden
-            >
-                <div class="section-heading">
-                    <div>
-                        <p class="eyebrow">PATRIMÔNIO</p>
-                        <h2 id="equipamentos-title">Equipamentos</h2>
-                        <p class="section-description">
-                            Registre, edite e gerencie os equipamentos.
-                        </p>
-                    </div>
+                </article>
 
-                    <button
-                        type="button"
-                        class="primary-button"
-                        data-action="criar-equipamento"
-                    >
-                        + Novo equipamento
-                    </button>
-                </div>
+                <!-- Equipamentos -->
+                <article class="painel painel-equipamentos">
 
-                <section class="content-card">
-                    <div class="table-toolbar">
-                        <input
-                            type="search"
-                            class="search-input"
-                            placeholder="Buscar equipamento..."
-                            aria-label="Buscar equipamento"
-                            data-search="tabela-equipamentos"
+                    <div class="cabecalho-painel">
+                        <div>
+                            <h2>Equipamentos</h2>
+
+                            <p>
+                                Consulte e gerencie os equipamentos cadastrados.
+                            </p>
+                        </div>
+
+                        <a
+                            href="/admin_equipamentos"
+                            class="link-painel"
                         >
+                            Gerenciar equipamentos
+                        </a>
                     </div>
 
-                    <div class="table-container">
-                        <table id="tabela-equipamentos">
+                    <div class="area-tabela">
+                        <table>
                             <thead>
                                 <tr>
-                                    <th>ID</th>
                                     <th>Equipamento</th>
-                                    <th>Categoria</th>
+                                    <th>Quantidade</th>
                                     <th>Disponibilidade</th>
-                                    <th>Ações</th>
                                 </tr>
                             </thead>
 
-                            <tbody>
+                            <tbody id="listaEquipamentos">
                                 <tr>
-                                    <td colspan="5" class="empty-state">
-                                        Os equipamentos cadastrados serão
-                                        carregados pela API.
+                                    <td colspan="3" class="mensagem-vazia">
+                                        Os dados dos equipamentos serão exibidos aqui.
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
-                </section>
+
+                </article>
+
             </section>
 
-            <!-- PEDIDOS -->
-            <section
-                class="tab-panel"
-                id="tab-pedidos"
-                aria-labelledby="pedidos-title"
-                hidden
-            >
-                <div class="section-heading">
-                    <div>
-                        <p class="eyebrow">SOLICITAÇÕES</p>
-                        <h2 id="pedidos-title">Pedidos</h2>
-                        <p class="section-description">
-                            Consulte e gerencie os pedidos existentes.
-                        </p>
-                    </div>
-                </div>
-
-                <section class="content-card">
-                    <div class="table-toolbar">
-                        <input
-                            type="search"
-                            class="search-input"
-                            placeholder="Buscar pedido..."
-                            aria-label="Buscar pedido"
-                            data-search="tabela-pedidos"
-                        >
-                    </div>
-
-                    <div class="table-container">
-                        <table id="tabela-pedidos">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Solicitante</th>
-                                    <th>Equipamento</th>
-                                    <th>Status</th>
-                                    <th>Ações</th>
-                                </tr>
-                            </thead>
-
-                            <tbody>
-                                <tr>
-                                    <td colspan="5" class="empty-state">
-                                        Os pedidos cadastrados serão
-                                        carregados pela API.
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </section>
-            </section>
-
-            <footer class="page-footer">
-                THE IRON COMPASS · Painel administrativo
+            <!-- Rodapé -->
+            <footer class="rodape-pagina">
+                <p>
+                    THE IRON COMPASS — Sistema de Gerenciamento de Empréstimos
+                </p>
             </footer>
 
         </main>

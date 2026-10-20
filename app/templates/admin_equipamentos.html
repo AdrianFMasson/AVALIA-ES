@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Gestão de Equipamentos | THE IRON COMPASS</title>
+
+    <link
+        rel="stylesheet"
+        href="/static/css/admin_equipamentos.css"
+    >
+
+    <script
+        src="/static/js/admin_equipamentos.js"
+        defer
+    ></script>
+</head>
+
+<body>
+    <aside class="menu-lateral">
+        <div class="identidade">
+            <div class="logo">IC</div>
+
+            <div class="identidade-texto">
+                <h1>THE IRON COMPASS</h1>
+                <p>Sistema de Gestão</p>
+            </div>
+        </div>
+
+        <div class="separador-menu"></div>
+
+        <p class="titulo-menu">MENU PRINCIPAL</p>
+
+        <nav class="navegacao">
+            <a href="/dashboard-admin" class="item-menu">
+                <span>⌂</span>
+                Dashboard
+            </a>
+
+            <a href="/admin_usuarios" class="item-menu">
+                <span>♙</span>
+                Usuários
+            </a>
+
+            <a href="/admin_estoque" class="item-menu">
+                <span>▤</span>
+                Estoques
+            </a>
+
+            <a href="/admin_equipamentos" class="item-menu ativo">
+                <span>⚙</span>
+                Equipamentos
+            </a>
+
+            <a href="/admin_pedidos" class="item-menu">
+                <span>▣</span>
+                Pedidos
+            </a>
+
+            <a href="/admin_emprestimos" class="item-menu">
+                <span>⇄</span>
+                Empréstimos
+            </a>
+        </nav>
+
+        <div class="rodape-menu">
+            <div class="separador-menu"></div>
+            <p>THE IRON COMPASS</p>
+            <span>Painel administrativo</span>
+        </div>
+    </aside>
+
+    <main class="conteudo-principal">
+        <header class="cabecalho-pagina">
+            <div>
+                <p class="caminho-pagina">Administração / Equipamentos</p>
+                <h2>Gestão de Equipamentos</h2>
+                <p class="descricao-pagina">
+                    Cadastre, consulte e atualize os equipamentos do sistema.
+                </p>
+            </div>
+
+            <button
+                type="button"
+                id="novoEquipamento"
+                class="botao botao-principal"
+            >
+                + Novo equipamento
+            </button>
+        </header>
+
+        <section class="painel-listagem">
+            <div class="cabecalho-painel">
+                <div>
+                    <h3>Equipamentos cadastrados</h3>
+                    <p>Pesquise, filtre e edite os equipamentos existentes.</p>
+                </div>
+            </div>
+
+            <div class="area-filtros">
+                <div class="campo-filtro campo-busca">
+                    <label for="buscaEquipamentos">Pesquisar</label>
+                    <input
+                        type="search"
+                        id="buscaEquipamentos"
+                        placeholder="Nome, categoria, ID ou descrição..."
+                    >
+                </div>
+
+                <div class="campo-filtro">
+                    <label for="filtroDisponibilidade">Disponibilidade</label>
+                    <select id="filtroDisponibilidade">
+                        <option value="">Todos os status</option>
+                        <option value="DISPONIVEL">Disponível</option>
+                        <option value="EMPRESTADO">Emprestado</option>
+                        <option value="MANUTENCAO">Em manutenção</option>
+                        <option value="INATIVO">Inativo</option>
+                    </select>
+                </div>
+            </div>
+
+            <div
+                id="mensagemEquipamentos"
+                class="mensagem"
+                role="status"
+                aria-live="polite"
+            ></div>
+
+            <div
+                id="listaEquipamentos"
+                class="lista-equipamentos"
+            >
+                <div class="estado-vazio">Carregando equipamentos...</div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal de cadastro e edição -->
+    <div
+        id="modalEquipamento"
+        class="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="tituloModalEquipamento"
+        aria-hidden="true"
+        hidden
+    >
+        <div class="modal-conteudo">
+            <div class="modal-cabecalho">
+                <div>
+                    <p class="caminho-pagina">Gestão de equipamentos</p>
+                    <h2 id="tituloModalEquipamento">Cadastrar equipamento</h2>
+                </div>
+
+                <button
+                    type="button"
+                    id="fecharModal"
+                    class="botao-fechar"
+                    aria-label="Fechar janela"
+                >
+                    ×
+                </button>
+            </div>
+
+            <form id="formEquipamento">
+                <input type="hidden" id="equipamentoId" name="id_equipamento">
+
+                <div class="campo">
+                    <label for="nomeEquipamento">Nome do equipamento</label>
+                    <input
+                        type="text"
+                        id="nomeEquipamento"
+                        name="nome"
+                        maxlength="150"
+                        placeholder="Ex.: Notebook Dell Latitude"
+                        required
+                    >
+                </div>
+
+                <div class="campo">
+                    <label for="patrimonioEquipamento">ID do estoque</label>
+                    <select
+                        id="patrimonioEquipamento"
+                        name="id_estoque"
+                        required
+                    >
+                        <option value="">Selecione o ID do estoque</option>
+
+                        {% for estoque in estoques %}
+                        <option value="{{ estoque.id_estoque }}">
+                            {{ estoque.id_estoque }} — {{ estoque.descricao }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="campo">
+                    <label for="categoriaEquipamento">Categoria</label>
+
+                    <div class="categoria-container">
+                        <input
+                            type="text"
+                            id="categoriaEquipamento"
+                            name="categoria"
+                            maxlength="100"
+                            placeholder="Digite ou selecione uma categoria"
+                            autocomplete="off"
+                            aria-autocomplete="list"
+                            aria-controls="listaCategorias"
+                            required
+                        >
+
+                        <button
+                            type="button"
+                            id="abrirListaCategorias"
+                            class="botao-lista-categorias"
+                            aria-label="Mostrar categorias existentes"
+                            aria-expanded="false"
+                        >
+                            ▼
+                        </button>
+
+                        <ul
+                            id="listaCategorias"
+                            class="lista-categorias"
+                            role="listbox"
+                            hidden
+                        ></ul>
+                    </div>
+
+                    <small>
+                        Escolha uma categoria existente ou digite uma nova.
+                    </small>
+                </div>
+
+                <div class="campo">
+                    <label for="disponibilidadeEquipamento">Status</label>
+                    <select
+                        id="disponibilidadeEquipamento"
+                        name="status_equip"
+                        required
+                    >
+                        <option value="disponivel">Disponível</option>
+                        <option value="emprestado">Emprestado</option>
+                        <option value="manutencao">Em manutenção</option>
+                        <option value="inativo">Inativo</option>
+                    </select>
+                </div>
+
+                <div class="campo">
+                    <label for="conservacaoEquipamento">Descrição</label>
+                    <textarea
+                        id="conservacaoEquipamento"
+                        name="descricao"
+                        rows="4"
+                        placeholder="Informe detalhes do equipamento..."
+                    ></textarea>
+                </div>
+
+                <div
+                    id="mensagemFormulario"
+                    class="mensagem"
+                    role="status"
+                    aria-live="polite"
+                ></div>
+
+                <div class="acoes-modal">
+                    <button
+                        type="button"
+                        id="cancelarEquipamento"
+                        class="botao botao-secundario"
+                    >
+                        Cancelar
+                    </button>
+
+                    <button
+                        type="submit"
+                        id="salvarEquipamento"
+                        class="botao botao-principal"
+                    >
+                        Cadastrar equipamento
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

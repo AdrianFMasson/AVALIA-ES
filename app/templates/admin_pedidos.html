@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedidos | THE IRON COMPASS</title>
+    <link rel="stylesheet" href="/static/css/admin_pedidos.css">
+    <script src="/static/js/admin_pedidos.js" defer></script>
+</head>
+<body>
+<div class="layout">
+    <aside class="menu-lateral">
+        <div class="identidade">
+            <img src="/static/imagens/compasso.svg" alt="Compasso" class="logo">
+            <h2>THE IRON COMPASS</h2>
+            <p>Sistema de Empréstimos</p>
+        </div>
+
+        <nav class="navegacao">
+            <a class="item-menu" href="/dashboard-admin">
+                <span class="icone">⌂</span> Dashboard
+            </a>
+            <a class="item-menu" href="/admin_users">
+                <span class="icone">♙</span> Usuários
+            </a>
+            <a class="item-menu" href="/admin_equipamentos">
+                <span class="icone">▣</span> Equipamentos
+            </a>
+            <a class="item-menu ativo" href="/admin_pedidos">
+                <span class="icone">▤</span> Pedidos
+            </a>
+        </nav>
+
+        <div class="rodape-menu">
+            <form action="/encerrar-sessao" method="post">
+                <button class="item-menu sair" type="submit">
+                    ↪ Encerrar sessão
+                </button>
+            </form>
+        </div>
+    </aside>
+
+    <main class="conteudo-principal">
+        <header class="cabecalho">
+            <div>
+                <p class="subtitulo">ADMINISTRAÇÃO / SOLICITAÇÕES</p>
+                <h1>Pedidos</h1>
+                <p class="descricao">
+                    Consulte e acompanhe os pedidos de equipamentos.
+                </p>
+            </div>
+
+            <div class="informacoes-usuario">
+                <span class="avatar">♙</span>
+                <div>
+                    <strong>
+                        {{ usuario.nome if usuario and usuario.nome else "Administrador" }}
+                    </strong>
+                    <small>Administrador</small>
+                </div>
+            </div>
+        </header>
+
+        <section class="indicadores">
+            <article class="cartao">
+                <span>Total de pedidos</span>
+                <strong id="totalPedidos">0</strong>
+            </article>
+            <article class="cartao">
+                <span>Abertos</span>
+                <strong id="pedidosAbertos">0</strong>
+            </article>
+            <article class="cartao">
+                <span>Em análise</span>
+                <strong id="pedidosEmAnalise">0</strong>
+            </article>
+            <article class="cartao">
+                <span>Encerrados</span>
+                <strong id="pedidosEncerrados">0</strong>
+            </article>
+        </section>
+
+        <section class="painel">
+            <div class="barra-acoes">
+                <div>
+                    <h2>Lista de pedidos</h2>
+                    <p>Pedidos registrados pelos usuários do sistema.</p>
+                </div>
+
+                <button
+                    type="button"
+                    class="botao-secundario"
+                    id="atualizarPedidos"
+                >
+                    Atualizar lista
+                </button>
+            </div>
+
+            <div class="filtros">
+                <input
+                    id="buscaPedidos"
+                    type="search"
+                    placeholder="Buscar por usuário ou equipamento..."
+                    aria-label="Buscar pedidos"
+                >
+
+                <select id="filtroStatus" aria-label="Filtrar pedidos por status">
+                    <option value="">Todos os status</option>
+                    <option value="ABERTO">Abertos</option>
+                    <option value="EM_ANALISE">Em análise</option>
+                    <option value="ENCERRADO">Encerrados</option>
+                </select>
+            </div>
+
+            <div
+                id="mensagemPedidos"
+                class="mensagem"
+                role="status"
+                aria-live="polite"
+            >
+                Carregando pedidos...
+            </div>
+
+            <div class="area-tabela">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Número</th>
+                            <th>Solicitante</th>
+                            <th>Equipamento</th>
+                            <th>Data do pedido</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="listaPedidos"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <dialog id="modalStatusPedido">
+            <form id="formStatusPedido">
+                <div class="modal-cabecalho">
+                    <div>
+                        <p class="subtitulo">GERENCIAMENTO</p>
+                        <h2>Atualizar pedido</h2>
+                    </div>
+
+                    <button
+                        type="button"
+                        class="botao-fechar"
+                        id="fecharModalPedido"
+                        aria-label="Fechar"
+                    >×</button>
+                </div>
+
+                <input type="hidden" id="pedidoId">
+
+                <p id="resumoPedido"></p>
+
+                <label for="novoStatusPedido">Novo status</label>
+                <select id="novoStatusPedido" required>
+                    <option value="ABERTO">Aberto</option>
+                    <option value="EM_ANALISE">Em análise</option>
+                    <option value="ENCERRADO">Encerrado</option>
+                </select>
+
+                <p id="erroPedido" class="erro" role="alert"></p>
+
+                <div class="modal-acoes">
+                    <button
+                        type="button"
+                        class="botao-secundario"
+                        id="cancelarStatusPedido"
+                    >
+                        Cancelar
+                    </button>
+
+                    <button type="submit" class="botao-principal">
+                        Salvar status
+                    </button>
+                </div>
+            </form>
+        </dialog>
+
+        <footer class="rodape-pagina">
+            THE IRON COMPASS · Controle de pedidos
+        </footer>
+    </main>
+</div>
+</body>
+</html>

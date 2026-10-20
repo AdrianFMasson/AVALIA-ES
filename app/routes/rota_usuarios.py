@@ -36,21 +36,24 @@ def validar_gerenciamento(request: Request, db: Session):
 
 @usuarios_rota.get(
     "/usuarios",
-    status_code=status.HTTP_200_OK,
-    response_model=list[Usuarios]
+    response_model=list[Usuarios],
+    status_code=status.HTTP_200_OK
 )
 def buscar_usuarios(
     request: Request,
     db: Session = Depends(database.get_db)
 ):
+    # Valida se o usuário logado possui perfil de Gestor ou Administrador
     validar_gerenciamento(request, db)
 
     try:
-        return UsuariosController.buscar_usuarios(db)
-    except RuntimeError:
+        # Nota: Certifique-se de que o método no seu controller chame algo como 'listar_usuarios' 
+        # ou 'buscar_todos_usuarios'. Altere o nome abaixo se o seu método tiver outra nomenclatura.
+        return UsuariosController.listar_usuarios(db)
+    except Exception as e:
         raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Não foi possível consultar os usuários."
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e)
         )
 
 
@@ -73,10 +76,10 @@ def criar_usuario(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(e)
         )
-    except RuntimeError:
+    except RuntimeError as e:
         raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Não foi possível cadastrar o usuário."
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e)
         )
 
 
@@ -112,20 +115,20 @@ def atualizar_usuario(
         )
     except HTTPException:
         raise
-    except KeyError:
+    except KeyError as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Usuário não encontrado."
+            detail=str(e)
         )
     except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(e)
         )
-    except RuntimeError:
+    except RuntimeError as e:
         raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Não foi possível atualizar o usuário."
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e)
         )
 
 
@@ -142,18 +145,18 @@ def deletar_usuario(
 
     try:
         UsuariosController.deletar_usuario(db, usuario_id)
-    except KeyError:
+    except KeyError as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Usuário não encontrado."
+            detail=str(e)
         )
     except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(e)
         )
-    except RuntimeError:
+    except RuntimeError as e:
         raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Não foi possível excluir o usuário."
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e)
         )

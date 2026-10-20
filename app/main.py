@@ -142,27 +142,27 @@ def pagina_login(
     request: Request,
     db: Session = Depends(database.get_db),
 ):
-    autenticacao = obter_usuario_autenticado(request, db)
+    token = request.cookies.get("access_token")
 
-    # Se já estiver autenticado, encaminha para o dashboard correto.
-    if autenticacao is not None:
-        destino = obter_dashboard_por_perfil(
-            autenticacao["perfil"]
-        )
-
-        if destino:
-            resposta = RedirectResponse(
-                url=destino,
-                status_code=status.HTTP_303_SEE_OTHER,
+    if token:
+        try:
+            encerrar_sessao_por_token(db, token)
+        except SQLAlchemyError:
+            db.rollback()
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail="Não foi possível encerrar a sessão. Tente novamente.",
             )
 
-            return resposta_sem_cache(resposta)
-
-    # Se não estiver autenticado, exibe a página de login.
     resposta = templates.TemplateResponse(
         request=request,
         name="login.html",
         context={},
+    )
+
+    resposta.delete_cookie(
+        key="access_token",
+        path="/",
     )
 
     return resposta_sem_cache(resposta)
