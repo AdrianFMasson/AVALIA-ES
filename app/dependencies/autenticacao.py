@@ -1,9 +1,9 @@
-
 from datetime import datetime, timedelta, timezone
 import secrets
+
 import jwt
 from jwt import InvalidTokenError
-from fastapi import Request, HTTPException, status
+from fastapi import HTTPException, Request, status
 from sqlalchemy.exc import SQLAlchemyError
 from sqlmodel import Session, select
 
@@ -51,7 +51,6 @@ def validar_token_acesso(token: str) -> dict:
         },
     )
 
-    # Confirma que os campos temporais são coerentes.
     agora = datetime.now(timezone.utc).timestamp()
     emitido_em = payload["iat"]
     expira_em = payload["exp"]

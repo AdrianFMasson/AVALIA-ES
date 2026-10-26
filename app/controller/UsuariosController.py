@@ -5,6 +5,14 @@ from entities.models import Usuarios, Perfil, UsuarioAtualizacao
 from utils.validacao_senha import validar_senha
 from utils.seguranca_senha import gerar_hash_senha
 
+def buscar_usuario_por_id(db: Session, usuario_id: int) -> Usuarios | None:
+    try:
+        return db.get(Usuarios, usuario_id)
+    except OperationalError as e:
+        raise RuntimeError(
+            "Falha de comunicação com o banco de dados."
+        ) from e
+
 def buscar_usuarios(db: Session) -> List[Usuarios]:
     try:
         statement = select(Usuarios)
