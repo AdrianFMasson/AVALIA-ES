@@ -1,7 +1,6 @@
 :root {
     --azul-petroleo: #173b46;
     --azul-escuro: #102b33;
-    --azul-medio: #24515b;
     --cobre: #bd6b3c;
     --cobre-escuro: #8f4828;
     --cobre-claro: #e6a16f;
@@ -13,6 +12,8 @@
     --sucesso: #477b5c;
     --erro: #a63e32;
 }
+
+
 * {
     margin: 0;
     padding: 0;
