@@ -1,79 +1,151 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Gestão de Pedidos | The Iron Compass</title>
-    <link rel="stylesheet" href="/static/css/gestor_pedidos.css">
-    <script src="/static/js/gestor_pedidos.js" defer></script>
-    <script src="/static/js/gestor_pedidos.js" defer></script>
+
+    <link
+        rel="stylesheet"
+        href="/static/css/gestor_pedidos.css"
+    >
+
+    <script
+        src="/static/js/gestor_pedidos.js"
+        defer
+    ></script>
 </head>
 
 <body>
+    <!-- MENU LATERAL -->
     <aside class="menu-lateral">
         <div class="identidade">
-            <img src="/static/imagens/compasso.svg" alt="Logo The Iron Compass" class="logo">
+            <img
+                src="/static/imagens/compasso.svg"
+                alt="Logo The Iron Compass"
+                class="logo"
+            >
+
             <div class="identidade-texto">
                 <h1>THE IRON COMPASS</h1>
                 <p>Sistema de Gestão</p>
             </div>
         </div>
+
         <div class="separador-menu"></div>
+
         <p class="titulo-menu">MENU PRINCIPAL</p>
-        <nav class="navegacao">
-            <a href="/dashboard-gestor" class="item-menu"><span class="icone">⌂</span><span>Dashboard</span></a>
-            <a href="/gestor_users" class="item-menu"><span class="icone">♙</span><span>Usuários</span></a>
-            <a href="/gestor_pedidos" class="item-menu ativo"><span class="icone">▤</span><span>Pedidos</span></a>
-            <a href="/gestor_equipamentos" class="item-menu"><span class="icone">⚙</span><span>Equipamentos</span></a>
-            <a href="/gestor_emprestimos" class="item-menu"><span class="icone">⇄</span><span>Empréstimos</span></a>
-            
+
+        <nav class="navegacao" aria-label="Menu principal">
+            <a href="/dashboard-gestor" class="item-menu">
+                <span class="icone" aria-hidden="true">⌂</span>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="/gestor_users" class="item-menu">
+                <span class="icone" aria-hidden="true">♙</span>
+                <span>Usuários</span>
+            </a>
+
+            <a
+                href="/gestor_pedidos"
+                class="item-menu ativo"
+                aria-current="page"
+            >
+                <span class="icone" aria-hidden="true">▤</span>
+                <span>Pedidos</span>
+            </a>
+
+            <a href="/gestor_equipamentos" class="item-menu">
+                <span class="icone" aria-hidden="true">⚙</span>
+                <span>Equipamentos</span>
+            </a>
+
+            <a href="/gestor_emprestimos" class="item-menu">
+                <span class="icone" aria-hidden="true">⇄</span>
+                <span>Empréstimos</span>
+            </a>
         </nav>
+
         <div class="rodape-menu">
-                <a href="/login" class="item-menu sair">
-                    <span class="icone">⇥</span>
-                    <span>Sair</span>
-                </a>
-            </div>
+            <div class="separador-menu"></div>
+
+            <a href="/login" class="item-menu sair">
+                <span class="icone" aria-hidden="true">⇥</span>
+                <span>Sair</span>
+            </a>
+
+            
     </aside>
 
+    <!-- CONTEÚDO PRINCIPAL -->
     <main class="conteudo-principal">
+
+        <!-- CABEÇALHO -->
         <header class="cabecalho-pagina">
-            <div>
-                <p class="caminho-pagina">Gestão / Pedidos</p>
+            <div class="informacoes-pagina">
+                <p class="caminho-pagina">GESTÃO / PEDIDOS</p>
+
                 <h2>Gestão de Pedidos</h2>
-                <p class="descricao-pagina">Consulte os pedidos cadastrados e atualize seus status.</p>
+
+                <p class="descricao-pagina">
+                    Consulte os pedidos cadastrados e atualize seus status.
+                </p>
             </div>
         </header>
 
-        <section class="painel">
+        <!-- PAINEL -->
+        <section class="painel" aria-label="Listagem de pedidos">
+
+            <!-- INDICADORES -->
             <div class="resumo">
-                <div>
+                <div class="cartao-resumo">
                     <span>Total de pedidos</span>
                     <strong id="totalPedidos">0</strong>
                 </div>
-                <div>
+
+                <div class="cartao-resumo">
                     <span>Pedidos abertos</span>
                     <strong id="totalAbertos">0</strong>
                 </div>
-                <div>
+
+                <div class="cartao-resumo">
                     <span>Em análise</span>
                     <strong id="totalAnalise">0</strong>
                 </div>
-                <div>
+
+                <div class="cartao-resumo">
                     <span>Encerrados</span>
                     <strong id="totalEncerrados">0</strong>
                 </div>
             </div>
 
-            <div id="mensagemTela" class="mensagem" role="status" aria-live="polite"></div>
+            <!-- MENSAGENS DO JAVASCRIPT -->
+            <div
+                id="mensagemTela"
+                class="mensagem"
+                role="status"
+                aria-live="polite"
+            ></div>
 
+            <!-- FILTROS -->
             <div class="filtros">
                 <div class="campo">
                     <label for="busca">Buscar pedido</label>
-                    <input type="search" id="busca" placeholder="Digite o ID do pedido...">
+
+                    <input
+                        type="search"
+                        id="busca"
+                        placeholder="Digite o ID do pedido..."
+                        autocomplete="off"
+                    >
                 </div>
+
                 <div class="campo">
                     <label for="filtroStatus">Filtrar por status</label>
+
                     <select id="filtroStatus">
                         <option value="">Todos os status</option>
                         <option value="ABERTO">Aberto</option>
@@ -81,28 +153,50 @@
                         <option value="ENCERRADO">Encerrado</option>
                     </select>
                 </div>
-                <button type="button" id="botaoAtualizar" class="botao botao-principal">Atualizar lista</button>
+
+                <button
+                    type="button"
+                    id="botaoAtualizar"
+                    class="botao botao-principal"
+                >
+                    Atualizar lista
+                </button>
             </div>
 
+            <!-- TABELA -->
             <div class="tabela-container">
                 <table>
                     <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Discente (ID)</th>
-                            <th>Equipamento (ID)</th>
-                            <th>Data do pedido</th>
-                            <th>Status</th>
-                            <th>Ações</th>
+                            <th scope="col">ID</th>
+                            <th scope="col">Discente (ID)</th>
+                            <th scope="col">Equipamento (ID)</th>
+                            <th scope="col">Data do pedido</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Ações</th>
                         </tr>
                     </thead>
+
                     <tbody id="listaPedidos">
-                        <tr><td colspan="6" class="vazio">Carregando pedidos...</td></tr>
+                        <tr>
+                            <td colspan="6" class="vazio">
+                                Carregando pedidos...
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
-            <p class="rodape-tabela" id="quantidadeExibida">Carregando...</p>
+
+            <p class="rodape-tabela" id="quantidadeExibida">
+                Carregando...
+            </p>
         </section>
+
+        <!-- RODAPÉ -->
+        <footer class="rodape-pagina">
+            <span>THE IRON COMPASS</span>
+            <span> · Sistema de Gestão</span>
+        </footer>
     </main>
 </body>
 </html>

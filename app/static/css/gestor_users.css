@@ -1,10 +1,11 @@
 /* =========================================
-   PALETA E CONFIGURAÇÕES GERAIS
+   PALETA OFICIAL — THE IRON COMPASS
 ========================================= */
 
 :root {
     --azul-petroleo: #173b46;
     --azul-escuro: #102b33;
+    --azul-medio: #24515b;
 
     --cobre: #bd6b3c;
     --cobre-escuro: #8f4828;
@@ -18,11 +19,12 @@
     --borda: #ded5c2;
 
     --sucesso: #477b5c;
+    --alerta: #b47b2c;
     --erro: #a63e32;
 }
 
 /* =========================================
-   RESET E ESTRUTURA
+   RESET E ESTRUTURA GERAL
 ========================================= */
 
 * {
@@ -31,14 +33,24 @@
     box-sizing: border-box;
 }
 
+html {
+    min-height: 100%;
+    font-size: 16px;
+    scroll-behavior: smooth;
+}
+
 body {
+    min-width: 320px;
     min-height: 100vh;
-    display: flex;
+
+    display: grid;
+    grid-template-columns: 270px minmax(0, 1fr);
 
     background: var(--marfim);
     color: var(--texto);
 
     font-family: "Segoe UI", Arial, sans-serif;
+    line-height: 1.5;
 }
 
 a {
@@ -46,65 +58,119 @@ a {
     text-decoration: none;
 }
 
+button,
+input,
+select,
+textarea {
+    font: inherit;
+}
+
 /* =========================================
    MENU LATERAL
+   PADRÃO DO DASHBOARD_GESTOR.CSS
 ========================================= */
 
 .menu-lateral {
-    width: 270px;
-    min-width: 270px;
-    min-height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 100;
 
     display: flex;
     flex-direction: column;
 
-    padding: 25px 17px 20px;
+    width: 270px;
+    height: 100vh;
+
+    padding: 25px 18px 18px;
 
     color: var(--marfim);
 
     background: linear-gradient(
         180deg,
-        var(--azul-petroleo),
-        var(--azul-escuro)
+        var(--azul-petroleo) 0%,
+        var(--azul-escuro) 100%
     );
 
     border-right: 4px solid var(--cobre);
+
+    overflow-y: auto;
+    overflow-x: hidden;
 }
+
+/* =========================================
+   IDENTIDADE VISUAL
+========================================= */
 
 .identidade {
     display: flex;
     align-items: center;
     gap: 11px;
 
+    width: 100%;
+    min-width: 0;
+
     padding: 0 5px 20px;
+
+    border-bottom: none;
 }
 
 .logo {
-    width: 48px;
-    height: 48px;
+    display: block;
 
-    flex-shrink: 0;
+    flex: 0 0 48px;
+
+    width: 48px !important;
+    height: 48px !important;
+
+    min-width: 48px;
+    max-width: 48px !important;
+    max-height: 48px !important;
+
     object-fit: contain;
 }
 
-.identidade-texto h1 {
+.identidade-texto {
+    min-width: 0;
+}
+
+.identidade-texto h1,
+.identidade h2 {
+    min-width: 0;
+    margin: 0;
+
     color: var(--cobre-claro);
 
-    font: bold 15px Georgia, serif;
-    letter-spacing: 1.2px;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 15px;
+    font-weight: 700;
     line-height: 1.4;
+    letter-spacing: 1.2px;
+
+    overflow-wrap: normal;
+    word-break: normal;
 }
 
-.identidade-texto p {
-    margin-top: 4px;
+.identidade-texto p,
+.identidade p {
+    margin: 4px 0 0;
 
     color: #d5d8d2;
+
     font-size: 11px;
+    line-height: 1.4;
+    letter-spacing: normal;
 }
+
+/* =========================================
+   SEPARADOR E TÍTULO DO MENU
+========================================= */
 
 .separador-menu {
     height: 2px;
-    margin: 0 3px 22px;
+    flex-shrink: 0;
+
+    margin: 0 3px 0;
 
     background: linear-gradient(
         90deg,
@@ -115,7 +181,7 @@ a {
 }
 
 .titulo-menu {
-    margin: 0 10px 12px;
+    margin: 20px 10px 0;
 
     color: var(--cobre-claro);
 
@@ -124,77 +190,122 @@ a {
     letter-spacing: 1.5px;
 }
 
+/* =========================================
+   NAVEGAÇÃO
+   DIMENSÕES E ESTADOS IGUAIS AO DASHBOARD
+========================================= */
+
 .navegacao {
     display: flex;
     flex-direction: column;
+    align-items: stretch;
     gap: 5px;
+
+    width: 100%;
+    margin-top: 28px;
 }
 
 .item-menu {
-    min-height: 49px;
-
     display: flex;
     align-items: center;
+    justify-content: flex-start;
     gap: 12px;
 
-    padding: 10px 13px;
+    width: 100%;
+    min-height: 49px;
 
-    color: #e2e7e4;
+    padding: 11px 13px;
 
-    border-left: 3px solid transparent;
-    border-radius: 5px;
+    color: rgba(244, 239, 227, 0.8);
+
+    border: 1px solid transparent;
+    border-radius: 7px;
 
     font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
 
     transition:
         background 0.2s,
+        border-color 0.2s,
         color 0.2s;
 }
 
 .item-menu:hover {
-    color: #fff;
-    background: rgba(255, 255, 255, 0.08);
+    color: var(--papel);
+    background: rgba(244, 239, 227, 0.07);
 }
 
 .item-menu.ativo {
-    color: #fff;
+    padding-left: 11px;
 
-    background: rgba(189, 107, 60, 0.17);
-    border-left-color: var(--cobre-claro);
+    color: var(--cobre-claro);
+    font-weight: 700;
+
+    background: linear-gradient(
+        90deg,
+        rgba(189, 107, 60, 0.2),
+        rgba(189, 107, 60, 0.06)
+    );
+
+    border-color: rgba(189, 107, 60, 0.25);
+    border-left: 3px solid var(--cobre-claro);
 }
 
 .icone {
-    width: 25px;
-    flex-shrink: 0;
-
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
 
+    flex: 0 0 25px;
+    width: 25px;
+
     color: var(--cobre-claro);
+
     font-size: 22px;
+    line-height: 1;
 }
+
+/* =========================================
+   RODAPÉ DO MENU
+========================================= */
 
 .rodape-menu {
     margin-top: auto;
-    padding-top: 30px;
+    padding-top: 18px;
 
-    color: #b8c4c2;
-    font-size: 11px;
+    border-top: 1px solid rgba(230, 161, 111, 0.2);
 }
 
 .rodape-menu .separador-menu {
-    margin-bottom: 15px;
+    display: none;
 }
 
-.rodape-menu p {
+.rodape-menu .sair {
+    margin-top: 0;
+}
+
+.item-menu.sair {
+    color: rgba(244, 239, 227, 0.75);
+}
+
+.item-menu.sair:hover {
+    color: var(--cobre-claro);
+    background: rgba(189, 107, 60, 0.15);
+}
+
+.assinatura-menu {
+    margin-top: 14px;
+
     color: var(--cobre-claro);
 
-    font: bold 11px Georgia, serif;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 11px;
+    font-weight: 700;
     letter-spacing: 1px;
 }
 
-.rodape-menu span {
+.versao-menu {
     display: block;
     margin-top: 6px;
 
@@ -207,41 +318,68 @@ a {
 ========================================= */
 
 .conteudo-principal {
-    width: calc(100% - 270px);
+    grid-column: 2;
+
+    width: 100%;
     min-width: 0;
     min-height: 100vh;
 
-    padding: 38px clamp(20px, 4vw, 55px);
+    display: flex;
+    flex-direction: column;
+
+    padding: 32px clamp(22px, 3vw, 44px) 24px;
+
+    overflow-x: hidden;
 }
+
+/* =========================================
+   CABEÇALHO
+========================================= */
 
 .cabecalho-pagina {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 20px;
+    gap: 24px;
 
     margin-bottom: 30px;
+    padding-bottom: 24px;
+
+    border-bottom: 1px solid var(--borda);
+}
+
+.informacoes-pagina {
+    min-width: 0;
 }
 
 .caminho-pagina {
-    margin-bottom: 10px;
+    display: block;
+
+    margin-bottom: 7px;
 
     color: var(--cobre-escuro);
-    font-size: 12px;
-    font-weight: 600;
+
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
 }
 
 .cabecalho-pagina h2 {
     color: var(--azul-petroleo);
 
-    font: bold clamp(25px, 3vw, 34px) Georgia, serif;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(27px, 3vw, 36px);
+    font-weight: normal;
+    line-height: 1.2;
 }
 
 .descricao-pagina {
     margin-top: 9px;
 
     color: var(--texto-suave);
-    font-size: 14px;
+
+    font-size: 13px;
     line-height: 1.6;
 }
 
@@ -251,53 +389,65 @@ a {
 
 .painel-listagem {
     width: 100%;
-    padding: 26px;
+    min-width: 0;
 
     background: var(--papel);
 
     border: 1px solid var(--borda);
     border-top: 4px solid var(--cobre);
-    border-radius: 10px;
+    border-radius: 9px;
 
-    box-shadow: 0 8px 25px rgba(16, 43, 51, 0.07);
+    box-shadow: 0 3px 10px rgba(16, 43, 51, 0.04);
+
+    overflow: hidden;
 }
 
 .cabecalho-painel {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 15px;
+    gap: 16px;
 
-    margin-bottom: 24px;
+    padding: 20px 22px;
+
+    border-bottom: 1px solid var(--borda);
+}
+
+.cabecalho-painel > div {
+    min-width: 0;
 }
 
 .cabecalho-painel h3 {
     color: var(--azul-petroleo);
 
-    font: bold 20px Georgia, serif;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 19px;
+    font-weight: normal;
+    line-height: 1.4;
 }
 
 .cabecalho-painel p {
-    margin-top: 7px;
+    margin-top: 6px;
 
     color: var(--texto-suave);
-    font-size: 13px;
+
+    font-size: 12px;
     line-height: 1.5;
 }
 
 .contador {
     flex-shrink: 0;
 
-    padding: 8px 12px;
+    padding: 7px 11px;
 
     color: var(--azul-petroleo);
-    background: #f8f2e7;
+    background: #f3ecde;
 
     border: 1px solid var(--borda);
-    border-radius: 20px;
+    border-radius: 6px;
 
-    font-size: 12px;
-    font-weight: 600;
+    font-size: 11px;
+    font-weight: 700;
 }
 
 /* =========================================
@@ -315,13 +465,13 @@ a {
     align-items: end;
     gap: 15px;
 
-    margin-bottom: 22px;
-    padding: 20px;
+    margin: 20px 22px 22px;
+    padding: 18px;
 
     background: #f8f2e7;
 
     border: 1px solid var(--borda);
-    border-radius: 8px;
+    border-radius: 7px;
 }
 
 .campo-pesquisa {
@@ -343,17 +493,19 @@ a {
 .campo-pesquisa select {
     width: 100%;
     min-width: 0;
-    min-height: 45px;
+    min-height: 43px;
 
-    padding: 11px 13px;
+    padding: 10px 12px;
 
     color: var(--texto);
-    background: #fff;
+    background: var(--papel);
 
     border: 1px solid var(--borda);
     border-radius: 6px;
 
-    font: 14px "Segoe UI", Arial, sans-serif;
+    font-family: "Segoe UI", Arial, sans-serif;
+    font-size: 13px;
+
     outline: none;
 
     transition:
@@ -379,11 +531,12 @@ a {
 ========================================= */
 
 .botao {
-    min-height: 42px;
+    min-height: 41px;
 
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    gap: 7px;
 
     padding: 10px 15px;
 
@@ -392,7 +545,10 @@ a {
 
     cursor: pointer;
 
-    font: 600 12px "Segoe UI", Arial, sans-serif;
+    font-family: "Segoe UI", Arial, sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+
     text-decoration: none;
     white-space: nowrap;
 
@@ -408,7 +564,7 @@ a {
 }
 
 .botao-principal {
-    color: #fff;
+    color: var(--papel);
 
     background: var(--azul-petroleo);
     border-color: var(--azul-petroleo);
@@ -416,6 +572,7 @@ a {
 
 .botao-principal:hover {
     background: var(--azul-escuro);
+    border-color: var(--azul-escuro);
 }
 
 .botao-secundario {
@@ -426,7 +583,7 @@ a {
 }
 
 .botao-secundario:hover {
-    background: #f2eadc;
+    background: #f3ecde;
     border-color: var(--cobre);
 }
 
@@ -451,7 +608,7 @@ a {
 .mensagem {
     display: none;
 
-    margin-bottom: 20px;
+    margin: 0 22px 20px;
     padding: 12px 15px;
 
     border-radius: 6px;
@@ -481,61 +638,59 @@ a {
 ========================================= */
 
 .tabela-responsiva {
-    width: 100%;
+    width: calc(100% - 44px);
+    margin: 0 22px 22px;
+
     overflow-x: auto;
 
     border: 1px solid var(--borda);
     border-radius: 7px;
 }
 
-table {
+.tabela-responsiva table {
     width: 100%;
+    min-width: 720px;
 
     border-collapse: collapse;
     text-align: left;
-    white-space: nowrap;
-
-    font-size: 13px;
 }
 
-thead {
-    color: var(--marfim);
-    background: var(--azul-petroleo);
+.tabela-responsiva thead {
+    background: #f3ecde;
 }
 
-th {
-    padding: 15px 14px;
+.tabela-responsiva th {
+    padding: 14px 16px;
+
+    color: var(--azul-petroleo);
 
     font-size: 11px;
     font-weight: 700;
-    letter-spacing: 0.4px;
-    text-transform: uppercase;
+    letter-spacing: 0.3px;
     white-space: nowrap;
 }
 
-td {
-    padding: 14px;
+.tabela-responsiva td {
+    padding: 15px 16px;
 
     color: var(--texto);
-    border-bottom: 1px solid #ebe4d7;
+
+    border-bottom: 1px solid #eee8dc;
 
     font-size: 12px;
+    line-height: 1.5;
     vertical-align: middle;
 }
 
-tbody tr {
-    transition: background 0.2s;
+.tabela-responsiva tbody tr:last-child td {
+    border-bottom: none;
 }
 
-tbody tr:last-child td {
-    border-bottom: 0;
+.tabela-responsiva tbody tr:hover {
+    background: rgba(244, 239, 227, 0.55);
 }
 
-tbody tr:hover {
-    background: #fbf5ea;
-}
-
-td:first-child {
+.tabela-responsiva td:first-child {
     color: var(--azul-petroleo);
     font-weight: 700;
 }
@@ -573,149 +728,215 @@ td:first-child {
 ========================================= */
 
 .estado-tabela {
-    padding: 35px 16px;
+    padding: 28px 18px;
 
     color: var(--texto-suave);
-    text-align: center;
+
+    font-size: 13px;
     line-height: 1.6;
+    text-align: center;
 }
 
 /* =========================================
-   RESPONSIVIDADE — NOTEBOOKS
+   RODAPÉ DA PÁGINA
+========================================= */
+
+.rodape-pagina {
+    margin-top: 30px;
+    padding-top: 18px;
+
+    border-top: 1px solid var(--borda);
+
+    color: var(--texto-suave);
+
+    font-size: 11px;
+    line-height: 1.6;
+    text-align: center;
+}
+
+.rodape-pagina span:first-child {
+    color: var(--cobre-escuro);
+
+    font-family: Georgia, "Times New Roman", serif;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+}
+
+/* =========================================
+   NOTEBOOKS E TABLETS
 ========================================= */
 
 @media (max-width: 1200px) {
+    .menu-lateral {
+        width: 235px;
+        padding: 22px 14px 16px;
+    }
+
+    .identidade {
+        gap: 11px;
+        padding-right: 5px;
+        padding-left: 5px;
+    }
+
+    .logo {
+        width: 48px !important;
+        height: 48px !important;
+        min-width: 48px;
+        max-width: 48px !important;
+        max-height: 48px !important;
+        flex: 0 0 48px;
+    }
+
+    .identidade-texto h1,
+    .identidade h2 {
+        font-size: 15px;
+        letter-spacing: 1.2px;
+    }
+
+    .identidade-texto p,
+    .identidade p {
+        font-size: 11px;
+    }
+
     .conteudo-principal {
-        padding: 30px 22px;
+        padding: 28px 24px;
     }
 
     .area-pesquisa {
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     }
 
     .acoes-pesquisa {
         grid-column: 1 / -1;
     }
-
-    .painel-listagem {
-        padding: 22px;
-    }
 }
 
 /* =========================================
-   RESPONSIVIDADE — TELAS MÉDIAS
+   CELULARES E TELAS PEQUENAS
 ========================================= */
 
-@media (max-width: 1050px) {
-    .menu-lateral {
-        width: 235px;
-        min-width: 235px;
-
-        padding-right: 12px;
-        padding-left: 12px;
-    }
-
-    .conteudo-principal {
-        width: calc(100% - 235px);
-        padding: 26px 20px;
-    }
-
-    .painel-listagem {
-        padding: 20px;
-    }
-}
-
-/* =========================================
-   RESPONSIVIDADE — CELULARES E TABLETS
-========================================= */
-
-@media (max-width: 700px) {
+@media (max-width: 760px) {
     body {
         display: block;
     }
 
     .menu-lateral {
-        width: 100%;
-        min-width: 0;
-        min-height: auto;
+        position: relative;
 
-        padding: 15px;
+        width: 100%;
+        height: auto;
+        min-height: 0;
+
+        padding: 16px;
 
         border-right: 0;
-        border-bottom: 4px solid var(--cobre);
+        border-bottom: 3px solid var(--cobre);
+
+        overflow: visible;
     }
 
     .identidade {
-        padding-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 11px;
+
+        padding: 0 4px 16px;
     }
 
-    .separador-menu {
-        margin-bottom: 13px;
+    .logo {
+        width: 48px !important;
+        height: 48px !important;
+        min-width: 48px;
+        max-width: 48px !important;
+        max-height: 48px !important;
+        flex: 0 0 48px;
+    }
+
+    .identidade-texto h1,
+    .identidade h2 {
+        font-size: 15px;
+        letter-spacing: 1.2px;
+    }
+
+    .identidade-texto p,
+    .identidade p {
+        font-size: 11px;
     }
 
     .titulo-menu {
-        margin-bottom: 9px;
+        margin-top: 12px;
     }
 
     .navegacao {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 5px;
+        gap: 6px;
+
+        margin-top: 18px;
     }
 
     .item-menu {
-        min-height: 43px;
-        gap: 7px;
+        justify-content: flex-start;
 
-        padding: 8px;
+        min-width: 0;
+        min-height: 44px;
+
+        gap: 8px;
+        padding: 9px;
 
         font-size: 12px;
+        white-space: normal;
+    }
+
+    .item-menu.ativo {
+        padding-left: 7px;
     }
 
     .icone {
+        flex: 0 0 22px;
         width: 22px;
-        flex-basis: 22px;
 
         font-size: 19px;
     }
 
     .rodape-menu {
-        display: none;
+        display: block;
+
+        width: 100%;
+        margin-top: 12px;
+        padding-top: 12px;
     }
 
     .conteudo-principal {
+        grid-column: auto;
+
         width: 100%;
         min-height: auto;
 
-        padding: 25px 15px;
+        padding: 24px 18px;
     }
 
     .cabecalho-pagina {
         align-items: flex-start;
         flex-direction: column;
-        gap: 12px;
-
-        margin-bottom: 22px;
+        gap: 16px;
     }
 
     .cabecalho-pagina h2 {
-        font-size: 25px;
-    }
-
-    .painel-listagem {
-        padding: 16px;
+        font-size: 27px;
     }
 
     .cabecalho-painel {
         align-items: flex-start;
         flex-direction: column;
-        gap: 12px;
+
+        padding: 17px 14px;
     }
 
     .area-pesquisa {
-        grid-template-columns: 1fr;
-        gap: 14px;
+        grid-template-columns: minmax(0, 1fr);
 
+        margin: 16px 14px;
         padding: 15px;
     }
 
@@ -727,46 +948,82 @@ td:first-child {
         flex: 1;
     }
 
-    .tabela-responsiva {
-        border-radius: 5px;
+    .mensagem {
+        margin-right: 14px;
+        margin-left: 14px;
     }
 
-    table {
+    .tabela-responsiva {
+        width: calc(100% - 28px);
+        margin: 0 14px 16px;
+    }
+
+    .tabela-responsiva table {
         min-width: 720px;
     }
 }
 
 /* =========================================
-   RESPONSIVIDADE — CELULARES PEQUENOS
+   CELULARES PEQUENOS
 ========================================= */
 
-@media (max-width: 380px) {
-    .identidade-texto h1 {
-        font-size: 13px;
-    }
-
-    .logo {
-        width: 42px;
-        height: 42px;
-    }
-
-    .navegacao {
-        grid-template-columns: 1fr;
+@media (max-width: 480px) {
+    .menu-lateral {
+        padding: 14px 12px;
     }
 
     .conteudo-principal {
-        padding: 20px 10px;
+        padding: 20px 12px;
+    }
+
+    .navegacao {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .cabecalho-pagina h2 {
-        font-size: 22px;
-    }
-
-    .painel-listagem {
-        padding: 12px;
+        font-size: 25px;
     }
 
     .area-pesquisa {
+        margin-right: 12px;
+        margin-left: 12px;
         padding: 12px;
+    }
+
+    .acoes-pesquisa {
+        flex-direction: column;
+    }
+
+    .acoes-pesquisa .botao {
+        width: 100%;
+    }
+
+    .mensagem {
+        margin-right: 12px;
+        margin-left: 12px;
+    }
+
+    .tabela-responsiva {
+        width: calc(100% - 24px);
+        margin-right: 12px;
+        margin-left: 12px;
+    }
+
+    .rodape-pagina {
+        margin-top: 22px;
+    }
+}
+
+/* =========================================
+   ACESSIBILIDADE
+========================================= */
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        transition: none !important;
+        animation: none !important;
     }
 }

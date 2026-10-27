@@ -3,96 +3,180 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Gestão de Discentes | The Iron Compass</title>
+
     <link rel="stylesheet" href="/static/css/gestor_users.css">
     <script src="/static/js/gestor_users.js" defer></script>
 </head>
+
 <body>
     <aside class="menu-lateral">
         <div class="identidade">
-            <img src="/static/imagens/compasso.svg" alt="Logo The Iron Compass" class="logo">
+            <img
+                src="/static/imagens/compasso.svg"
+                alt="Logo The Iron Compass"
+                class="logo"
+            >
+
             <div class="identidade-texto">
                 <h1>THE IRON COMPASS</h1>
                 <p>Sistema de Gestão</p>
             </div>
         </div>
+
         <div class="separador-menu"></div>
+
         <p class="titulo-menu">MENU PRINCIPAL</p>
-        <nav class="navegacao">
-            <a href="/dashboard-gestor" class="item-menu"><span class="icone">⌂</span><span>Dashboard</span></a>
-            <a href="/gestor_users" class="item-menu ativo"><span class="icone">♙</span><span>Usuários</span></a>
-            <a href="/gestor_pedidos" class="item-menu"><span class="icone">▤</span><span>Pedidos</span></a>
-            <a href="/gestor_equipamentos" class="item-menu"><span class="icone">⚙</span><span>Equipamentos</span></a>
-            <a href="/gestor_emprestimos" class="item-menu"><span class="icone">⇄</span><span>Empréstimos</span></a>
-            
-            
+
+        <nav class="navegacao" aria-label="Menu principal">
+            <a href="/dashboard-gestor" class="item-menu">
+                <span class="icone" aria-hidden="true">⌂</span>
+                <span>Dashboard</span>
+            </a>
+
+            <a
+                href="/gestor_users"
+                class="item-menu ativo"
+                aria-current="page"
+            >
+                <span class="icone" aria-hidden="true">♙</span>
+                <span>Usuários</span>
+            </a>
+
+            <a href="/gestor_pedidos" class="item-menu">
+                <span class="icone" aria-hidden="true">▤</span>
+                <span>Pedidos</span>
+            </a>
+
+            <a href="/gestor_equipamentos" class="item-menu">
+                <span class="icone" aria-hidden="true">⚙</span>
+                <span>Equipamentos</span>
+            </a>
+
+            <a href="/gestor_emprestimos" class="item-menu">
+                <span class="icone" aria-hidden="true">⇄</span>
+                <span>Empréstimos</span>
+            </a>
+        </nav>
+
         <div class="rodape-menu">
-                <a href="/login" class="item-menu sair">
-                    <span class="icone">⇥</span>
-                    <span>Sair</span>
-                </a>
-            </div>
+            <div class="separador-menu"></div>
+
+            <a href="/login" class="item-menu sair">
+                <span class="icone" aria-hidden="true">⇥</span>
+                <span>Sair</span>
+            </a>
+
+            
     </aside>
 
     <main class="conteudo-principal">
         <header class="cabecalho-pagina">
-            <div>
+            <div class="informacoes-pagina">
                 <p class="caminho-pagina">Gestão / Usuários</p>
+
                 <h2>Gestão de Discentes</h2>
-                <p class="descricao-pagina">Consulte e gerencie os discentes cadastrados no sistema.</p>
+
+                <p class="descricao-pagina">
+                    Consulte e gerencie os discentes cadastrados no sistema.
+                </p>
             </div>
         </header>
 
-        <section class="painel-listagem">
+        <section class="painel-listagem" aria-labelledby="titulo-listagem">
             <div class="cabecalho-painel">
                 <div>
-                    <h3>Discentes cadastrados</h3>
-                    <p>Pesquise pelo identificador do usuário para consultar seus dados.</p>
+                    <h3 id="titulo-listagem">Discentes cadastrados</h3>
+
+                    <p>
+                        Pesquise pelo identificador do usuário para consultar
+                        seus dados.
+                    </p>
                 </div>
-                <span class="contador" id="contadorDiscentes">0 discentes</span>
+
+                <span class="contador" id="contadorDiscentes">
+                    0 discentes
+                </span>
             </div>
 
             <form id="formPesquisa" class="area-pesquisa">
                 <div class="campo-pesquisa">
                     <label for="pesquisaId">ID do usuário</label>
-                    <input type="number" id="pesquisaId" name="pesquisaId" min="1" placeholder="Digite o ID do discente">
+
+                    <input
+                        type="number"
+                        id="pesquisaId"
+                        name="pesquisaId"
+                        min="1"
+                        step="1"
+                        placeholder="Digite o ID do discente"
+                    >
                 </div>
+
                 <div class="campo-pesquisa">
                     <label for="filtroStatus">Status</label>
+
                     <select id="filtroStatus" name="filtroStatus">
                         <option value="">Todos os status</option>
                         <option value="true">Ativo</option>
                         <option value="false">Inativo</option>
                     </select>
                 </div>
+
                 <div class="acoes-pesquisa">
-                    <button type="submit" class="botao botao-principal">Consultar</button>
-                    <button type="button" id="limparPesquisa" class="botao botao-secundario">Limpar</button>
+                    <button
+                        type="submit"
+                        class="botao botao-principal"
+                    >
+                        Consultar
+                    </button>
+
+                    <button
+                        type="button"
+                        id="limparPesquisa"
+                        class="botao botao-secundario"
+                    >
+                        Limpar
+                    </button>
                 </div>
             </form>
 
-            <div id="mensagemTela" class="mensagem" role="status" aria-live="polite"></div>
+            <div
+                id="mensagemTela"
+                class="mensagem"
+                role="status"
+                aria-live="polite"
+            ></div>
 
             <div class="tabela-responsiva">
                 <table>
                     <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Nome</th>
-                            <th>E-mail</th>
-                            <th>Perfil</th>
-                            <th>Status</th>
-                            <th>Ações</th>
+                            <th scope="col">ID</th>
+                            <th scope="col">Nome</th>
+                            <th scope="col">E-mail</th>
+                            <th scope="col">Perfil</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Ações</th>
                         </tr>
                     </thead>
+
                     <tbody id="tabelaDiscentes">
                         <tr>
-                            <td colspan="6" class="estado-tabela">Carregando discentes...</td>
+                            <td colspan="6" class="estado-tabela">
+                                Carregando discentes...
+                            </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
         </section>
+
+        <footer class="rodape-pagina">
+            <span>THE IRON COMPASS</span>
+            <span>Gestão de Discentes</span>
+        </footer>
     </main>
 </body>
 </html>

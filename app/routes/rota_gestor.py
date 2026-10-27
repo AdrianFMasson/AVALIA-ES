@@ -14,7 +14,6 @@ from dependencies.dependencies import database
 from dependencies.autenticacao import obter_usuario_autenticado
 from entities.models import (
     Usuarios,
-    Perfil,
     Equipamentos,
     Pedido,
     StatusPedido,
@@ -66,21 +65,13 @@ def exigir_gestor_api(request: Request, db: Session):
 
 
 # =========================================================
-# ENTRADA PARA ATUALIZAÇÃO DO STATUS
+# FUNÇÃO AUXILIAR PARA RENDERIZAR PÁGINAS DO GESTOR
 # =========================================================
 
-class PedidoStatusEntrada(BaseModel):
-    status: StatusPedido
-
-
-# =========================================================
-# PÁGINA DE EMPRÉSTIMOS DO GESTOR
-# =========================================================
-
-@gestor_rota.get("/gestor_emprestimos")
-def gestor_emprestimos(
+def renderizar_pagina_gestor(
     request: Request,
-    db: Session = Depends(database.get_db),
+    db: Session,
+    nome_template: str,
 ):
     autenticacao = exigir_gestor(request, db)
 
@@ -89,11 +80,99 @@ def gestor_emprestimos(
 
     return templates.TemplateResponse(
         request=request,
-        name="gestor_emprestimos.html",
+        name=nome_template,
         context={
             "usuario": autenticacao["usuario"],
         },
     )
+
+
+# =========================================================
+# DASHBOARD DO GESTOR
+# =========================================================
+
+@gestor_rota.get("/dashboard-gestor")
+def dashboard_gestor(
+    request: Request,
+    db: Session = Depends(database.get_db),
+):
+    return renderizar_pagina_gestor(
+        request,
+        db,
+        "dashboard_gestor.html",
+    )
+
+
+# =========================================================
+# PÁGINA DE USUÁRIOS
+# =========================================================
+
+@gestor_rota.get("/gestor_users")
+def gestor_users(
+    request: Request,
+    db: Session = Depends(database.get_db),
+):
+    return renderizar_pagina_gestor(
+        request,
+        db,
+        "gestor_users.html",
+    )
+
+
+# =========================================================
+# PÁGINA DE PEDIDOS
+# =========================================================
+
+@gestor_rota.get("/gestor_pedidos")
+def gestor_pedidos(
+    request: Request,
+    db: Session = Depends(database.get_db),
+):
+    return renderizar_pagina_gestor(
+        request,
+        db,
+        "gestor_pedidos.html",
+    )
+
+
+# =========================================================
+# PÁGINA DE EQUIPAMENTOS
+# =========================================================
+
+@gestor_rota.get("/gestor_equipamentos")
+def gestor_equipamentos(
+    request: Request,
+    db: Session = Depends(database.get_db),
+):
+    return renderizar_pagina_gestor(
+        request,
+        db,
+        "gestor_equipamentos.html",
+    )
+
+
+# =========================================================
+# PÁGINA DE EMPRÉSTIMOS
+# =========================================================
+
+@gestor_rota.get("/gestor_emprestimos")
+def gestor_emprestimos(
+    request: Request,
+    db: Session = Depends(database.get_db),
+):
+    return renderizar_pagina_gestor(
+        request,
+        db,
+        "gestor_emprestimos.html",
+    )
+
+
+# =========================================================
+# ENTRADA PARA ATUALIZAÇÃO DO STATUS
+# =========================================================
+
+class PedidoStatusEntrada(BaseModel):
+    status: StatusPedido
 
 
 # =========================================================
