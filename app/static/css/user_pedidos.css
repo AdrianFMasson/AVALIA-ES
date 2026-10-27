@@ -5,7 +5,6 @@
    ========================================================= */
 
 :root {
-    /* Cores principais */
     --cobre: #bd6b3c;
     --cobre-escuro: #8f4828;
     --cobre-claro: #e6a16f;
@@ -14,7 +13,6 @@
     --azul-escuro: #102b33;
     --azul-medio: #24515b;
 
-    /* Fundos */
     --marfim: #f4efe3;
     --papel: #fffdf7;
     --fundo-hover: #faf6ed;
@@ -23,26 +21,20 @@
     --fundo-cobre: #f8e8da;
     --fundo-filtro: rgb(244 239 227 / 38%);
 
-    /* Textos */
     --texto: #26383b;
     --texto-suave: #718084;
     --texto-menu: #e1e5df;
     --texto-menu-secundario: #d0d9d5;
     --texto-menu-claro: #fffaf2;
 
-    /* Bordas */
     --borda: #ded5c2;
     --borda-tabela: #eee8dc;
     --borda-avatar: #d5b58c;
 
-    /* Estados */
     --sucesso: #477b5c;
     --alerta: #b47b2c;
     --erro: #a84e43;
-    --indicador-secundario: #648b9a;
-    --icone-secundario: #416b7a;
 
-    /* Status dos pedidos */
     --status-pendente-texto: #87651b;
     --status-pendente-fundo: #fbf2d9;
     --status-pendente-borda: #ead7a5;
@@ -59,7 +51,6 @@
     --status-cancelado-fundo: #eeece7;
     --status-cancelado-borda: #d8d5cf;
 
-    /* Transparências */
     --branco-07: rgb(255 255 255 / 7%);
     --marfim-07: rgb(244 239 227 / 7%);
     --marfim-48: rgb(244 239 227 / 48%);
@@ -81,7 +72,6 @@
     --azul-sombra-08: rgb(16 43 51 / 8%);
     --azul-sombra-12: rgb(16 43 51 / 12%);
 
-    /* Tipografia oficial */
     --fonte-principal: "Segoe UI", Arial, sans-serif;
     --fonte-titulo: Georgia, "Times New Roman", serif;
 
@@ -90,16 +80,13 @@
     --tamanho-titulo: 36px;
     --tamanho-subtitulo: 19px;
 
-    /* Dimensões */
     --largura-menu: 270px;
     --largura-menu-tablet: 250px;
-    --largura-menu-mobile: 76px;
-
     --largura-logo: 48px;
+
     --altura-campo: 44px;
     --altura-botao: 44px;
 
-    /* Espaçamentos */
     --espaco-1: 4px;
     --espaco-2: 8px;
     --espaco-3: 12px;
@@ -109,17 +96,14 @@
     --espaco-7: 28px;
     --espaco-8: 32px;
 
-    /* Bordas */
     --raio-pequeno: 6px;
     --raio-padrao: 8px;
     --raio-grande: 9px;
 
-    /* Sombras */
     --sombra: 0 8px 24px rgb(16 43 51 / 8%);
     --sombra-menu: 5px 0 18px var(--azul-sombra-12);
     --sombra-foco: 0 0 0 3px var(--cobre-12);
 
-    /* Transições */
     --transicao-padrao: 0.2s ease;
 }
 
@@ -193,6 +177,14 @@ textarea:focus-visible {
     min-height: 100vh;
 }
 
+.conteudo-principal {
+    grid-column: 2;
+    width: 100%;
+    min-width: 0;
+    min-height: 100vh;
+    padding: 35px clamp(22px, 4vw, 56px) 24px;
+}
+
 /* =========================================================
    4. MENU LATERAL
    ========================================================= */
@@ -201,74 +193,83 @@ textarea:focus-visible {
     position: fixed;
     inset: 0 auto 0 0;
     z-index: 100;
+
     display: flex;
     flex-direction: column;
+
     width: var(--largura-menu);
     height: 100vh;
     min-height: 100vh;
+
     padding: 28px 18px 20px;
     overflow-x: hidden;
     overflow-y: auto;
+
     background: linear-gradient(
         180deg,
         var(--azul-petroleo),
         var(--azul-escuro)
     );
+
     color: var(--marfim);
     border-right: 4px solid var(--cobre-escuro);
     box-shadow: var(--sombra-menu);
 }
 
 /* =========================================================
-   5. IDENTIDADE VISUAL DO MENU
+   5. IDENTIDADE VISUAL
+   Classes padronizadas do HTML-base
    ========================================================= */
 
-.marca {
+.identidade {
     position: relative;
+
     display: flex;
     align-items: center;
     gap: var(--espaco-3);
+
     width: 100%;
     min-width: 0;
+
     padding: 0 4px 22px;
     border-bottom: 1px solid var(--cobre-claro-30);
 }
 
-.marca::after {
+.identidade::after {
     position: absolute;
     bottom: -1px;
     left: 4px;
+
     width: 72px;
     height: 2px;
+
     background: linear-gradient(
         90deg,
         var(--cobre),
         var(--cobre-claro)
     );
+
     content: "";
 }
 
-.simbolo-sistema {
+.logo {
     display: block;
     flex: 0 0 var(--largura-logo);
+
     width: var(--largura-logo);
     height: var(--largura-logo);
     min-width: var(--largura-logo);
     max-width: var(--largura-logo);
+
     object-fit: contain;
 }
 
-.marca-texto {
-    display: flex;
+.identidade > div {
     flex: 1 1 auto;
-    flex-direction: column;
-    gap: 3px;
     min-width: 0;
 }
 
-.marca-texto h1,
-.marca-texto h2,
-.marca-texto strong {
+.identidade h2 {
     color: var(--cobre-claro);
     font-family: var(--fonte-titulo);
     font-size: 15px;
@@ -278,8 +279,8 @@ textarea:focus-visible {
     overflow-wrap: anywhere;
 }
 
-.marca-texto p,
-.marca-texto span {
+.identidade p {
+    margin-top: 3px;
     color: var(--texto-menu-secundario);
     font-family: var(--fonte-principal);
     font-size: var(--tamanho-texto-auxiliar);
@@ -296,41 +297,39 @@ textarea:focus-visible {
     flex-direction: column;
     align-items: stretch;
     gap: 8px;
+
     width: 100%;
     margin-top: 27px;
 }
 
-.titulo-menu {
-    margin: 0 10px 8px;
-    color: var(--marfim-48);
-    font-family: var(--fonte-principal);
-    font-size: 10px;
-    font-weight: 700;
-    line-height: 1.5;
-    letter-spacing: 1.8px;
-    text-transform: uppercase;
-}
-
 .item-menu {
     position: relative;
+
     display: flex;
     align-items: center;
     justify-content: flex-start;
     gap: 13px;
+
     width: 100%;
     min-width: 0;
     min-height: 49px;
+
     padding: 10px 14px;
+
     border: 1px solid transparent;
     border-radius: var(--raio-pequeno);
+
     background: transparent;
     color: var(--marfim-80);
+
     font-family: var(--fonte-principal);
     font-size: var(--tamanho-texto);
     font-weight: 500;
     line-height: 1.5;
     text-align: left;
+
     white-space: nowrap;
+
     transition:
         background var(--transicao-padrao),
         color var(--transicao-padrao),
@@ -346,13 +345,16 @@ textarea:focus-visible {
 .item-menu.ativo,
 .item-menu.active {
     padding-left: 10px;
+
     border-color: var(--cobre-25);
     border-left: 3px solid var(--cobre-claro);
+
     background: linear-gradient(
         90deg,
         var(--cobre-22),
         var(--cobre-06)
     );
+
     color: var(--papel);
     font-weight: 700;
 }
@@ -362,7 +364,9 @@ textarea:focus-visible {
     align-items: center;
     justify-content: center;
     flex: 0 0 25px;
+
     width: 25px;
+
     color: var(--cobre-claro);
     font-size: 22px;
     line-height: 1;
@@ -374,30 +378,22 @@ textarea:focus-visible {
 
 .rodape-menu {
     margin-top: auto;
-    padding: 20px 10px 0;
+    padding-top: 20px;
     border-top: 1px solid var(--cobre-claro-25);
-    color: var(--marfim-55);
-    font-family: var(--fonte-principal);
-    font-size: var(--tamanho-texto-auxiliar);
-    line-height: 1.6;
-    text-align: center;
 }
 
-/* =========================================================
-   8. CONTEÚDO PRINCIPAL
-   ========================================================= */
-
-.conteudo-principal {
-    grid-column: 2;
-    min-width: 0;
+.rodape-menu .item-menu {
     width: 100%;
-    min-height: 100vh;
-    padding: 35px clamp(22px, 4vw, 56px) 24px;
-    overflow-x: hidden;
+}
+
+.item-menu.sair:hover {
+    border-color: rgb(248 229 229 / 30%);
+    background: rgb(168 78 67 / 18%);
+    color: var(--papel);
 }
 
 /* =========================================================
-   9. CABEÇALHO DA PÁGINA
+   8. CABEÇALHO DA PÁGINA
    ========================================================= */
 
 .cabecalho {
@@ -405,19 +401,15 @@ textarea:focus-visible {
     align-items: center;
     justify-content: space-between;
     gap: 25px;
+
     margin-bottom: 30px;
     padding-bottom: 28px;
+
     border-bottom: 1px solid var(--borda);
 }
 
 .titulo-pagina {
     min-width: 0;
-    color: var(--azul-escuro);
-    font-family: var(--fonte-titulo);
-    font-size: clamp(28px, 3vw, var(--tamanho-titulo));
-    font-weight: normal;
-    line-height: 1.25;
-    overflow-wrap: anywhere;
 }
 
 .titulo-pagina h1 {
@@ -426,6 +418,19 @@ textarea:focus-visible {
     font-size: clamp(28px, 3vw, var(--tamanho-titulo));
     font-weight: normal;
     line-height: 1.25;
+    overflow-wrap: anywhere;
+}
+
+.subtitulo {
+    display: block;
+    margin-bottom: 7px;
+
+    color: var(--cobre-escuro);
+    font-family: var(--fonte-principal);
+    font-size: 10px;
+    font-weight: 800;
+    line-height: 1.5;
+    letter-spacing: 2px;
 }
 
 .titulo-pagina > p:last-child {
@@ -436,84 +441,79 @@ textarea:focus-visible {
     line-height: 1.6;
 }
 
-.subtitulo {
-    margin-bottom: 7px;
-    color: var(--cobre-escuro);
-    font-family: var(--fonte-principal);
-    font-size: 10px;
-    font-weight: 800;
-    line-height: 1.5;
-    letter-spacing: 2px;
-}
-
 /* =========================================================
-   10. AÇÕES DO CABEÇALHO
+   9. IDENTIFICAÇÃO DO USUÁRIO
    ========================================================= */
 
-.acoes-cabecalho {
+.informacoes-usuario {
     display: flex;
     align-items: center;
-    justify-content: flex-end;
+    gap: 12px;
     flex-shrink: 0;
-    gap: 14px;
+    min-width: 0;
 }
 
-/* =========================================================
-   IDENTIFICAÇÃO DO USUÁRIO
-   ========================================================= */
-
-.nome-usuario {
-    display: block;
-    font-family: Arial, sans-serif;
-    font-size: 11px;
-    font-weight: 400;
-    line-height: 1.5;
-    color: var(--cobre-claro);
-    overflow-wrap: anywhere;
-}
-.botao-sair {
-    display: inline-flex;
+.avatar-usuario {
+    display: flex;
     align-items: center;
     justify-content: center;
-    flex-shrink: 0;
-    min-height: var(--altura-botao);
-    padding: 9px 15px;
-    border: 1px solid var(--borda);
-    border-radius: var(--raio-pequeno);
-    background: var(--papel);
+    flex: 0 0 42px;
+
+    width: 42px;
+    height: 42px;
+
+    border: 1px solid var(--borda-avatar);
+    border-radius: 50%;
+
+    background: var(--fundo-icone);
     color: var(--azul-petroleo);
-    font-family: var(--fonte-principal);
-    font-size: 12px;
-    font-weight: 600;
-    transition:
-        background var(--transicao-padrao),
-        border-color var(--transicao-padrao),
-        color var(--transicao-padrao);
+
+    font-size: 21px;
 }
 
-.botao-sair:hover {
-    border-color: var(--cobre);
-    background: var(--fundo-cobre);
-    color: var(--cobre-escuro);
+.dados-usuario {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.dados-usuario span {
+    color: var(--azul-escuro);
+    font-size: 12px;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+
+.dados-usuario small {
+    color: var(--texto-suave);
+    font-size: var(--tamanho-texto-auxiliar);
 }
 
 /* =========================================================
-   11. PAINEL DE PEDIDOS
+   10. PAINEL DE PEDIDOS
    ========================================================= */
+
+.secao-conteudo {
+    width: 100%;
+    min-width: 0;
+}
 
 .painel-pedidos {
     width: 100%;
     min-width: 0;
     overflow: hidden;
+
     border: 1px solid var(--borda);
     border-top: 4px solid var(--cobre);
     border-radius: var(--raio-padrao);
+
     background: var(--papel);
     box-shadow: var(--sombra);
 }
 
 /* =========================================================
-   12. CABEÇALHO DO PAINEL
+   11. CABEÇALHO DO PAINEL
    ========================================================= */
 
 .cabecalho-painel {
@@ -521,8 +521,10 @@ textarea:focus-visible {
     align-items: center;
     justify-content: space-between;
     gap: 18px;
+
     padding: 22px 24px;
     border-bottom: 1px solid var(--borda);
+
     background: linear-gradient(
         180deg,
         var(--papel),
@@ -551,7 +553,7 @@ textarea:focus-visible {
 }
 
 /* =========================================================
-   13. CONTADOR DE PEDIDOS
+   12. CONTADOR
    ========================================================= */
 
 .contador {
@@ -559,134 +561,129 @@ textarea:focus-visible {
     align-items: center;
     justify-content: center;
     flex: 0 0 auto;
-    min-width: 38px;
+    gap: 4px;
+
     min-height: 34px;
     padding: 5px 11px;
+
     border: 1px solid var(--cobre-30);
     border-radius: var(--raio-pequeno);
+
     background: var(--fundo-cobre);
     color: var(--cobre-escuro);
+
     font-family: var(--fonte-principal);
     font-size: var(--tamanho-texto);
-    font-weight: 700;
     line-height: 1.4;
 }
 
-/* =========================================================
-   14. AÇÕES DOS PEDIDOS
-   ========================================================= */
-
-.acoes-pedidos {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 14px;
-    padding: 18px 24px;
-    border-bottom: 1px solid var(--borda);
-}
-
-.botao-voltar {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    gap: 8px;
-    min-height: var(--altura-botao);
-    padding: 10px 16px;
-    border: 1px solid var(--azul-petroleo);
-    border-radius: var(--raio-pequeno);
-    background: var(--azul-petroleo);
-    color: var(--papel);
-    font-family: var(--fonte-principal);
-    font-size: 12px;
-    font-weight: 600;
-    line-height: 1.4;
-    transition:
-        background var(--transicao-padrao),
-        border-color var(--transicao-padrao);
-}
-
-.botao-voltar:hover {
-    border-color: var(--azul-escuro);
-    background: var(--azul-escuro);
+.contador span:first-child {
+    font-weight: 800;
 }
 
 /* =========================================================
-   15. FILTROS
+   13. FILTROS
    ========================================================= */
 
 .filtros {
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     flex-wrap: wrap;
-    gap: 12px;
+    gap: 16px;
+
     padding: 20px 24px;
     border-bottom: 1px solid var(--borda);
+
     background: var(--fundo-filtro);
 }
 
 .campo-pesquisa,
 .campo-filtro {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+
+    min-width: 0;
+}
+
+.campo-pesquisa {
+    flex: 1 1 260px;
+}
+
+.campo-filtro {
+    flex: 0 1 220px;
+}
+
+.campo-pesquisa label,
+.campo-filtro label {
+    color: var(--azul-escuro);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.campo-pesquisa input,
+.campo-filtro select {
+    width: 100%;
+    min-width: 0;
     min-height: var(--altura-campo);
+
+    padding: 10px 13px;
+
     border: 1px solid var(--borda);
     border-radius: var(--raio-pequeno);
-    outline: none;
+
     background: var(--papel);
     color: var(--texto);
+
     font-family: var(--fonte-principal);
     font-size: var(--tamanho-texto);
+
     transition:
         border-color var(--transicao-padrao),
         box-shadow var(--transicao-padrao);
 }
 
-.campo-pesquisa {
-    flex: 1 1 240px;
-    min-width: 180px;
-    padding: 10px 13px;
-}
-
-.campo-filtro {
-    flex: 0 1 190px;
-    min-width: 150px;
-    padding: 9px 12px;
-}
-
-.campo-pesquisa::placeholder {
+.campo-pesquisa input::placeholder {
     color: var(--texto-suave);
-    opacity: 0.8;
+    opacity: 0.85;
 }
 
-.campo-pesquisa:focus,
-.campo-filtro:focus {
+.campo-pesquisa input:focus,
+.campo-filtro select:focus {
     border-color: var(--cobre);
+    outline: none;
     box-shadow: var(--sombra-foco);
 }
 
 /* =========================================================
-   16. TABELA RESPONSIVA
+   14. TABELA RESPONSIVA
    ========================================================= */
 
+.area-tabela,
 .tabela-responsiva {
     width: 100%;
+    min-width: 0;
     overflow-x: auto;
     overscroll-behavior-x: contain;
 }
 
+.area-tabela table,
 .tabela-responsiva table {
     width: 100%;
     border-collapse: collapse;
     text-align: left;
 }
 
+.area-tabela thead,
 .tabela-responsiva thead {
     background: var(--fundo-tabela);
 }
 
+.area-tabela th,
 .tabela-responsiva th {
     padding: 15px 18px;
     border-bottom: 1px solid var(--borda);
+
     color: var(--azul-escuro);
     font-family: var(--fonte-principal);
     font-size: 10px;
@@ -696,9 +693,11 @@ textarea:focus-visible {
     white-space: nowrap;
 }
 
+.area-tabela td,
 .tabela-responsiva td {
     padding: 15px 18px;
     border-top: 1px solid var(--borda-tabela);
+
     color: var(--texto);
     font-family: var(--fonte-principal);
     font-size: 12px;
@@ -706,37 +705,63 @@ textarea:focus-visible {
     vertical-align: middle;
 }
 
+.area-tabela tbody tr,
 .tabela-responsiva tbody tr {
-    transition: background 0.15s ease;
+    transition: background var(--transicao-padrao);
 }
 
+.area-tabela tbody tr:hover,
 .tabela-responsiva tbody tr:hover {
     background: var(--fundo-hover);
 }
 
+.area-tabela td:first-child,
 .tabela-responsiva td:first-child {
     color: var(--azul-petroleo);
     font-weight: 700;
 }
 
 /* =========================================================
-   17. STATUS DOS PEDIDOS
+   15. STATUS DOS PEDIDOS
    ========================================================= */
 
 .status {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+
     max-width: 100%;
     padding: 5px 10px;
+
     border: 1px solid transparent;
     border-radius: 20px;
+
     font-family: var(--fonte-principal);
     font-size: 10px;
     font-weight: 700;
     line-height: 1.4;
     white-space: nowrap;
 }
+
+.status-aberto {
+    border-color: var(--status-pendente-borda);
+    background: var(--status-pendente-fundo);
+    color: var(--status-pendente-texto);
+}
+
+.status-analise {
+    border-color: var(--cobre-claro-30);
+    background: var(--fundo-cobre);
+    color: var(--cobre-escuro);
+}
+
+.status-encerrado {
+    border-color: var(--status-cancelado-borda);
+    background: var(--status-cancelado-fundo);
+    color: var(--status-cancelado-texto);
+}
+
+/* Classes de status adicionais, caso sejam usadas em outras telas */
 
 .status-pendente {
     border-color: var(--status-pendente-borda);
@@ -769,11 +794,12 @@ textarea:focus-visible {
 }
 
 /* =========================================================
-   18. ESTADO SEM REGISTROS
+   16. ESTADO SEM REGISTROS
    ========================================================= */
 
-.sem-registros {
-    padding: 45px 20px;
+.sem-registros,
+.mensagem-vazia {
+    padding: 40px 20px;
     color: var(--texto-suave);
     font-family: var(--fonte-principal);
     font-size: var(--tamanho-texto);
@@ -781,35 +807,40 @@ textarea:focus-visible {
     text-align: center;
 }
 
-.sem-registros strong {
-    display: block;
-    margin-bottom: 6px;
-    color: var(--azul-escuro);
-    font-family: var(--fonte-titulo);
-    font-size: 17px;
-    font-weight: normal;
-}
-
 /* =========================================================
-   19. MENSAGEM DOS FILTROS
+   17. MENSAGEM DOS FILTROS
    ========================================================= */
 
 .mensagem-filtro {
     padding: 12px 24px;
     border-top: 1px solid var(--borda);
+
     background: var(--fundo-filtro);
     color: var(--texto-suave);
+
     font-family: var(--fonte-principal);
     font-size: var(--tamanho-texto-auxiliar);
     line-height: 1.6;
 }
 
+.mensagem-filtro[hidden] {
+    display: none;
+}
+
 /* =========================================================
-   20. RODAPÉ DO CONTEÚDO
+   18. RODAPÉ DA PÁGINA
    ========================================================= */
 
+.rodape-pagina,
 .rodape-conteudo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 5px 12px;
+
     padding: 24px 0 8px;
+
     color: var(--texto-suave);
     font-family: var(--fonte-principal);
     font-size: var(--tamanho-texto-auxiliar);
@@ -818,7 +849,7 @@ textarea:focus-visible {
 }
 
 /* =========================================================
-   21. TELAS GRANDES
+   19. TELAS GRANDES
    ========================================================= */
 
 @media (min-width: 1500px) {
@@ -829,21 +860,20 @@ textarea:focus-visible {
 }
 
 /* =========================================================
-   22. NOTEBOOKS
+   20. NOTEBOOKS
    ========================================================= */
 
 @media (max-width: 1200px) {
+    .layout {
+        grid-template-columns: var(--largura-menu-tablet) minmax(0, 1fr);
+    }
+
     .menu-lateral {
         width: var(--largura-menu-tablet);
         padding: 22px 14px 16px;
     }
 
-    .layout {
-        grid-template-columns: var(--largura-menu-tablet) minmax(0, 1fr);
-    }
-
     .conteudo-principal {
-        grid-column: 2;
         padding: 28px 24px;
     }
 
@@ -852,12 +882,13 @@ textarea:focus-visible {
     }
 
     .cabecalho-painel,
-    .acoes-pedidos,
     .filtros {
         padding-right: 18px;
         padding-left: 18px;
     }
 
+    .area-tabela th,
+    .area-tabela td,
     .tabela-responsiva th,
     .tabela-responsiva td {
         padding: 13px 14px;
@@ -865,7 +896,7 @@ textarea:focus-visible {
 }
 
 /* =========================================================
-   23. TABLETS
+   21. TABLETS
    ========================================================= */
 
 @media (max-width: 900px) {
@@ -879,22 +910,21 @@ textarea:focus-visible {
         gap: 16px;
     }
 
-    .acoes-cabecalho {
-        justify-content: flex-start;
+    .informacoes-usuario {
         width: 100%;
-    }
-
-    .nome-usuario {
-        display: block;
     }
 
     .cabecalho-painel {
         padding: 19px;
     }
+
+    .filtros {
+        gap: 12px;
+    }
 }
 
 /* =========================================================
-   24. CELULARES
+   22. CELULARES
    ========================================================= */
 
 @media (max-width: 760px) {
@@ -906,44 +936,43 @@ textarea:focus-visible {
     .menu-lateral {
         position: relative;
         inset: auto;
+
         width: 100%;
         height: auto;
         min-height: 0;
+
         padding: 16px;
         overflow: visible;
+
         border-right: 0;
         border-bottom: 3px solid var(--cobre);
         box-shadow: 0 4px 14px var(--azul-sombra-08);
     }
 
-    .marca {
+    .identidade {
         gap: 11px;
         padding: 0 4px 16px;
     }
 
-    .simbolo-sistema {
+    .logo {
         flex-basis: var(--largura-logo);
         width: var(--largura-logo);
         height: var(--largura-logo);
     }
 
-    .marca-texto h1,
-    .marca-texto h2,
-    .marca-texto strong {
+    .identidade h2 {
         font-size: 14px;
+    }
+
+    .identidade p {
+        font-size: 10px;
     }
 
     .navegacao {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        align-items: stretch;
         gap: 6px;
         margin-top: 18px;
-    }
-
-    .titulo-menu {
-        grid-column: 1 / -1;
-        margin: 0 5px 5px;
     }
 
     .item-menu {
@@ -972,44 +1001,19 @@ textarea:focus-visible {
 
     .conteudo-principal {
         display: block;
-        grid-column: auto;
         width: 100%;
         min-height: auto;
-        margin-left: 0;
         padding: 24px 18px;
     }
 
     .cabecalho {
-        align-items: flex-start;
-        flex-direction: column;
         gap: 14px;
         margin-bottom: 22px;
         padding-bottom: 20px;
     }
 
-    .titulo-pagina {
-        font-size: 26px;
-    }
-
     .titulo-pagina h1 {
         font-size: 26px;
-    }
-
-    .subtitulo {
-        font-size: 10px;
-        letter-spacing: 2px;
-    }
-
-    .acoes-cabecalho {
-        justify-content: space-between;
-        gap: 10px;
-        width: 100%;
-    }
-
-    .nome-usuario {
-        display: block;
-        min-width: 0;
-        overflow-wrap: anywhere;
     }
 
     .cabecalho-painel {
@@ -1017,8 +1021,8 @@ textarea:focus-visible {
         padding: 18px;
     }
 
-    .acoes-pedidos,
     .filtros {
+        align-items: stretch;
         padding: 16px 18px;
     }
 
@@ -1026,9 +1030,10 @@ textarea:focus-visible {
     .campo-filtro {
         flex: 1 1 100%;
         width: 100%;
-        min-width: 0;
     }
 
+    .area-tabela th,
+    .area-tabela td,
     .tabela-responsiva th,
     .tabela-responsiva td {
         padding: 12px;
@@ -1037,14 +1042,10 @@ textarea:focus-visible {
     .mensagem-filtro {
         padding: 12px 18px;
     }
-
-    .rodape-conteudo {
-        padding-top: 20px;
-    }
 }
 
 /* =========================================================
-   25. CELULARES PEQUENOS
+   23. CELULARES PEQUENOS
    ========================================================= */
 
 @media (max-width: 480px) {
@@ -1052,26 +1053,19 @@ textarea:focus-visible {
         padding: 14px 12px;
     }
 
-    .marca {
-        gap: 10px;
-    }
-
-    .simbolo-sistema {
+    .logo {
         flex-basis: 44px;
         width: 44px;
         height: 44px;
         min-width: 44px;
     }
 
-    .marca-texto h1,
-    .marca-texto h2,
-    .marca-texto strong {
+    .identidade h2 {
         font-size: 13px;
         letter-spacing: 0.8px;
     }
 
-    .marca-texto p,
-    .marca-texto span {
+    .identidade p {
         font-size: 10px;
     }
 
@@ -1090,18 +1084,14 @@ textarea:focus-visible {
         padding: 20px 12px;
     }
 
-    .titulo-pagina,
     .titulo-pagina h1 {
         font-size: 23px;
     }
 
-    .acoes-cabecalho {
-        flex-wrap: wrap;
-    }
-
-    .botao-sair {
-        min-height: 38px;
-        padding: 8px 12px;
+    .avatar-usuario {
+        flex-basis: 38px;
+        width: 38px;
+        height: 38px;
     }
 
     .cabecalho-painel {
@@ -1114,15 +1104,12 @@ textarea:focus-visible {
         font-size: 18px;
     }
 
-    .acoes-pedidos,
     .filtros {
         padding: 14px 13px;
     }
 
-    .botao-voltar {
-        width: 100%;
-    }
-
+    .area-tabela th,
+    .area-tabela td,
     .tabela-responsiva th,
     .tabela-responsiva td {
         padding: 10px;
@@ -1130,22 +1117,28 @@ textarea:focus-visible {
     }
 
     .contador {
-        min-width: 32px;
-        min-height: 30px;
         padding: 4px 8px;
+        font-size: 11px;
     }
 
-    .sem-registros {
-        padding: 32px 14px;
+    .sem-registros,
+    .mensagem-vazia {
+        padding: 30px 14px;
     }
 
     .mensagem-filtro {
         padding: 11px 13px;
     }
+
+    .rodape-pagina,
+    .rodape-conteudo {
+        flex-direction: column;
+        padding-top: 20px;
+    }
 }
 
 /* =========================================================
-   26. ACESSIBILIDADE
+   24. ACESSIBILIDADE
    ========================================================= */
 
 @media (prefers-reduced-motion: reduce) {

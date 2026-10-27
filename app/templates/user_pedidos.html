@@ -1,145 +1,211 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, private">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
+
     <title>Meus Pedidos | The Iron Compass</title>
+
     <link rel="stylesheet" href="/static/css/user_pedidos.css">
     <script src="/static/js/user_pedidos.js" defer></script>
 </head>
+
 <body>
     <div class="layout">
+
+        <!-- MENU LATERAL -->
         <aside class="menu-lateral">
-            <div class="marca">
-                <img src="/static/imagens/compasso.svg" alt="Símbolo do The Iron Compass" class="simbolo-sistema">
-                <div class="marca-texto">
+            <div class="identidade">
+                <img
+                    src="/static/imagens/compasso.svg"
+                    alt="Compasso The Iron Compass"
+                    class="logo"
+                >
+
+                <div>
                     <h2>THE IRON COMPASS</h2>
-                    <span>GESTÃO DE EQUIPAMENTOS</span>
+                    <p>Sistema de Empréstimos</p>
                 </div>
             </div>
 
-            <nav class="navegacao">
+            <nav class="navegacao" aria-label="Navegação principal">
                 <a href="/dashboard-user" class="item-menu">
-                    <span class="icone">⌂</span>
+                    <span class="icone" aria-hidden="true">⌂</span>
                     <span>Dashboard</span>
                 </a>
-                <a href="/user_pedidos" class="item-menu ativo" aria-current="page">
-                    <span class="icone">▤</span>
+
+                <a
+                    href="/user_pedidos"
+                    class="item-menu ativo"
+                    aria-current="page"
+                >
+                    <span class="icone" aria-hidden="true">▤</span>
                     <span>Meus Pedidos</span>
                 </a>
+
                 <a href="/user_emprestimos" class="item-menu">
-                    <span class="icone">⚒</span>
+                    <span class="icone" aria-hidden="true">⚙</span>
                     <span>Meus Empréstimos</span>
                 </a>
+
                 <a href="/user_perfil" class="item-menu">
-                    <span class="icone">♙</span>
+                    <span class="icone" aria-hidden="true">♙</span>
                     <span>Meu Perfil</span>
                 </a>
             </nav>
 
             <div class="rodape-menu">
-                <span>THE IRON COMPASS</span>
-                <small>Sistema de empréstimos</small>
+                <a href="/login" class="item-menu sair">
+                    <span class="icone" aria-hidden="true">⇥</span>
+                    <span>Sair</span>
+                </a>
             </div>
         </aside>
 
+        <!-- CONTEÚDO PRINCIPAL -->
         <main class="conteudo-principal">
+
+            <!-- CABEÇALHO -->
             <header class="cabecalho">
                 <div class="titulo-pagina">
-                    <span class="subtitulo">ÁREA DO USUÁRIO</span>
+                    <p class="subtitulo">ÁREA DO USUÁRIO</p>
                     <h1>Meus Pedidos</h1>
                     <p>Consulte os pedidos vinculados à sua conta.</p>
                 </div>
 
-                <div class="acoes-cabecalho">
-                    <span class="nome-usuario">{{ usuario.nome if usuario and usuario.nome else "Usuário" }}</span>
-                    <form action="/logout" method="post">
-                        <button type="submit" class="botao-sair">Sair</button>
-                    </form>
+                <div class="informacoes-usuario">
+                    <div class="avatar-usuario" aria-hidden="true">♙</div>
+
+                    <div class="dados-usuario">
+                        <span id="nomeUsuario">
+                            {{ usuario.nome if usuario and usuario.nome else "Usuário" }}
+                        </span>
+                        <small id="perfilUsuario">Discente</small>
+                    </div>
                 </div>
             </header>
 
-            <section class="painel-pedidos">
-                <div class="cabecalho-painel">
-                    <div>
-                        <h2>Histórico de pedidos</h2>
-                        <p>Dados consultados a partir dos registros do sistema.</p>
-                    </div>
-                    <div class="contador">
-                        <span id="totalPedidos">{{ pedidos|length }}</span>
-                        <span>pedido(s)</span>
-                    </div>
-                </div>
+            <!-- HISTÓRICO DE PEDIDOS -->
+            <section class="secao-conteudo" aria-labelledby="tituloPedidos">
+                <article class="painel painel-pedidos">
 
-                <div class="filtros">
-                    <div class="campo-pesquisa">
-                        <label for="pesquisaPedidos">Pesquisar</label>
-                        <input type="search" id="pesquisaPedidos" placeholder="Pesquisar nos pedidos...">
+                    <div class="cabecalho-painel">
+                        <div>
+                            <h2 id="tituloPedidos">Histórico de pedidos</h2>
+                            <p>Dados consultados a partir dos registros do sistema.</p>
+                        </div>
+
+                        <div class="contador" aria-label="Quantidade de pedidos">
+                            <span id="totalPedidos">{{ pedidos|length }}</span>
+                            <span>pedido(s)</span>
+                        </div>
                     </div>
 
-                    <div class="campo-filtro">
-                        <label for="filtroStatus">Filtrar por status</label>
-                        <select id="filtroStatus">
-                            <option value="">Todos os status</option>
-                            <option value="ABERTO">Aberto</option>
-                            <option value="EM_ANALISE">Em análise</option>
-                            <option value="ENCERRADO">Encerrado</option>
-                        </select>
+                    <!-- FILTROS -->
+                    <div class="filtros">
+                        <div class="campo-pesquisa">
+                            <label for="pesquisaPedidos">Pesquisar</label>
+                            <input
+                                type="search"
+                                id="pesquisaPedidos"
+                                placeholder="Pesquisar nos pedidos..."
+                                autocomplete="off"
+                            >
+                        </div>
+
+                        <div class="campo-filtro">
+                            <label for="filtroStatus">Filtrar por status</label>
+                            <select id="filtroStatus">
+                                <option value="">Todos os status</option>
+                                <option value="ABERTO">Aberto</option>
+                                <option value="EM_ANALISE">Em análise</option>
+                                <option value="ENCERRADO">Encerrado</option>
+                            </select>
+                        </div>
                     </div>
-                </div>
 
-                <div class="tabela-responsiva">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>ID do pedido</th>
-                                <th>Data do pedido</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody id="corpoTabelaPedidos">
-                            {% for pedido in pedidos %}
-                            {% set status_pedido = pedido.status.value if pedido.status.value is defined else pedido.status %}
-                            <tr data-status="{{ status_pedido }}">
-                                <td>#{{ pedido.id_pedido }}</td>
-                                <td>
-                                    {% if pedido.data_pedido %}
-                                        {{ pedido.data_pedido.strftime("%d/%m/%Y %H:%M") if pedido.data_pedido.hour is defined else pedido.data_pedido.strftime("%d/%m/%Y") }}
-                                    {% else %}
-                                        Não informada
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    {% if status_pedido == "ABERTO" %}
-                                        <span class="status status-aberto">Aberto</span>
-                                    {% elif status_pedido == "EM_ANALISE" %}
-                                        <span class="status status-analise">Em análise</span>
-                                    {% elif status_pedido == "ENCERRADO" %}
-                                        <span class="status status-encerrado">Encerrado</span>
-                                    {% else %}
-                                        <span class="status">{{ status_pedido }}</span>
-                                    {% endif %}
-                                </td>
-                            </tr>
-                            {% else %}
-                            <tr>
-                                <td colspan="3" class="sem-registros">Nenhum pedido encontrado para sua conta.</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
+                    <!-- TABELA -->
+                    <div class="area-tabela tabela-responsiva">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th scope="col">ID do pedido</th>
+                                    <th scope="col">Data do pedido</th>
+                                    <th scope="col">Status</th>
+                                </tr>
+                            </thead>
 
-                <p id="mensagemFiltro" class="mensagem-filtro" hidden>Nenhum pedido corresponde à pesquisa.</p>
+                            <tbody id="corpoTabelaPedidos">
+                                {% for pedido in pedidos %}
+                                    {% set status_pedido = pedido.status.value if pedido.status.value is defined else pedido.status %}
+
+                                    <tr data-status="{{ status_pedido }}">
+                                        <td>#{{ pedido.id_pedido }}</td>
+
+                                        <td>
+                                            {% if pedido.data_pedido %}
+                                                {{ pedido.data_pedido.strftime("%d/%m/%Y %H:%M") if pedido.data_pedido.hour is defined else pedido.data_pedido.strftime("%d/%m/%Y") }}
+                                            {% else %}
+                                                Não informada
+                                            {% endif %}
+                                        </td>
+
+                                        <td>
+                                            {% if status_pedido == "ABERTO" %}
+                                                <span class="status status-aberto">
+                                                    Aberto
+                                                </span>
+                                            {% elif status_pedido == "EM_ANALISE" %}
+                                                <span class="status status-analise">
+                                                    Em análise
+                                                </span>
+                                            {% elif status_pedido == "ENCERRADO" %}
+                                                <span class="status status-encerrado">
+                                                    Encerrado
+                                                </span>
+                                            {% else %}
+                                                <span class="status">
+                                                    {{ status_pedido }}
+                                                </span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% else %}
+                                    <tr>
+                                        <td colspan="3" class="sem-registros">
+                                            Nenhum pedido encontrado para sua conta.
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- MENSAGEM DOS FILTROS -->
+                    <p
+                        id="mensagemFiltro"
+                        class="mensagem-filtro"
+                        role="status"
+                        aria-live="polite"
+                        hidden
+                    >
+                        Nenhum pedido corresponde à pesquisa.
+                    </p>
+
+                </article>
             </section>
 
-            <footer class="rodape-conteudo">
+            <!-- RODAPÉ -->
+            <footer class="rodape-pagina">
                 <span>THE IRON COMPASS</span>
-                <span>Sistema de gerenciamento de empréstimos</span>
+                <span>Sistema de Gerenciamento de Empréstimos</span>
             </footer>
+
         </main>
     </div>
 </body>

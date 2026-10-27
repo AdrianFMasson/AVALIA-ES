@@ -3,7 +3,6 @@
    ========================================================= */
 
 :root {
-    /* Cores principais */
     --azul-petroleo: #173b46;
     --azul-escuro: #102b33;
     --azul-medio: #24515b;
@@ -16,7 +15,6 @@
     --papel: #fffdf7;
     --branco: #ffffff;
 
-    /* Textos e bordas */
     --texto: #26383b;
     --texto-suave: #718084;
     --texto-menu: #e1e5df;
@@ -25,15 +23,12 @@
     --borda: #ded5c2;
     --borda-tabela: #eee8dc;
     --borda-avatar: #d5b58c;
-
     --placeholder: #929b98;
 
-    /* Estados */
     --sucesso: #477b5c;
     --alerta: #b47b2c;
     --erro: #a84e43;
 
-    /* Fundos */
     --fundo-contador: #f8e8da;
     --fundo-filtros: #faf6ed;
     --fundo-tabela: #f7f2e8;
@@ -41,21 +36,17 @@
     --fundo-sucesso: #e5f2e7;
     --fundo-erro: #f8e5e5;
     --fundo-cancelado: #eeece7;
-
     --fundo-hover: #faf6ed;
     --fundo-icone: #eadcc4;
 
-    /* Bordas de estados */
     --borda-contador: rgba(189, 107, 60, 0.3);
     --borda-aviso: #ead7a5;
     --borda-sucesso: #b8d7c0;
     --borda-erro: #e7bcbc;
     --borda-cancelado: #d8d5cf;
 
-    /* Transparências */
     --brilho-cobre: rgba(230, 161, 111, 0.25);
     --brilho-cobre-suave: rgba(230, 161, 111, 0.2);
-
     --cobre-transparente: rgba(189, 107, 60, 0.25);
     --cobre-ativo: rgba(189, 107, 60, 0.22);
     --cobre-ativo-suave: rgba(189, 107, 60, 0.06);
@@ -65,37 +56,30 @@
     --marfim-hover: rgba(244, 239, 227, 0.07);
     --marfim-tabela: rgba(244, 239, 227, 0.55);
     --marfim-aviso: rgba(244, 239, 227, 0.5);
-
     --papel-cabecalho: rgba(255, 253, 247, 0.8);
 
     --sombra-menu: rgba(16, 43, 51, 0.12);
     --sombra-menu-mobile: rgba(16, 43, 51, 0.08);
     --sombra-suave: rgba(16, 43, 51, 0.08);
 
-    /* Tipografia */
     --fonte-titulo: Georgia, "Times New Roman", serif;
     --fonte-interface: "Segoe UI", Arial, sans-serif;
 
-    /* Dimensões */
     --largura-menu: 270px;
     --largura-menu-tablet: 250px;
-    --largura-menu-mobile: 76px;
-
     --altura-logo: 48px;
     --altura-campo: 44px;
     --altura-botao: 44px;
 
-    /* Bordas */
     --raio-padrao: 6px;
     --raio-painel: 9px;
 
-    /* Efeitos */
     --sombra: 0 8px 24px var(--sombra-suave);
     --transicao: 0.2s ease;
 }
 
 /* =========================================================
-   2. RESET E ELEMENTOS GERAIS
+   2. RESET E CONFIGURAÇÕES GERAIS
    ========================================================= */
 
 * {
@@ -113,10 +97,8 @@ html {
 body {
     min-width: 320px;
     min-height: 100vh;
-
     background: var(--marfim);
     color: var(--texto);
-
     font-family: var(--fonte-interface);
     font-size: 14px;
     line-height: 1.5;
@@ -166,7 +148,6 @@ textarea:focus-visible {
 .layout {
     display: grid;
     grid-template-columns: var(--largura-menu) minmax(0, 1fr);
-
     width: 100%;
     min-height: 100vh;
 }
@@ -198,7 +179,6 @@ textarea:focus-visible {
     );
 
     color: var(--marfim);
-
     border-right: 4px solid var(--cobre-escuro);
     box-shadow: 4px 0 18px var(--sombra-menu);
 }
@@ -207,36 +187,17 @@ textarea:focus-visible {
    5. IDENTIDADE VISUAL
    ========================================================= */
 
-.marca {
-    position: relative;
-
+.identidade {
     display: flex;
     align-items: center;
-
     gap: 11px;
+
     width: 100%;
     min-width: 0;
     padding: 0 5px 20px;
 
     border-bottom: 1px solid var(--brilho-cobre);
     color: var(--marfim);
-}
-
-.marca::after {
-    position: absolute;
-    bottom: -1px;
-    left: 5px;
-
-    width: 72px;
-    height: 2px;
-
-    background: linear-gradient(
-        90deg,
-        var(--cobre),
-        var(--cobre-claro)
-    );
-
-    content: "";
 }
 
 .logo {
@@ -249,37 +210,26 @@ textarea:focus-visible {
     object-fit: contain;
 }
 
-.marca-texto {
-    display: flex;
+.identidade > div {
     flex: 1 1 auto;
-    flex-direction: column;
-
-    gap: 3px;
     min-width: 0;
 }
 
-.marca-texto h2 {
+.identidade h2 {
     color: var(--cobre-claro);
-
     font-family: var(--fonte-titulo);
     font-size: 15px;
     font-weight: 700;
     line-height: 1.5;
     letter-spacing: 1.2px;
-
     overflow-wrap: anywhere;
 }
 
-.marca-texto span {
-    display: block;
+.identidade p {
     margin-top: 4px;
-
     color: var(--texto-menu-secundario);
-
-    font-family: var(--fonte-interface);
     font-size: 11px;
     line-height: 1.5;
-    letter-spacing: 0.7px;
 }
 
 /* =========================================================
@@ -290,8 +240,8 @@ textarea:focus-visible {
     display: flex;
     flex-direction: column;
     align-items: stretch;
-
     gap: 7px;
+
     width: 100%;
     margin-top: 27px;
 }
@@ -302,8 +252,8 @@ textarea:focus-visible {
     display: flex;
     align-items: center;
     justify-content: flex-start;
-
     gap: 12px;
+
     width: 100%;
     min-width: 0;
     min-height: var(--altura-botao);
@@ -320,7 +270,6 @@ textarea:focus-visible {
     font-weight: 500;
     line-height: 1.4;
     text-align: left;
-    white-space: nowrap;
 
     transition:
         background var(--transicao),
@@ -337,7 +286,6 @@ textarea:focus-visible {
 .item-menu.ativo,
 .item-menu.active {
     padding-left: 10px;
-
     border-color: var(--cobre-transparente);
     border-left: 3px solid var(--cobre-claro);
 
@@ -365,32 +313,41 @@ textarea:focus-visible {
 }
 
 /* =========================================================
-   7. RODAPÉ DO MENU
+   7. SAIR DO SISTEMA
    ========================================================= */
 
 .rodape-menu {
     display: flex;
     flex-direction: column;
-
     gap: 5px;
+
     margin-top: auto;
-    padding: 20px 10px 0;
+    padding: 20px 0 0;
 
     border-top: 1px solid var(--brilho-cobre-suave);
-
-    color: var(--marfim-menu);
-    font-family: var(--fonte-interface);
-    font-size: 11px;
-    line-height: 1.6;
-    letter-spacing: 0.3px;
 }
 
-.rodape-menu small {
-    color: var(--cobre-claro);
+.rodape-menu form {
+    width: 100%;
+}
 
+.item-menu.sair {
+    color: #f0b4a8;
+}
+
+.item-menu.sair .icone {
+    color: #f0b4a8;
+}
+
+.item-menu.sair:hover {
+    border-color: rgba(240, 180, 168, 0.3);
+    background: rgba(168, 78, 67, 0.15);
+    color: var(--branco);
+}
+
+.item-menu.sair button,
+button.item-menu.sair {
     font-family: var(--fonte-interface);
-    font-size: 10px;
-    letter-spacing: 0;
 }
 
 /* =========================================================
@@ -418,10 +375,9 @@ textarea:focus-visible {
     display: flex;
     align-items: center;
     justify-content: space-between;
-
     gap: 24px;
-    min-width: 0;
 
+    min-width: 0;
     margin: -35px calc(-1 * clamp(22px, 4vw, 56px)) 30px;
     padding: 22px clamp(22px, 4vw, 56px) 24px;
 
@@ -433,15 +389,11 @@ textarea:focus-visible {
     min-width: 0;
 }
 
-/* Subtítulo */
-
 .subtitulo {
     display: block;
     margin-bottom: 6px;
 
     color: var(--cobre-escuro);
-
-    font-family: var(--fonte-interface);
     font-size: 10px;
     font-weight: 700;
     letter-spacing: 2px;
@@ -449,52 +401,69 @@ textarea:focus-visible {
     text-transform: uppercase;
 }
 
-/* Título principal */
-
 .titulo-pagina h1 {
     color: var(--azul-petroleo);
-
     font-family: var(--fonte-titulo);
     font-size: clamp(27px, 3vw, 36px);
     font-weight: normal;
     line-height: 1.25;
-
     overflow-wrap: anywhere;
 }
 
-/* Descrição */
-
-.titulo-pagina p {
+.titulo-pagina > p {
     margin-top: 7px;
-
     color: var(--texto-suave);
-
-    font-family: var(--fonte-interface);
     font-size: 13px;
     line-height: 1.6;
 }
 
 /* =========================================================
-   10. AÇÕES DO CABEÇALHO
+   10. INFORMAÇÕES DO USUÁRIO
    ========================================================= */
 
-.acoes-cabecalho {
+.informacoes-usuario {
     display: flex;
     align-items: center;
     justify-content: flex-end;
+    gap: 11px;
 
-    gap: 12px;
     flex-shrink: 0;
     min-width: 0;
 }
 
-.nome-usuario {
-    max-width: 200px;
+.avatar-usuario {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex: 0 0 43px;
+    width: 43px;
+    height: 43px;
+
+    border: 1px solid var(--borda-avatar);
+    border-radius: 50%;
+
+    background: var(--fundo-icone);
+    color: var(--azul-petroleo);
+
+    font-family: var(--fonte-titulo);
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.dados-usuario {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+
+    min-width: 0;
+}
+
+.dados-usuario span {
+    max-width: 220px;
     overflow: hidden;
 
     color: var(--azul-petroleo);
-
-    font-family: var(--fonte-interface);
     font-size: 13px;
     font-weight: 700;
 
@@ -502,45 +471,22 @@ textarea:focus-visible {
     white-space: nowrap;
 }
 
-.acoes-cabecalho form {
-    margin: 0;
-}
-
-.botao-sair {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-
-    flex-shrink: 0;
-    min-height: var(--altura-botao);
-    padding: 9px 14px;
-
-    border: 1px solid var(--erro);
-    border-radius: 5px;
-
-    background: transparent;
-    color: var(--erro);
-
-    font-family: var(--fonte-interface);
-    font-size: 12px;
-    font-weight: 700;
-
-    transition:
-        background var(--transicao),
-        color var(--transicao),
-        border-color var(--transicao);
-}
-
-.botao-sair:hover {
-    background: var(--erro);
-    color: var(--branco);
+.dados-usuario small {
+    color: var(--texto-suave);
+    font-size: 11px;
+    line-height: 1.4;
 }
 
 /* =========================================================
-   11. PAINEL DE EMPRÉSTIMOS
+   11. SEÇÃO E PAINEL DE EMPRÉSTIMOS
    ========================================================= */
 
-.painel-emprestimos {
+.secao-conteudo {
+    width: 100%;
+    min-width: 0;
+}
+
+.painel {
     width: 100%;
     min-width: 0;
     padding: 24px;
@@ -553,6 +499,11 @@ textarea:focus-visible {
     box-shadow: var(--sombra);
 }
 
+.painel-emprestimos {
+    width: 100%;
+    min-width: 0;
+}
+
 /* =========================================================
    12. CABEÇALHO DO PAINEL
    ========================================================= */
@@ -561,8 +512,8 @@ textarea:focus-visible {
     display: flex;
     align-items: center;
     justify-content: space-between;
-
     gap: 18px;
+
     margin-bottom: 22px;
     padding-bottom: 17px;
 
@@ -575,7 +526,6 @@ textarea:focus-visible {
 
 .cabecalho-painel h2 {
     color: var(--azul-petroleo);
-
     font-family: var(--fonte-titulo);
     font-size: 20px;
     font-weight: normal;
@@ -584,16 +534,13 @@ textarea:focus-visible {
 
 .cabecalho-painel p {
     margin-top: 5px;
-
     color: var(--texto-suave);
-
-    font-family: var(--fonte-interface);
     font-size: 12px;
     line-height: 1.6;
 }
 
 /* =========================================================
-   13. CONTADOR DE EMPRÉSTIMOS
+   13. CONTADOR
    ========================================================= */
 
 .contador {
@@ -611,8 +558,6 @@ textarea:focus-visible {
 
     background: var(--fundo-contador);
     color: var(--azul-petroleo);
-
-    font-family: var(--fonte-interface);
 }
 
 .contador span:first-child {
@@ -623,88 +568,27 @@ textarea:focus-visible {
 
 .contador span:last-child {
     margin-top: 3px;
-
     color: var(--texto-suave);
     font-size: 10px;
     line-height: 1.4;
 }
 
 /* =========================================================
-   14. AÇÕES DA PÁGINA
-   ========================================================= */
-
-.acoes-pagina {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-
-    gap: 10px;
-    margin-bottom: 20px;
-}
-
-.botao-voltar,
-.botao-secundario {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-
-    gap: 8px;
-    min-height: var(--altura-botao);
-    padding: 10px 16px;
-
-    border: 1px solid var(--azul-petroleo);
-    border-radius: var(--raio-padrao);
-
-    background: var(--azul-petroleo);
-    color: var(--marfim);
-
-    font-family: var(--fonte-interface);
-    font-size: 12px;
-    font-weight: 700;
-    line-height: 1.4;
-
-    transition:
-        background var(--transicao),
-        border-color var(--transicao),
-        transform var(--transicao);
-}
-
-.botao-voltar:hover,
-.botao-secundario:hover {
-    border-color: var(--azul-escuro);
-    background: var(--azul-escuro);
-    transform: translateY(-1px);
-}
-
-.botao-secundario {
-    border-color: var(--borda);
-    background: var(--papel);
-    color: var(--azul-petroleo);
-}
-
-.botao-secundario:hover {
-    border-color: var(--cobre);
-    background: var(--fundo-contador);
-    color: var(--cobre-escuro);
-}
-
-/* =========================================================
-   15. FILTROS
+   14. FILTROS
    ========================================================= */
 
 .filtros {
     display: flex;
     align-items: flex-end;
     flex-wrap: wrap;
-
     gap: 14px;
+
     width: 100%;
     margin-bottom: 18px;
     padding: 16px;
 
     border: 1px solid var(--borda);
     border-radius: var(--raio-padrao);
-
     background: var(--fundo-filtros);
 }
 
@@ -712,7 +596,6 @@ textarea:focus-visible {
 .campo-filtro {
     display: flex;
     flex-direction: column;
-
     gap: 7px;
     min-width: 0;
 }
@@ -728,8 +611,6 @@ textarea:focus-visible {
 .campo-pesquisa label,
 .campo-filtro label {
     color: var(--azul-petroleo);
-
-    font-family: var(--fonte-interface);
     font-size: 11px;
     font-weight: 700;
     line-height: 1.5;
@@ -772,9 +653,10 @@ textarea:focus-visible {
 }
 
 /* =========================================================
-   16. TABELA RESPONSIVA
+   15. ÁREA DA TABELA
    ========================================================= */
 
+.area-tabela,
 .tabela-responsiva {
     width: 100%;
     min-width: 0;
@@ -786,26 +668,26 @@ textarea:focus-visible {
     border-radius: var(--raio-padrao);
 }
 
+.area-tabela table,
 .tabela-responsiva table {
     width: 100%;
     min-width: 850px;
-
     border-collapse: collapse;
     text-align: left;
 }
 
+.area-tabela thead,
 .tabela-responsiva thead {
     background: var(--fundo-tabela);
 }
 
+.area-tabela th,
 .tabela-responsiva th {
     padding: 14px 15px;
 
     border-bottom: 1px solid var(--borda);
 
     color: var(--azul-petroleo);
-
-    font-family: var(--fonte-interface);
     font-size: 11px;
     font-weight: 700;
     letter-spacing: 0.3px;
@@ -814,39 +696,41 @@ textarea:focus-visible {
     white-space: nowrap;
 }
 
+.area-tabela td,
 .tabela-responsiva td {
     padding: 14px 15px;
-
     border-bottom: 1px solid var(--borda-tabela);
 
     color: var(--texto);
-
-    font-family: var(--fonte-interface);
     font-size: 12px;
     line-height: 1.6;
     vertical-align: middle;
     white-space: nowrap;
 }
 
+.area-tabela tbody tr:last-child td,
 .tabela-responsiva tbody tr:last-child td {
     border-bottom: none;
 }
 
+.area-tabela tbody tr,
 .tabela-responsiva tbody tr {
     transition: background 0.15s ease;
 }
 
+.area-tabela tbody tr:hover:not(.linha-vazia),
 .tabela-responsiva tbody tr:hover:not(.linha-vazia) {
     background: var(--marfim-tabela);
 }
 
+.area-tabela td:first-child,
 .tabela-responsiva td:first-child {
     color: var(--azul-petroleo);
     font-weight: 700;
 }
 
 /* =========================================================
-   17. STATUS DOS EMPRÉSTIMOS
+   16. STATUS DOS EMPRÉSTIMOS
    ========================================================= */
 
 .status {
@@ -861,7 +745,6 @@ textarea:focus-visible {
     border: 1px solid transparent;
     border-radius: 20px;
 
-    font-family: var(--fonte-interface);
     font-size: 10px;
     font-weight: 700;
     line-height: 1.4;
@@ -896,34 +779,21 @@ textarea:focus-visible {
 }
 
 /* =========================================================
-   18. ESTADO SEM REGISTROS
+   17. ESTADO SEM REGISTROS
    ========================================================= */
 
+.linha-vazia td,
 .sem-registros {
     padding: 35px 18px;
-
     color: var(--texto-suave);
-
-    font-family: var(--fonte-interface);
     font-size: 13px;
     line-height: 1.6;
     text-align: center;
     white-space: normal;
 }
 
-.sem-registros strong {
-    display: block;
-    margin-bottom: 6px;
-
-    color: var(--azul-petroleo);
-
-    font-family: var(--fonte-titulo);
-    font-size: 17px;
-    font-weight: normal;
-}
-
 /* =========================================================
-   19. MENSAGEM DOS FILTROS
+   18. MENSAGEM DOS FILTROS
    ========================================================= */
 
 .mensagem-filtro {
@@ -936,43 +806,58 @@ textarea:focus-visible {
     background: var(--marfim-aviso);
     color: var(--texto-suave);
 
-    font-family: var(--fonte-interface);
     font-size: 12px;
     line-height: 1.6;
     text-align: center;
 }
 
 /* =========================================================
-   20. RODAPÉ DO CONTEÚDO
+   19. RODAPÉ DA PÁGINA
    ========================================================= */
 
-.rodape-conteudo {
+.rodape-pagina {
     display: flex;
     align-items: center;
     justify-content: space-between;
     flex-wrap: wrap;
-
     gap: 8px;
+
     margin-top: auto;
     padding: 24px 0 8px;
 
     border-top: 1px solid var(--borda);
 
     color: var(--texto-suave);
-
-    font-family: var(--fonte-interface);
     font-size: 11px;
     line-height: 1.6;
 }
 
-.rodape-conteudo span:first-child {
+.rodape-pagina span:first-child {
     color: var(--cobre-escuro);
     font-weight: 700;
     letter-spacing: 0.8px;
 }
 
+/* Compatibilidade com o nome antigo do rodapé */
+.rodape-conteudo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+
+    margin-top: auto;
+    padding: 24px 0 8px;
+
+    border-top: 1px solid var(--borda);
+
+    color: var(--texto-suave);
+    font-size: 11px;
+    line-height: 1.6;
+}
+
 /* =========================================================
-   21. NOTEBOOKS
+   20. NOTEBOOKS
    ========================================================= */
 
 @media (max-width: 1200px) {
@@ -990,14 +875,16 @@ textarea:focus-visible {
         gap: 18px;
     }
 
-    .painel-emprestimos {
+    .painel {
         padding: 20px;
     }
 
-    .nome-usuario {
-        max-width: 160px;
+    .dados-usuario span {
+        max-width: 170px;
     }
 
+    .area-tabela th,
+    .area-tabela td,
     .tabela-responsiva th,
     .tabela-responsiva td {
         padding: 13px 14px;
@@ -1005,8 +892,7 @@ textarea:focus-visible {
 }
 
 /* =========================================================
-   22. TABLETS E CELULARES
-   Mantém o menu expandido e empilhado
+   21. TABLETS E CELULARES
    ========================================================= */
 
 @media (max-width: 760px) {
@@ -1033,7 +919,7 @@ textarea:focus-visible {
         box-shadow: 0 4px 14px var(--sombra-menu-mobile);
     }
 
-    .marca {
+    .identidade {
         gap: 11px;
         padding: 0 4px 16px;
     }
@@ -1044,15 +930,11 @@ textarea:focus-visible {
         height: 44px;
     }
 
-    .marca-texto {
-        display: flex;
-    }
-
-    .marca-texto h2 {
+    .identidade h2 {
         font-size: 14px;
     }
 
-    .marca-texto span {
+    .identidade p {
         font-size: 10px;
     }
 
@@ -1067,11 +949,11 @@ textarea:focus-visible {
 
     .item-menu {
         justify-content: flex-start;
+        gap: 8px;
 
         min-width: 0;
         min-height: 44px;
         padding: 9px;
-        gap: 8px;
 
         font-size: 12px;
         white-space: normal;
@@ -1089,11 +971,11 @@ textarea:focus-visible {
     }
 
     .rodape-menu {
-        display: none;
+        margin-top: 12px;
+        padding-top: 12px;
     }
 
     .conteudo-principal {
-        display: flex;
         grid-column: auto;
 
         width: 100%;
@@ -1116,24 +998,22 @@ textarea:focus-visible {
         font-size: 25px;
     }
 
-    .titulo-pagina p {
+    .titulo-pagina > p {
         font-size: 12px;
     }
 
-    .acoes-cabecalho {
-        justify-content: space-between;
-
-        gap: 10px;
+    .informacoes-usuario {
+        justify-content: flex-start;
         width: 100%;
     }
 
-    .nome-usuario {
-        max-width: 65%;
+    .dados-usuario span {
+        max-width: min(65vw, 280px);
         white-space: normal;
         overflow-wrap: anywhere;
     }
 
-    .painel-emprestimos {
+    .painel {
         padding: 18px;
     }
 
@@ -1155,18 +1035,14 @@ textarea:focus-visible {
         flex: 1 1 100%;
     }
 
-    .campo-pesquisa input,
-    .campo-filtro select {
-        min-height: var(--altura-campo);
-    }
-
+    .rodape-pagina,
     .rodape-conteudo {
         margin-top: 24px;
     }
 }
 
 /* =========================================================
-   23. CELULARES PEQUENOS
+   22. CELULARES PEQUENOS
    ========================================================= */
 
 @media (max-width: 480px) {
@@ -1174,7 +1050,7 @@ textarea:focus-visible {
         padding: 14px 12px;
     }
 
-    .marca {
+    .identidade {
         gap: 10px;
     }
 
@@ -1184,12 +1060,12 @@ textarea:focus-visible {
         height: 40px;
     }
 
-    .marca-texto h2 {
+    .identidade h2 {
         font-size: 13px;
         letter-spacing: 0.8px;
     }
 
-    .marca-texto span {
+    .identidade p {
         font-size: 10px;
     }
 
@@ -1222,33 +1098,30 @@ textarea:focus-visible {
         letter-spacing: 1.1px;
     }
 
-    .titulo-pagina p {
+    .titulo-pagina > p {
         font-size: 11px;
     }
 
-    .acoes-cabecalho {
-        flex-wrap: wrap;
-        gap: 8px;
+    .avatar-usuario {
+        flex-basis: 38px;
+        width: 38px;
+        height: 38px;
+        font-size: 16px;
     }
 
-    .nome-usuario {
-        max-width: 100%;
-        font-size: 11px;
+    .dados-usuario span {
+        max-width: 70vw;
+        font-size: 12px;
     }
 
-    .botao-sair {
-        min-height: 38px;
-        padding: 8px 12px;
-    }
-
-    .painel-emprestimos {
+    .painel {
         padding: 13px;
     }
 
     .cabecalho-painel {
         align-items: flex-start;
-
         gap: 10px;
+
         margin-bottom: 16px;
         padding-bottom: 14px;
     }
@@ -1274,18 +1147,6 @@ textarea:focus-visible {
         font-size: 9px;
     }
 
-    .acoes-pagina {
-        gap: 8px;
-        margin-bottom: 16px;
-    }
-
-    .botao-voltar,
-    .botao-secundario {
-        min-height: 38px;
-        padding: 9px 11px;
-        font-size: 11px;
-    }
-
     .filtros {
         padding: 11px;
     }
@@ -1296,6 +1157,8 @@ textarea:focus-visible {
         font-size: 12px;
     }
 
+    .area-tabela th,
+    .area-tabela td,
     .tabela-responsiva th,
     .tabela-responsiva td {
         padding: 11px 10px;
@@ -1307,6 +1170,7 @@ textarea:focus-visible {
         font-size: 9px;
     }
 
+    .linha-vazia td,
     .sem-registros {
         padding: 30px 12px;
     }
@@ -1316,19 +1180,19 @@ textarea:focus-visible {
         font-size: 11px;
     }
 
+    .rodape-pagina,
     .rodape-conteudo {
         align-items: flex-start;
         flex-direction: column;
-
         gap: 4px;
-        padding-top: 18px;
 
+        padding-top: 18px;
         font-size: 10px;
     }
 }
 
 /* =========================================================
-   24. ACESSIBILIDADE
+   23. ACESSIBILIDADE
    ========================================================= */
 
 @media (prefers-reduced-motion: reduce) {
