@@ -1,28 +1,131 @@
-/* =========================================
-   VARIÁVEIS E CONFIGURAÇÕES GERAIS
-========================================= */
+
+/* =========================================================
+   1. VARIÁVEIS GLOBAIS
+   Modelo base oficial do projeto
+   ========================================================= */
 
 :root {
-    --azul-petroleo: #173b46;
-    --azul-escuro: #102b33;
-    --azul-medio: #24515b;
+    /* Cores principais */
     --cobre: #bd6b3c;
     --cobre-escuro: #8f4828;
     --cobre-claro: #e6a16f;
+
+    --azul-petroleo: #173b46;
+    --azul-escuro: #102b33;
+    --azul-medio: #24515b;
+
+    /* Fundos */
     --marfim: #f4efe3;
     --papel: #fffdf7;
+    --fundo-hover: #faf6ed;
+    --fundo-tabela: #f7f2e8;
+    --fundo-icone: #eadcc4;
+    --fundo-cobre: #f8e8da;
+    --fundo-filtro: rgb(244 239 227 / 38%);
+
+    /* Textos */
     --texto: #26383b;
     --texto-suave: #718084;
+    --texto-menu: #e1e5df;
+    --texto-menu-secundario: #d0d9d5;
+    --texto-menu-claro: #fffaf2;
+
+    /* Bordas */
     --borda: #ded5c2;
+    --borda-tabela: #eee8dc;
+    --borda-avatar: #d5b58c;
+
+    /* Estados */
     --sucesso: #477b5c;
     --alerta: #b47b2c;
     --erro: #a84e43;
-    --sombra: 0 8px 24px rgba(16, 43, 51, 0.08);
+    --indicador-secundario: #648b9a;
+    --icone-secundario: #416b7a;
+
+    /* Status dos pedidos */
+    --status-pendente-texto: #87651b;
+    --status-pendente-fundo: #fbf2d9;
+    --status-pendente-borda: #ead7a5;
+
+    --status-aprovado-texto: #356846;
+    --status-aprovado-fundo: #e5f2e7;
+    --status-aprovado-borda: #b8d7c0;
+
+    --status-recusado-texto: #963f3f;
+    --status-recusado-fundo: #f8e5e5;
+    --status-recusado-borda: #e7bcbc;
+
+    --status-cancelado-texto: #66645f;
+    --status-cancelado-fundo: #eeece7;
+    --status-cancelado-borda: #d8d5cf;
+
+    /* Transparências */
+    --branco-07: rgb(255 255 255 / 7%);
+    --marfim-07: rgb(244 239 227 / 7%);
+    --marfim-48: rgb(244 239 227 / 48%);
+    --marfim-55: rgb(244 239 227 / 55%);
+    --marfim-80: rgb(244 239 227 / 80%);
+
+    --cobre-06: rgb(189 107 60 / 6%);
+    --cobre-08: rgb(189 107 60 / 8%);
+    --cobre-12: rgb(189 107 60 / 12%);
+    --cobre-20: rgb(189 107 60 / 20%);
+    --cobre-22: rgb(189 107 60 / 22%);
+    --cobre-25: rgb(189 107 60 / 25%);
+    --cobre-30: rgb(189 107 60 / 30%);
+
+    --cobre-claro-20: rgb(230 161 111 / 20%);
+    --cobre-claro-25: rgb(230 161 111 / 25%);
+    --cobre-claro-30: rgb(230 161 111 / 30%);
+
+    --azul-sombra-08: rgb(16 43 51 / 8%);
+    --azul-sombra-12: rgb(16 43 51 / 12%);
+
+    /* Tipografia oficial */
+    --fonte-principal: "Segoe UI", Arial, sans-serif;
+    --fonte-titulo: Georgia, "Times New Roman", serif;
+
+    --tamanho-texto: 13px;
+    --tamanho-texto-auxiliar: 11px;
+    --tamanho-titulo: 36px;
+    --tamanho-subtitulo: 19px;
+
+    /* Dimensões */
+    --largura-menu: 270px;
+    --largura-menu-tablet: 250px;
+    --largura-menu-mobile: 76px;
+
+    --largura-logo: 48px;
+    --altura-campo: 44px;
+    --altura-botao: 44px;
+
+    /* Espaçamentos */
+    --espaco-1: 4px;
+    --espaco-2: 8px;
+    --espaco-3: 12px;
+    --espaco-4: 16px;
+    --espaco-5: 20px;
+    --espaco-6: 24px;
+    --espaco-7: 28px;
+    --espaco-8: 32px;
+
+    /* Bordas */
+    --raio-pequeno: 6px;
+    --raio-padrao: 8px;
+    --raio-grande: 9px;
+
+    /* Sombras */
+    --sombra: 0 8px 24px rgb(16 43 51 / 8%);
+    --sombra-menu: 5px 0 18px var(--azul-sombra-12);
+    --sombra-foco: 0 0 0 3px var(--cobre-12);
+
+    /* Transições */
+    --transicao-padrao: 0.2s ease;
 }
 
-/* =========================================
-   RESET E ELEMENTOS GERAIS
-========================================= */
+/* =========================================================
+   2. RESET E ELEMENTOS GERAIS
+   ========================================================= */
 
 * {
     margin: 0;
@@ -41,8 +144,8 @@ body {
     min-height: 100vh;
     background: var(--marfim);
     color: var(--texto);
-    font-family: Georgia, "Times New Roman", serif;
-    font-size: 14px;
+    font-family: var(--fonte-principal);
+    font-size: var(--tamanho-texto);
     line-height: 1.5;
 }
 
@@ -79,62 +182,62 @@ textarea:focus-visible {
     outline-offset: 3px;
 }
 
-/* =========================================
-   LAYOUT PRINCIPAL
-========================================= */
+/* =========================================================
+   3. LAYOUT PRINCIPAL
+   ========================================================= */
 
 .layout {
     display: grid;
-    grid-template-columns: 270px minmax(0, 1fr);
+    grid-template-columns: var(--largura-menu) minmax(0, 1fr);
     width: 100%;
     min-height: 100vh;
 }
 
-/* =========================================
-   MENU LATERAL
-========================================= */
+/* =========================================================
+   4. MENU LATERAL
+   ========================================================= */
 
 .menu-lateral {
     position: fixed;
-    top: 0;
-    left: 0;
+    inset: 0 auto 0 0;
     z-index: 100;
     display: flex;
     flex-direction: column;
-    width: 270px;
+    width: var(--largura-menu);
     height: 100vh;
-    padding: 25px 18px 18px;
+    min-height: 100vh;
+    padding: 28px 18px 20px;
     overflow-x: hidden;
     overflow-y: auto;
     background: linear-gradient(
         180deg,
-        var(--azul-petroleo) 0%,
-        var(--azul-escuro) 100%
+        var(--azul-petroleo),
+        var(--azul-escuro)
     );
     color: var(--marfim);
     border-right: 4px solid var(--cobre-escuro);
-    box-shadow: 4px 0 18px rgba(16, 43, 51, 0.12);
+    box-shadow: var(--sombra-menu);
 }
 
-/* =========================================
-   IDENTIDADE VISUAL
-========================================= */
+/* =========================================================
+   5. IDENTIDADE VISUAL DO MENU
+   ========================================================= */
 
 .marca {
     position: relative;
     display: flex;
     align-items: center;
-    gap: 11px;
+    gap: var(--espaco-3);
     width: 100%;
     min-width: 0;
-    padding: 0 5px 20px;
-    border-bottom: 1px solid rgba(230, 161, 111, 0.25);
+    padding: 0 4px 22px;
+    border-bottom: 1px solid var(--cobre-claro-30);
 }
 
 .marca::after {
     position: absolute;
     bottom: -1px;
-    left: 5px;
+    left: 4px;
     width: 72px;
     height: 2px;
     background: linear-gradient(
@@ -147,11 +250,11 @@ textarea:focus-visible {
 
 .simbolo-sistema {
     display: block;
-    flex: 0 0 48px;
-    width: 48px;
-    height: 48px;
-    min-width: 48px;
-    max-width: 48px;
+    flex: 0 0 var(--largura-logo);
+    width: var(--largura-logo);
+    height: var(--largura-logo);
+    min-width: var(--largura-logo);
+    max-width: var(--largura-logo);
     object-fit: contain;
 }
 
@@ -167,40 +270,40 @@ textarea:focus-visible {
 .marca-texto h2,
 .marca-texto strong {
     color: var(--cobre-claro);
-    font-family: Georgia, "Times New Roman", serif;
+    font-family: var(--fonte-titulo);
     font-size: 15px;
     font-weight: 700;
-    line-height: 1.4;
+    line-height: 1.5;
     letter-spacing: 1.2px;
     overflow-wrap: anywhere;
 }
 
 .marca-texto p,
 .marca-texto span {
-    color: #d5d8d2;
-    font-family: Arial, sans-serif;
-    font-size: 11px;
-    line-height: 1.4;
+    color: var(--texto-menu-secundario);
+    font-family: var(--fonte-principal);
+    font-size: var(--tamanho-texto-auxiliar);
+    line-height: 1.5;
     letter-spacing: 0.2px;
 }
 
-/* =========================================
-   NAVEGAÇÃO
-========================================= */
+/* =========================================================
+   6. NAVEGAÇÃO
+   ========================================================= */
 
 .navegacao {
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    gap: 7px;
+    gap: 8px;
     width: 100%;
     margin-top: 27px;
 }
 
 .titulo-menu {
     margin: 0 10px 8px;
-    color: rgba(244, 239, 227, 0.48);
-    font-family: Arial, sans-serif;
+    color: var(--marfim-48);
+    font-family: var(--fonte-principal);
     font-size: 10px;
     font-weight: 700;
     line-height: 1.5;
@@ -213,44 +316,44 @@ textarea:focus-visible {
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    gap: 12px;
+    gap: 13px;
     width: 100%;
     min-width: 0;
     min-height: 49px;
-    padding: 10px 13px;
+    padding: 10px 14px;
     border: 1px solid transparent;
-    border-radius: 7px;
+    border-radius: var(--raio-pequeno);
     background: transparent;
-    color: rgba(244, 239, 227, 0.8);
-    font-family: Arial, sans-serif;
-    font-size: 13px;
+    color: var(--marfim-80);
+    font-family: var(--fonte-principal);
+    font-size: var(--tamanho-texto);
     font-weight: 500;
-    line-height: 1.4;
+    line-height: 1.5;
     text-align: left;
     white-space: nowrap;
     transition:
-        background 0.2s ease,
-        color 0.2s ease,
-        border-color 0.2s ease;
+        background var(--transicao-padrao),
+        color var(--transicao-padrao),
+        border-color var(--transicao-padrao);
 }
 
 .item-menu:hover {
-    background: rgba(244, 239, 227, 0.07);
-    border-color: rgba(230, 161, 111, 0.3);
+    background: var(--marfim-07);
+    border-color: var(--cobre-claro-30);
     color: var(--papel);
 }
 
 .item-menu.ativo,
 .item-menu.active {
     padding-left: 10px;
-    border-color: rgba(189, 107, 60, 0.25);
+    border-color: var(--cobre-25);
     border-left: 3px solid var(--cobre-claro);
     background: linear-gradient(
         90deg,
-        rgba(189, 107, 60, 0.22),
-        rgba(189, 107, 60, 0.06)
+        var(--cobre-22),
+        var(--cobre-06)
     );
-    color: var(--cobre-claro);
+    color: var(--papel);
     font-weight: 700;
 }
 
@@ -265,70 +368,87 @@ textarea:focus-visible {
     line-height: 1;
 }
 
-/* =========================================
-   RODAPÉ DO MENU
-========================================= */
+/* =========================================================
+   7. RODAPÉ DO MENU
+   ========================================================= */
 
 .rodape-menu {
     margin-top: auto;
     padding: 20px 10px 0;
-    border-top: 1px solid rgba(230, 161, 111, 0.2);
-    color: rgba(244, 239, 227, 0.55);
-    font-family: Arial, sans-serif;
-    font-size: 11px;
+    border-top: 1px solid var(--cobre-claro-25);
+    color: var(--marfim-55);
+    font-family: var(--fonte-principal);
+    font-size: var(--tamanho-texto-auxiliar);
     line-height: 1.6;
     text-align: center;
 }
 
-/* =========================================
-   CONTEÚDO PRINCIPAL
-========================================= */
+/* =========================================================
+   8. CONTEÚDO PRINCIPAL
+   ========================================================= */
 
 .conteudo-principal {
     grid-column: 2;
     min-width: 0;
     width: 100%;
     min-height: 100vh;
-    padding: 32px clamp(22px, 3vw, 44px) 24px;
+    padding: 35px clamp(22px, 4vw, 56px) 24px;
     overflow-x: hidden;
 }
 
-/* =========================================
-   CABEÇALHO
-========================================= */
+/* =========================================================
+   9. CABEÇALHO DA PÁGINA
+   ========================================================= */
 
 .cabecalho {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 24px;
+    gap: 25px;
     margin-bottom: 30px;
-    padding-bottom: 24px;
-    border-bottom: 2px solid var(--cobre);
+    padding-bottom: 28px;
+    border-bottom: 1px solid var(--borda);
 }
 
 .titulo-pagina {
     min-width: 0;
-    color: var(--azul-petroleo);
-    font-family: Georgia, "Times New Roman", serif;
-    font-size: clamp(27px, 3vw, 36px);
+    color: var(--azul-escuro);
+    font-family: var(--fonte-titulo);
+    font-size: clamp(28px, 3vw, var(--tamanho-titulo));
     font-weight: normal;
     line-height: 1.25;
     overflow-wrap: anywhere;
 }
-.titulo-pagina h1{font-size:clamp(27px,3vw,36px);font-weight:normal;line-height:1.2;color:var(--azul-petroleo)}
-.titulo-pagina>p:last-child{margin-top:9px;font-family:Arial,sans-serif;font-size:13px;line-height:1.6;color:var(--texto-suave)}
-.subtitulo {
-    margin-top: 7px;
+
+.titulo-pagina h1 {
+    color: var(--azul-escuro);
+    font-family: var(--fonte-titulo);
+    font-size: clamp(28px, 3vw, var(--tamanho-titulo));
+    font-weight: normal;
+    line-height: 1.25;
+}
+
+.titulo-pagina > p:last-child {
+    margin-top: 9px;
     color: var(--texto-suave);
-    font-family: Arial, sans-serif;
-    font-size: 13px;
+    font-family: var(--fonte-principal);
+    font-size: var(--tamanho-texto);
     line-height: 1.6;
 }
 
-/* =========================================
-   AÇÕES DO CABEÇALHO
-========================================= */
+.subtitulo {
+    margin-bottom: 7px;
+    color: var(--cobre-escuro);
+    font-family: var(--fonte-principal);
+    font-size: 10px;
+    font-weight: 800;
+    line-height: 1.5;
+    letter-spacing: 2px;
+}
+
+/* =========================================================
+   10. AÇÕES DO CABEÇALHO
+   ========================================================= */
 
 .acoes-cabecalho {
     display: flex;
@@ -338,42 +458,48 @@ textarea:focus-visible {
     gap: 14px;
 }
 
-.nome-usuario {
-    color: var(--azul-petroleo);
-    font-family: Arial, sans-serif;
-    font-size: 13px;
-    font-weight: 600;
-}
+/* =========================================================
+   IDENTIFICAÇÃO DO USUÁRIO
+   ========================================================= */
 
+.nome-usuario {
+    display: block;
+    font-family: Arial, sans-serif;
+    font-size: 11px;
+    font-weight: 400;
+    line-height: 1.5;
+    color: var(--cobre-claro);
+    overflow-wrap: anywhere;
+}
 .botao-sair {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    min-height: 40px;
+    min-height: var(--altura-botao);
     padding: 9px 15px;
     border: 1px solid var(--borda);
-    border-radius: 6px;
+    border-radius: var(--raio-pequeno);
     background: var(--papel);
     color: var(--azul-petroleo);
-    font-family: Arial, sans-serif;
+    font-family: var(--fonte-principal);
     font-size: 12px;
     font-weight: 600;
     transition:
-        background 0.2s ease,
-        border-color 0.2s ease,
-        color 0.2s ease;
+        background var(--transicao-padrao),
+        border-color var(--transicao-padrao),
+        color var(--transicao-padrao);
 }
 
 .botao-sair:hover {
     border-color: var(--cobre);
-    background: #f8e8da;
+    background: var(--fundo-cobre);
     color: var(--cobre-escuro);
 }
 
-/* =========================================
-   PAINEL DE PEDIDOS
-========================================= */
+/* =========================================================
+   11. PAINEL DE PEDIDOS
+   ========================================================= */
 
 .painel-pedidos {
     width: 100%;
@@ -381,14 +507,14 @@ textarea:focus-visible {
     overflow: hidden;
     border: 1px solid var(--borda);
     border-top: 4px solid var(--cobre);
-    border-radius: 9px;
+    border-radius: var(--raio-padrao);
     background: var(--papel);
     box-shadow: var(--sombra);
 }
 
-/* =========================================
-   CABEÇALHO DO PAINEL
-========================================= */
+/* =========================================================
+   12. CABEÇALHO DO PAINEL
+   ========================================================= */
 
 .cabecalho-painel {
     display: flex;
@@ -400,7 +526,7 @@ textarea:focus-visible {
     background: linear-gradient(
         180deg,
         var(--papel),
-        #faf6ed
+        var(--fundo-hover)
     );
 }
 
@@ -409,24 +535,24 @@ textarea:focus-visible {
 }
 
 .cabecalho-painel h2 {
-    color: var(--azul-petroleo);
-    font-family: Georgia, "Times New Roman", serif;
-    font-size: 20px;
+    color: var(--azul-escuro);
+    font-family: var(--fonte-titulo);
+    font-size: var(--tamanho-subtitulo);
     font-weight: normal;
     line-height: 1.4;
 }
 
 .cabecalho-painel p {
-    margin-top: 5px;
+    margin-top: 6px;
     color: var(--texto-suave);
-    font-family: Arial, sans-serif;
+    font-family: var(--fonte-principal);
     font-size: 12px;
     line-height: 1.6;
 }
 
-/* =========================================
-   CONTADOR
-========================================= */
+/* =========================================================
+   13. CONTADOR DE PEDIDOS
+   ========================================================= */
 
 .contador {
     display: inline-flex;
@@ -436,19 +562,19 @@ textarea:focus-visible {
     min-width: 38px;
     min-height: 34px;
     padding: 5px 11px;
-    border: 1px solid rgba(189, 107, 60, 0.3);
-    border-radius: 6px;
-    background: #f8e8da;
+    border: 1px solid var(--cobre-30);
+    border-radius: var(--raio-pequeno);
+    background: var(--fundo-cobre);
     color: var(--cobre-escuro);
-    font-family: Arial, sans-serif;
-    font-size: 13px;
+    font-family: var(--fonte-principal);
+    font-size: var(--tamanho-texto);
     font-weight: 700;
     line-height: 1.4;
 }
 
-/* =========================================
-   AÇÕES DOS PEDIDOS
-========================================= */
+/* =========================================================
+   14. AÇÕES DOS PEDIDOS
+   ========================================================= */
 
 .acoes-pedidos {
     display: flex;
@@ -466,19 +592,19 @@ textarea:focus-visible {
     justify-content: center;
     flex-shrink: 0;
     gap: 8px;
-    min-height: 40px;
+    min-height: var(--altura-botao);
     padding: 10px 16px;
     border: 1px solid var(--azul-petroleo);
-    border-radius: 6px;
+    border-radius: var(--raio-pequeno);
     background: var(--azul-petroleo);
     color: var(--papel);
-    font-family: Arial, sans-serif;
+    font-family: var(--fonte-principal);
     font-size: 12px;
     font-weight: 600;
     line-height: 1.4;
     transition:
-        background 0.2s ease,
-        border-color 0.2s ease;
+        background var(--transicao-padrao),
+        border-color var(--transicao-padrao);
 }
 
 .botao-voltar:hover {
@@ -486,9 +612,9 @@ textarea:focus-visible {
     background: var(--azul-escuro);
 }
 
-/* =========================================
-   FILTROS
-========================================= */
+/* =========================================================
+   15. FILTROS
+   ========================================================= */
 
 .filtros {
     display: flex;
@@ -497,22 +623,22 @@ textarea:focus-visible {
     gap: 12px;
     padding: 20px 24px;
     border-bottom: 1px solid var(--borda);
-    background: rgba(244, 239, 227, 0.38);
+    background: var(--fundo-filtro);
 }
 
 .campo-pesquisa,
 .campo-filtro {
-    min-height: 42px;
+    min-height: var(--altura-campo);
     border: 1px solid var(--borda);
-    border-radius: 6px;
+    border-radius: var(--raio-pequeno);
     outline: none;
     background: var(--papel);
     color: var(--texto);
-    font-family: Arial, sans-serif;
-    font-size: 13px;
+    font-family: var(--fonte-principal);
+    font-size: var(--tamanho-texto);
     transition:
-        border-color 0.2s ease,
-        box-shadow 0.2s ease;
+        border-color var(--transicao-padrao),
+        box-shadow var(--transicao-padrao);
 }
 
 .campo-pesquisa {
@@ -528,18 +654,19 @@ textarea:focus-visible {
 }
 
 .campo-pesquisa::placeholder {
-    color: #929b98;
+    color: var(--texto-suave);
+    opacity: 0.8;
 }
 
 .campo-pesquisa:focus,
 .campo-filtro:focus {
     border-color: var(--cobre);
-    box-shadow: 0 0 0 3px rgba(189, 107, 60, 0.12);
+    box-shadow: var(--sombra-foco);
 }
 
-/* =========================================
-   TABELA RESPONSIVA
-========================================= */
+/* =========================================================
+   16. TABELA RESPONSIVA
+   ========================================================= */
 
 .tabela-responsiva {
     width: 100%;
@@ -554,14 +681,14 @@ textarea:focus-visible {
 }
 
 .tabela-responsiva thead {
-    background: #f3ecde;
+    background: var(--fundo-tabela);
 }
 
 .tabela-responsiva th {
     padding: 15px 18px;
     border-bottom: 1px solid var(--borda);
-    color: var(--azul-petroleo);
-    font-family: Arial, sans-serif;
+    color: var(--azul-escuro);
+    font-family: var(--fonte-principal);
     font-size: 10px;
     font-weight: 700;
     letter-spacing: 0.8px;
@@ -571,9 +698,9 @@ textarea:focus-visible {
 
 .tabela-responsiva td {
     padding: 15px 18px;
-    border-top: 1px solid #eee7d9;
+    border-top: 1px solid var(--borda-tabela);
     color: var(--texto);
-    font-family: Arial, sans-serif;
+    font-family: var(--fonte-principal);
     font-size: 12px;
     line-height: 1.6;
     vertical-align: middle;
@@ -584,7 +711,7 @@ textarea:focus-visible {
 }
 
 .tabela-responsiva tbody tr:hover {
-    background: rgba(244, 239, 227, 0.55);
+    background: var(--fundo-hover);
 }
 
 .tabela-responsiva td:first-child {
@@ -592,9 +719,9 @@ textarea:focus-visible {
     font-weight: 700;
 }
 
-/* =========================================
-   STATUS DOS PEDIDOS
-========================================= */
+/* =========================================================
+   17. STATUS DOS PEDIDOS
+   ========================================================= */
 
 .status {
     display: inline-flex;
@@ -604,7 +731,7 @@ textarea:focus-visible {
     padding: 5px 10px;
     border: 1px solid transparent;
     border-radius: 20px;
-    font-family: Arial, sans-serif;
+    font-family: var(--fonte-principal);
     font-size: 10px;
     font-weight: 700;
     line-height: 1.4;
@@ -612,44 +739,44 @@ textarea:focus-visible {
 }
 
 .status-pendente {
-    border-color: #ead7a5;
-    background: #fbf2d9;
-    color: #87651b;
+    border-color: var(--status-pendente-borda);
+    background: var(--status-pendente-fundo);
+    color: var(--status-pendente-texto);
 }
 
 .status-aprovado {
-    border-color: #b8d7c0;
-    background: #e5f2e7;
-    color: #356846;
+    border-color: var(--status-aprovado-borda);
+    background: var(--status-aprovado-fundo);
+    color: var(--status-aprovado-texto);
 }
 
 .status-recusado {
-    border-color: #e7bcbc;
-    background: #f8e5e5;
-    color: #963f3f;
+    border-color: var(--status-recusado-borda);
+    background: var(--status-recusado-fundo);
+    color: var(--status-recusado-texto);
 }
 
 .status-cancelado {
-    border-color: #d8d5cf;
-    background: #eeece7;
-    color: #66645f;
+    border-color: var(--status-cancelado-borda);
+    background: var(--status-cancelado-fundo);
+    color: var(--status-cancelado-texto);
 }
 
 .status-concluido {
-    border-color: #b8d7c0;
-    background: #e5f2e7;
-    color: #356846;
+    border-color: var(--status-aprovado-borda);
+    background: var(--status-aprovado-fundo);
+    color: var(--status-aprovado-texto);
 }
 
-/* =========================================
-   ESTADO SEM REGISTROS
-========================================= */
+/* =========================================================
+   18. ESTADO SEM REGISTROS
+   ========================================================= */
 
 .sem-registros {
     padding: 45px 20px;
     color: var(--texto-suave);
-    font-family: Arial, sans-serif;
-    font-size: 13px;
+    font-family: var(--fonte-principal);
+    font-size: var(--tamanho-texto);
     line-height: 1.6;
     text-align: center;
 }
@@ -657,62 +784,62 @@ textarea:focus-visible {
 .sem-registros strong {
     display: block;
     margin-bottom: 6px;
-    color: var(--azul-petroleo);
-    font-family: Georgia, "Times New Roman", serif;
+    color: var(--azul-escuro);
+    font-family: var(--fonte-titulo);
     font-size: 17px;
     font-weight: normal;
 }
 
-/* =========================================
-   MENSAGEM DOS FILTROS
-========================================= */
+/* =========================================================
+   19. MENSAGEM DOS FILTROS
+   ========================================================= */
 
 .mensagem-filtro {
     padding: 12px 24px;
     border-top: 1px solid var(--borda);
-    background: rgba(244, 239, 227, 0.38);
+    background: var(--fundo-filtro);
     color: var(--texto-suave);
-    font-family: Arial, sans-serif;
-    font-size: 11px;
+    font-family: var(--fonte-principal);
+    font-size: var(--tamanho-texto-auxiliar);
     line-height: 1.6;
 }
 
-/* =========================================
-   RODAPÉ DO CONTEÚDO
-========================================= */
+/* =========================================================
+   20. RODAPÉ DO CONTEÚDO
+   ========================================================= */
 
 .rodape-conteudo {
     padding: 24px 0 8px;
     color: var(--texto-suave);
-    font-family: Arial, sans-serif;
-    font-size: 11px;
+    font-family: var(--fonte-principal);
+    font-size: var(--tamanho-texto-auxiliar);
     line-height: 1.6;
     text-align: center;
 }
 
-/* =========================================
-   TELAS GRANDES
-========================================= */
+/* =========================================================
+   21. TELAS GRANDES
+   ========================================================= */
 
 @media (min-width: 1500px) {
     .conteudo-principal {
-        padding-right: 48px;
-        padding-left: 48px;
+        padding-right: 56px;
+        padding-left: 56px;
     }
 }
 
-/* =========================================
-   NOTEBOOKS
-========================================= */
+/* =========================================================
+   22. NOTEBOOKS
+   ========================================================= */
 
 @media (max-width: 1200px) {
     .menu-lateral {
-        width: 250px;
+        width: var(--largura-menu-tablet);
         padding: 22px 14px 16px;
     }
 
     .layout {
-        grid-template-columns: 250px minmax(0, 1fr);
+        grid-template-columns: var(--largura-menu-tablet) minmax(0, 1fr);
     }
 
     .conteudo-principal {
@@ -722,10 +849,6 @@ textarea:focus-visible {
 
     .cabecalho {
         gap: 18px;
-    }
-
-    .titulo-pagina {
-        font-size: 27px;
     }
 
     .cabecalho-painel,
@@ -741,9 +864,9 @@ textarea:focus-visible {
     }
 }
 
-/* =========================================
-   TABLETS
-========================================= */
+/* =========================================================
+   23. TABLETS
+   ========================================================= */
 
 @media (max-width: 900px) {
     .conteudo-principal {
@@ -770,9 +893,9 @@ textarea:focus-visible {
     }
 }
 
-/* =========================================
-   CELULARES
-========================================= */
+/* =========================================================
+   24. CELULARES
+   ========================================================= */
 
 @media (max-width: 760px) {
     .layout {
@@ -782,8 +905,7 @@ textarea:focus-visible {
 
     .menu-lateral {
         position: relative;
-        top: auto;
-        left: auto;
+        inset: auto;
         width: 100%;
         height: auto;
         min-height: 0;
@@ -791,7 +913,7 @@ textarea:focus-visible {
         overflow: visible;
         border-right: 0;
         border-bottom: 3px solid var(--cobre);
-        box-shadow: 0 4px 14px rgba(16, 43, 51, 0.08);
+        box-shadow: 0 4px 14px var(--azul-sombra-08);
     }
 
     .marca {
@@ -800,9 +922,9 @@ textarea:focus-visible {
     }
 
     .simbolo-sistema {
-        flex-basis: 48px;
-        width: 48px;
-        height: 48px;
+        flex-basis: var(--largura-logo);
+        width: var(--largura-logo);
+        height: var(--largura-logo);
     }
 
     .marca-texto h1,
@@ -866,11 +988,16 @@ textarea:focus-visible {
     }
 
     .titulo-pagina {
-        font-size: 25px;
+        font-size: 26px;
+    }
+
+    .titulo-pagina h1 {
+        font-size: 26px;
     }
 
     .subtitulo {
-        font-size: 12px;
+        font-size: 10px;
+        letter-spacing: 2px;
     }
 
     .acoes-cabecalho {
@@ -916,9 +1043,9 @@ textarea:focus-visible {
     }
 }
 
-/* =========================================
-   CELULARES PEQUENOS
-========================================= */
+/* =========================================================
+   25. CELULARES PEQUENOS
+   ========================================================= */
 
 @media (max-width: 480px) {
     .menu-lateral {
@@ -963,7 +1090,8 @@ textarea:focus-visible {
         padding: 20px 12px;
     }
 
-    .titulo-pagina {
+    .titulo-pagina,
+    .titulo-pagina h1 {
         font-size: 23px;
     }
 
@@ -1016,9 +1144,9 @@ textarea:focus-visible {
     }
 }
 
-/* =========================================
-   ACESSIBILIDADE
-========================================= */
+/* =========================================================
+   26. ACESSIBILIDADE
+   ========================================================= */
 
 @media (prefers-reduced-motion: reduce) {
     *,

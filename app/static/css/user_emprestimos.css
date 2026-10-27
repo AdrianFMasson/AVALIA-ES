@@ -1,33 +1,102 @@
-/* =========================================
-   VARIÁVEIS E CONFIGURAÇÕES GERAIS
-========================================= */
+/* =========================================================
+   1. VARIÁVEIS E CONFIGURAÇÕES GERAIS
+   ========================================================= */
 
 :root {
-    --cobre: #bd6b3c;
-    --cobre-escuro: #8f4828;
-    --cobre-claro: #e6a16f;
-
+    /* Cores principais */
     --azul-petroleo: #173b46;
     --azul-escuro: #102b33;
     --azul-medio: #24515b;
 
+    --cobre: #bd6b3c;
+    --cobre-escuro: #8f4828;
+    --cobre-claro: #e6a16f;
+
     --marfim: #f4efe3;
     --papel: #fffdf7;
+    --branco: #ffffff;
 
+    /* Textos e bordas */
     --texto: #26383b;
     --texto-suave: #718084;
-    --borda: #ded5c2;
+    --texto-menu: #e1e5df;
+    --texto-menu-secundario: #d0d9d5;
 
+    --borda: #ded5c2;
+    --borda-tabela: #eee8dc;
+    --borda-avatar: #d5b58c;
+
+    --placeholder: #929b98;
+
+    /* Estados */
     --sucesso: #477b5c;
     --alerta: #b47b2c;
     --erro: #a84e43;
 
-    --sombra: 0 8px 24px rgba(16, 43, 51, 0.08);
+    /* Fundos */
+    --fundo-contador: #f8e8da;
+    --fundo-filtros: #faf6ed;
+    --fundo-tabela: #f7f2e8;
+    --fundo-aviso: #fbf2d9;
+    --fundo-sucesso: #e5f2e7;
+    --fundo-erro: #f8e5e5;
+    --fundo-cancelado: #eeece7;
+
+    --fundo-hover: #faf6ed;
+    --fundo-icone: #eadcc4;
+
+    /* Bordas de estados */
+    --borda-contador: rgba(189, 107, 60, 0.3);
+    --borda-aviso: #ead7a5;
+    --borda-sucesso: #b8d7c0;
+    --borda-erro: #e7bcbc;
+    --borda-cancelado: #d8d5cf;
+
+    /* Transparências */
+    --brilho-cobre: rgba(230, 161, 111, 0.25);
+    --brilho-cobre-suave: rgba(230, 161, 111, 0.2);
+
+    --cobre-transparente: rgba(189, 107, 60, 0.25);
+    --cobre-ativo: rgba(189, 107, 60, 0.22);
+    --cobre-ativo-suave: rgba(189, 107, 60, 0.06);
+    --cobre-foco: rgba(189, 107, 60, 0.13);
+
+    --marfim-menu: rgba(244, 239, 227, 0.8);
+    --marfim-hover: rgba(244, 239, 227, 0.07);
+    --marfim-tabela: rgba(244, 239, 227, 0.55);
+    --marfim-aviso: rgba(244, 239, 227, 0.5);
+
+    --papel-cabecalho: rgba(255, 253, 247, 0.8);
+
+    --sombra-menu: rgba(16, 43, 51, 0.12);
+    --sombra-menu-mobile: rgba(16, 43, 51, 0.08);
+    --sombra-suave: rgba(16, 43, 51, 0.08);
+
+    /* Tipografia */
+    --fonte-titulo: Georgia, "Times New Roman", serif;
+    --fonte-interface: "Segoe UI", Arial, sans-serif;
+
+    /* Dimensões */
+    --largura-menu: 270px;
+    --largura-menu-tablet: 250px;
+    --largura-menu-mobile: 76px;
+
+    --altura-logo: 48px;
+    --altura-campo: 44px;
+    --altura-botao: 44px;
+
+    /* Bordas */
+    --raio-padrao: 6px;
+    --raio-painel: 9px;
+
+    /* Efeitos */
+    --sombra: 0 8px 24px var(--sombra-suave);
+    --transicao: 0.2s ease;
 }
 
-/* =========================================
-   RESET E ELEMENTOS GERAIS
-========================================= */
+/* =========================================================
+   2. RESET E ELEMENTOS GERAIS
+   ========================================================= */
 
 * {
     margin: 0;
@@ -44,9 +113,11 @@ html {
 body {
     min-width: 320px;
     min-height: 100vh;
+
     background: var(--marfim);
     color: var(--texto);
-    font-family: Georgia, "Times New Roman", serif;
+
+    font-family: var(--fonte-interface);
     font-size: 14px;
     line-height: 1.5;
 }
@@ -88,20 +159,21 @@ textarea:focus-visible {
     display: none !important;
 }
 
-/* =========================================
-   LAYOUT PRINCIPAL
-========================================= */
+/* =========================================================
+   3. LAYOUT PRINCIPAL
+   ========================================================= */
 
 .layout {
     display: grid;
-    grid-template-columns: 250px minmax(0, 1fr);
+    grid-template-columns: var(--largura-menu) minmax(0, 1fr);
+
     width: 100%;
     min-height: 100vh;
 }
 
-/* =========================================
-   MENU LATERAL
-========================================= */
+/* =========================================================
+   4. MENU LATERAL
+   ========================================================= */
 
 .menu-lateral {
     position: fixed;
@@ -112,7 +184,7 @@ textarea:focus-visible {
     display: flex;
     flex-direction: column;
 
-    width: 250px;
+    width: var(--largura-menu);
     height: 100vh;
     padding: 25px 18px 18px;
 
@@ -128,12 +200,12 @@ textarea:focus-visible {
     color: var(--marfim);
 
     border-right: 4px solid var(--cobre-escuro);
-    box-shadow: 4px 0 18px rgba(16, 43, 51, 0.12);
+    box-shadow: 4px 0 18px var(--sombra-menu);
 }
 
-/* =========================================
-   IDENTIDADE VISUAL
-========================================= */
+/* =========================================================
+   5. IDENTIDADE VISUAL
+   ========================================================= */
 
 .marca {
     position: relative;
@@ -144,10 +216,9 @@ textarea:focus-visible {
     gap: 11px;
     width: 100%;
     min-width: 0;
-
     padding: 0 5px 20px;
 
-    border-bottom: 1px solid rgba(230, 161, 111, 0.25);
+    border-bottom: 1px solid var(--brilho-cobre);
     color: var(--marfim);
 }
 
@@ -170,10 +241,10 @@ textarea:focus-visible {
 
 .logo {
     display: block;
-    flex: 0 0 44px;
+    flex: 0 0 var(--altura-logo);
 
-    width: 44px;
-    height: 44px;
+    width: var(--altura-logo);
+    height: var(--altura-logo);
 
     object-fit: contain;
 }
@@ -189,11 +260,13 @@ textarea:focus-visible {
 
 .marca-texto h2 {
     color: var(--cobre-claro);
-    font-family: Georgia, "Times New Roman", serif;
-    font-size: 14px;
+
+    font-family: var(--fonte-titulo);
+    font-size: 15px;
     font-weight: 700;
     line-height: 1.5;
-    letter-spacing: 1px;
+    letter-spacing: 1.2px;
+
     overflow-wrap: anywhere;
 }
 
@@ -201,16 +274,17 @@ textarea:focus-visible {
     display: block;
     margin-top: 4px;
 
-    color: #d0d9d5;
-    font-family: Arial, sans-serif;
-    font-size: 10px;
+    color: var(--texto-menu-secundario);
+
+    font-family: var(--fonte-interface);
+    font-size: 11px;
     line-height: 1.5;
     letter-spacing: 0.7px;
 }
 
-/* =========================================
-   NAVEGAÇÃO
-========================================= */
+/* =========================================================
+   6. NAVEGAÇÃO
+   ========================================================= */
 
 .navegacao {
     display: flex;
@@ -232,17 +306,16 @@ textarea:focus-visible {
     gap: 12px;
     width: 100%;
     min-width: 0;
-    min-height: 49px;
-
+    min-height: var(--altura-botao);
     padding: 10px 13px;
 
     border: 1px solid transparent;
     border-radius: 7px;
 
     background: transparent;
-    color: rgba(244, 239, 227, 0.8);
+    color: var(--marfim-menu);
 
-    font-family: Arial, sans-serif;
+    font-family: var(--fonte-interface);
     font-size: 13px;
     font-weight: 500;
     line-height: 1.4;
@@ -250,14 +323,14 @@ textarea:focus-visible {
     white-space: nowrap;
 
     transition:
-        background 0.2s ease,
-        color 0.2s ease,
-        border-color 0.2s ease;
+        background var(--transicao),
+        color var(--transicao),
+        border-color var(--transicao);
 }
 
 .item-menu:hover {
-    background: rgba(244, 239, 227, 0.07);
-    border-color: rgba(230, 161, 111, 0.3);
+    background: var(--marfim-hover);
+    border-color: var(--brilho-cobre);
     color: var(--papel);
 }
 
@@ -265,13 +338,13 @@ textarea:focus-visible {
 .item-menu.active {
     padding-left: 10px;
 
-    border-color: rgba(189, 107, 60, 0.25);
+    border-color: var(--cobre-transparente);
     border-left: 3px solid var(--cobre-claro);
 
     background: linear-gradient(
         90deg,
-        rgba(189, 107, 60, 0.22),
-        rgba(189, 107, 60, 0.06)
+        var(--cobre-ativo),
+        var(--cobre-ativo-suave)
     );
 
     color: var(--cobre-claro);
@@ -291,9 +364,9 @@ textarea:focus-visible {
     line-height: 1;
 }
 
-/* =========================================
-   RODAPÉ DO MENU
-========================================= */
+/* =========================================================
+   7. RODAPÉ DO MENU
+   ========================================================= */
 
 .rodape-menu {
     display: flex;
@@ -303,10 +376,10 @@ textarea:focus-visible {
     margin-top: auto;
     padding: 20px 10px 0;
 
-    border-top: 1px solid rgba(230, 161, 111, 0.2);
+    border-top: 1px solid var(--brilho-cobre-suave);
 
-    color: rgba(244, 239, 227, 0.65);
-    font-family: Arial, sans-serif;
+    color: var(--marfim-menu);
+    font-family: var(--fonte-interface);
     font-size: 11px;
     line-height: 1.6;
     letter-spacing: 0.3px;
@@ -314,14 +387,15 @@ textarea:focus-visible {
 
 .rodape-menu small {
     color: var(--cobre-claro);
-    font-family: Arial, sans-serif;
+
+    font-family: var(--fonte-interface);
     font-size: 10px;
     letter-spacing: 0;
 }
 
-/* =========================================
-   CONTEÚDO PRINCIPAL
-========================================= */
+/* =========================================================
+   8. CONTEÚDO PRINCIPAL
+   ========================================================= */
 
 .conteudo-principal {
     grid-column: 2;
@@ -331,14 +405,14 @@ textarea:focus-visible {
 
     min-width: 0;
     min-height: 100vh;
-    padding: 24px clamp(20px, 3vw, 44px);
+    padding: 35px clamp(22px, 4vw, 56px) 20px;
 
     overflow-x: hidden;
 }
 
-/* =========================================
-   CABEÇALHO
-========================================= */
+/* =========================================================
+   9. CABEÇALHO DA PÁGINA
+   ========================================================= */
 
 .cabecalho {
     display: flex;
@@ -348,50 +422,61 @@ textarea:focus-visible {
     gap: 24px;
     min-width: 0;
 
-    margin: -24px calc(-1 * clamp(20px, 3vw, 44px)) 26px;
-    padding: 22px clamp(20px, 3vw, 44px);
+    margin: -35px calc(-1 * clamp(22px, 4vw, 56px)) 30px;
+    padding: 22px clamp(22px, 4vw, 56px) 24px;
 
     border-bottom: 2px solid var(--cobre);
-    background: rgba(255, 253, 247, 0.8);
+    background: var(--papel-cabecalho);
 }
 
 .titulo-pagina {
     min-width: 0;
 }
 
+/* Subtítulo */
+
 .subtitulo {
     display: block;
     margin-bottom: 6px;
 
     color: var(--cobre-escuro);
-    font-family: Arial, sans-serif;
+
+    font-family: var(--fonte-interface);
     font-size: 10px;
     font-weight: 700;
-    letter-spacing: 1.5px;
+    letter-spacing: 2px;
     line-height: 1.5;
+    text-transform: uppercase;
 }
+
+/* Título principal */
 
 .titulo-pagina h1 {
     color: var(--azul-petroleo);
-    font-family: Georgia, "Times New Roman", serif;
-    font-size: clamp(23px, 2.3vw, 32px);
+
+    font-family: var(--fonte-titulo);
+    font-size: clamp(27px, 3vw, 36px);
     font-weight: normal;
-    line-height: 1.3;
+    line-height: 1.25;
+
     overflow-wrap: anywhere;
 }
+
+/* Descrição */
 
 .titulo-pagina p {
     margin-top: 7px;
 
     color: var(--texto-suave);
-    font-family: Arial, sans-serif;
+
+    font-family: var(--fonte-interface);
     font-size: 13px;
     line-height: 1.6;
 }
 
-/* =========================================
-   AÇÕES DO CABEÇALHO
-========================================= */
+/* =========================================================
+   10. AÇÕES DO CABEÇALHO
+   ========================================================= */
 
 .acoes-cabecalho {
     display: flex;
@@ -408,7 +493,8 @@ textarea:focus-visible {
     overflow: hidden;
 
     color: var(--azul-petroleo);
-    font-family: Arial, sans-serif;
+
+    font-family: var(--fonte-interface);
     font-size: 13px;
     font-weight: 700;
 
@@ -426,7 +512,7 @@ textarea:focus-visible {
     justify-content: center;
 
     flex-shrink: 0;
-    min-height: 40px;
+    min-height: var(--altura-botao);
     padding: 9px 14px;
 
     border: 1px solid var(--erro);
@@ -435,24 +521,24 @@ textarea:focus-visible {
     background: transparent;
     color: var(--erro);
 
-    font-family: Arial, sans-serif;
+    font-family: var(--fonte-interface);
     font-size: 12px;
     font-weight: 700;
 
     transition:
-        background 0.2s ease,
-        color 0.2s ease,
-        border-color 0.2s ease;
+        background var(--transicao),
+        color var(--transicao),
+        border-color var(--transicao);
 }
 
 .botao-sair:hover {
     background: var(--erro);
-    color: #fff;
+    color: var(--branco);
 }
 
-/* =========================================
-   PAINEL DE EMPRÉSTIMOS
-========================================= */
+/* =========================================================
+   11. PAINEL DE EMPRÉSTIMOS
+   ========================================================= */
 
 .painel-emprestimos {
     width: 100%;
@@ -461,15 +547,15 @@ textarea:focus-visible {
 
     border: 1px solid var(--borda);
     border-top: 4px solid var(--cobre);
-    border-radius: 9px;
+    border-radius: var(--raio-painel);
 
     background: var(--papel);
     box-shadow: var(--sombra);
 }
 
-/* =========================================
-   CABEÇALHO DO PAINEL
-========================================= */
+/* =========================================================
+   12. CABEÇALHO DO PAINEL
+   ========================================================= */
 
 .cabecalho-painel {
     display: flex;
@@ -489,7 +575,8 @@ textarea:focus-visible {
 
 .cabecalho-painel h2 {
     color: var(--azul-petroleo);
-    font-family: Georgia, "Times New Roman", serif;
+
+    font-family: var(--fonte-titulo);
     font-size: 20px;
     font-weight: normal;
     line-height: 1.4;
@@ -499,14 +586,15 @@ textarea:focus-visible {
     margin-top: 5px;
 
     color: var(--texto-suave);
-    font-family: Arial, sans-serif;
+
+    font-family: var(--fonte-interface);
     font-size: 12px;
     line-height: 1.6;
 }
 
-/* =========================================
-   CONTADOR
-========================================= */
+/* =========================================================
+   13. CONTADOR DE EMPRÉSTIMOS
+   ========================================================= */
 
 .contador {
     display: flex;
@@ -518,12 +606,13 @@ textarea:focus-visible {
     min-width: 78px;
     padding: 11px 13px;
 
-    border: 1px solid rgba(189, 107, 60, 0.3);
-    border-radius: 6px;
+    border: 1px solid var(--borda-contador);
+    border-radius: var(--raio-padrao);
 
-    background: #f8e8da;
+    background: var(--fundo-contador);
     color: var(--azul-petroleo);
-    font-family: Arial, sans-serif;
+
+    font-family: var(--fonte-interface);
 }
 
 .contador span:first-child {
@@ -540,9 +629,9 @@ textarea:focus-visible {
     line-height: 1.4;
 }
 
-/* =========================================
-   AÇÕES DA PÁGINA
-========================================= */
+/* =========================================================
+   14. AÇÕES DA PÁGINA
+   ========================================================= */
 
 .acoes-pagina {
     display: flex;
@@ -560,24 +649,24 @@ textarea:focus-visible {
     justify-content: center;
 
     gap: 8px;
-    min-height: 42px;
+    min-height: var(--altura-botao);
     padding: 10px 16px;
 
     border: 1px solid var(--azul-petroleo);
-    border-radius: 6px;
+    border-radius: var(--raio-padrao);
 
     background: var(--azul-petroleo);
     color: var(--marfim);
 
-    font-family: Arial, sans-serif;
+    font-family: var(--fonte-interface);
     font-size: 12px;
     font-weight: 700;
     line-height: 1.4;
 
     transition:
-        background 0.2s ease,
-        border-color 0.2s ease,
-        transform 0.2s ease;
+        background var(--transicao),
+        border-color var(--transicao),
+        transform var(--transicao);
 }
 
 .botao-voltar:hover,
@@ -595,13 +684,13 @@ textarea:focus-visible {
 
 .botao-secundario:hover {
     border-color: var(--cobre);
-    background: #f8e8da;
+    background: var(--fundo-contador);
     color: var(--cobre-escuro);
 }
 
-/* =========================================
-   FILTROS
-========================================= */
+/* =========================================================
+   15. FILTROS
+   ========================================================= */
 
 .filtros {
     display: flex;
@@ -614,9 +703,9 @@ textarea:focus-visible {
     padding: 16px;
 
     border: 1px solid var(--borda);
-    border-radius: 6px;
+    border-radius: var(--raio-padrao);
 
-    background: #faf6ed;
+    background: var(--fundo-filtros);
 }
 
 .campo-pesquisa,
@@ -639,7 +728,8 @@ textarea:focus-visible {
 .campo-pesquisa label,
 .campo-filtro label {
     color: var(--azul-petroleo);
-    font-family: Arial, sans-serif;
+
+    font-family: var(--fonte-interface);
     font-size: 11px;
     font-weight: 700;
     line-height: 1.5;
@@ -649,7 +739,7 @@ textarea:focus-visible {
 .campo-filtro select {
     width: 100%;
     min-width: 0;
-    min-height: 42px;
+    min-height: var(--altura-campo);
     padding: 9px 11px;
 
     border: 1px solid var(--borda);
@@ -658,32 +748,32 @@ textarea:focus-visible {
     background: var(--papel);
     color: var(--texto);
 
-    font-family: Arial, sans-serif;
+    font-family: var(--fonte-interface);
     font-size: 12px;
 
     transition:
-        border-color 0.2s ease,
-        box-shadow 0.2s ease;
+        border-color var(--transicao),
+        box-shadow var(--transicao);
 }
 
 .campo-pesquisa input::placeholder {
-    color: #929b98;
+    color: var(--placeholder);
 }
 
 .campo-pesquisa input:focus,
 .campo-filtro select:focus {
     border-color: var(--cobre);
     outline: none;
-    box-shadow: 0 0 0 3px rgba(189, 107, 60, 0.13);
+    box-shadow: 0 0 0 3px var(--cobre-foco);
 }
 
 .campo-filtro select {
     cursor: pointer;
 }
 
-/* =========================================
-   TABELA RESPONSIVA
-========================================= */
+/* =========================================================
+   16. TABELA RESPONSIVA
+   ========================================================= */
 
 .tabela-responsiva {
     width: 100%;
@@ -693,7 +783,7 @@ textarea:focus-visible {
     overscroll-behavior-x: contain;
 
     border: 1px solid var(--borda);
-    border-radius: 6px;
+    border-radius: var(--raio-padrao);
 }
 
 .tabela-responsiva table {
@@ -705,7 +795,7 @@ textarea:focus-visible {
 }
 
 .tabela-responsiva thead {
-    background: #f3ecde;
+    background: var(--fundo-tabela);
 }
 
 .tabela-responsiva th {
@@ -714,7 +804,8 @@ textarea:focus-visible {
     border-bottom: 1px solid var(--borda);
 
     color: var(--azul-petroleo);
-    font-family: Arial, sans-serif;
+
+    font-family: var(--fonte-interface);
     font-size: 11px;
     font-weight: 700;
     letter-spacing: 0.3px;
@@ -726,10 +817,11 @@ textarea:focus-visible {
 .tabela-responsiva td {
     padding: 14px 15px;
 
-    border-bottom: 1px solid #eee7d9;
+    border-bottom: 1px solid var(--borda-tabela);
 
     color: var(--texto);
-    font-family: Arial, sans-serif;
+
+    font-family: var(--fonte-interface);
     font-size: 12px;
     line-height: 1.6;
     vertical-align: middle;
@@ -745,7 +837,7 @@ textarea:focus-visible {
 }
 
 .tabela-responsiva tbody tr:hover:not(.linha-vazia) {
-    background: rgba(244, 239, 227, 0.55);
+    background: var(--marfim-tabela);
 }
 
 .tabela-responsiva td:first-child {
@@ -753,9 +845,9 @@ textarea:focus-visible {
     font-weight: 700;
 }
 
-/* =========================================
-   STATUS DOS EMPRÉSTIMOS
-========================================= */
+/* =========================================================
+   17. STATUS DOS EMPRÉSTIMOS
+   ========================================================= */
 
 .status {
     display: inline-flex;
@@ -769,7 +861,7 @@ textarea:focus-visible {
     border: 1px solid transparent;
     border-radius: 20px;
 
-    font-family: Arial, sans-serif;
+    font-family: var(--fonte-interface);
     font-size: 10px;
     font-weight: 700;
     line-height: 1.4;
@@ -778,40 +870,41 @@ textarea:focus-visible {
 
 .status-solicitado,
 .status-pendente {
-    border-color: #ead7a5;
-    background: #fbf2d9;
-    color: #87651b;
+    border-color: var(--borda-aviso);
+    background: var(--fundo-aviso);
+    color: var(--alerta);
 }
 
 .status-aprovado,
 .status-concluido {
-    border-color: #b8d7c0;
-    background: #e5f2e7;
-    color: #356846;
+    border-color: var(--borda-sucesso);
+    background: var(--fundo-sucesso);
+    color: var(--sucesso);
 }
 
 .status-negado,
 .status-recusado {
-    border-color: #e7bcbc;
-    background: #f8e5e5;
-    color: #963f3f;
+    border-color: var(--borda-erro);
+    background: var(--fundo-erro);
+    color: var(--erro);
 }
 
 .status-cancelado {
-    border-color: #d8d5cf;
-    background: #eeece7;
-    color: #66645f;
+    border-color: var(--borda-cancelado);
+    background: var(--fundo-cancelado);
+    color: var(--texto-suave);
 }
 
-/* =========================================
-   ESTADO SEM REGISTROS
-========================================= */
+/* =========================================================
+   18. ESTADO SEM REGISTROS
+   ========================================================= */
 
 .sem-registros {
     padding: 35px 18px;
 
     color: var(--texto-suave);
-    font-family: Arial, sans-serif;
+
+    font-family: var(--fonte-interface);
     font-size: 13px;
     line-height: 1.6;
     text-align: center;
@@ -823,14 +916,15 @@ textarea:focus-visible {
     margin-bottom: 6px;
 
     color: var(--azul-petroleo);
-    font-family: Georgia, "Times New Roman", serif;
+
+    font-family: var(--fonte-titulo);
     font-size: 17px;
     font-weight: normal;
 }
 
-/* =========================================
-   MENSAGEM DOS FILTROS
-========================================= */
+/* =========================================================
+   19. MENSAGEM DOS FILTROS
+   ========================================================= */
 
 .mensagem-filtro {
     margin-top: 14px;
@@ -839,18 +933,18 @@ textarea:focus-visible {
     border: 1px solid var(--borda);
     border-radius: 5px;
 
-    background: rgba(244, 239, 227, 0.5);
+    background: var(--marfim-aviso);
     color: var(--texto-suave);
 
-    font-family: Arial, sans-serif;
+    font-family: var(--fonte-interface);
     font-size: 12px;
     line-height: 1.6;
     text-align: center;
 }
 
-/* =========================================
-   RODAPÉ DO CONTEÚDO
-========================================= */
+/* =========================================================
+   20. RODAPÉ DO CONTEÚDO
+   ========================================================= */
 
 .rodape-conteudo {
     display: flex;
@@ -865,7 +959,8 @@ textarea:focus-visible {
     border-top: 1px solid var(--borda);
 
     color: var(--texto-suave);
-    font-family: Arial, sans-serif;
+
+    font-family: var(--fonte-interface);
     font-size: 11px;
     line-height: 1.6;
 }
@@ -876,27 +971,22 @@ textarea:focus-visible {
     letter-spacing: 0.8px;
 }
 
-/* =========================================
-   NOTEBOOKS
-========================================= */
+/* =========================================================
+   21. NOTEBOOKS
+   ========================================================= */
 
 @media (max-width: 1200px) {
-    .layout {
-        grid-template-columns: 250px minmax(0, 1fr);
-    }
-
     .menu-lateral {
-        width: 250px;
         padding: 22px 14px 16px;
     }
 
     .conteudo-principal {
-        padding: 22px;
+        padding: 28px 22px 20px;
     }
 
     .cabecalho {
-        margin: -22px -22px 22px;
-        padding: 20px 22px;
+        margin: -28px -22px 26px;
+        padding: 20px 22px 22px;
         gap: 18px;
     }
 
@@ -914,10 +1004,10 @@ textarea:focus-visible {
     }
 }
 
-/* =========================================
-   TABLETS E CELULARES
-   Mantém o nav empilhado e expandido
-========================================= */
+/* =========================================================
+   22. TABLETS E CELULARES
+   Mantém o menu expandido e empilhado
+   ========================================================= */
 
 @media (max-width: 760px) {
     .layout {
@@ -933,7 +1023,6 @@ textarea:focus-visible {
         width: 100%;
         height: auto;
         min-height: 0;
-
         padding: 16px;
 
         overflow: visible;
@@ -941,7 +1030,7 @@ textarea:focus-visible {
         border-right: 0;
         border-bottom: 3px solid var(--cobre);
 
-        box-shadow: 0 4px 14px rgba(16, 43, 51, 0.08);
+        box-shadow: 0 4px 14px var(--sombra-menu-mobile);
     }
 
     .marca {
@@ -982,7 +1071,6 @@ textarea:focus-visible {
         min-width: 0;
         min-height: 44px;
         padding: 9px;
-
         gap: 8px;
 
         font-size: 12px;
@@ -1010,8 +1098,8 @@ textarea:focus-visible {
 
         width: 100%;
         min-height: auto;
-
         padding: 24px 18px;
+
         overflow-x: hidden;
     }
 
@@ -1062,17 +1150,14 @@ textarea:focus-visible {
         padding: 14px;
     }
 
-    .campo-pesquisa {
-        flex: 1 1 100%;
-    }
-
+    .campo-pesquisa,
     .campo-filtro {
         flex: 1 1 100%;
     }
 
     .campo-pesquisa input,
     .campo-filtro select {
-        min-height: 42px;
+        min-height: var(--altura-campo);
     }
 
     .rodape-conteudo {
@@ -1080,9 +1165,9 @@ textarea:focus-visible {
     }
 }
 
-/* =========================================
-   CELULARES PEQUENOS
-========================================= */
+/* =========================================================
+   23. CELULARES PEQUENOS
+   ========================================================= */
 
 @media (max-width: 480px) {
     .menu-lateral {
@@ -1162,6 +1247,7 @@ textarea:focus-visible {
 
     .cabecalho-painel {
         align-items: flex-start;
+
         gap: 10px;
         margin-bottom: 16px;
         padding-bottom: 14px;
@@ -1206,7 +1292,7 @@ textarea:focus-visible {
 
     .campo-pesquisa input,
     .campo-filtro select {
-        min-height: 39px;
+        min-height: 42px;
         font-size: 12px;
     }
 
@@ -1233,15 +1319,17 @@ textarea:focus-visible {
     .rodape-conteudo {
         align-items: flex-start;
         flex-direction: column;
+
         gap: 4px;
         padding-top: 18px;
+
         font-size: 10px;
     }
 }
 
-/* =========================================
-   ACESSIBILIDADE
-========================================= */
+/* =========================================================
+   24. ACESSIBILIDADE
+   ========================================================= */
 
 @media (prefers-reduced-motion: reduce) {
     *,
