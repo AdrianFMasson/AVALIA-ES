@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, private">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+
+    <title>Gestão de Empréstimos | The Iron Compass</title>
+
+    <link rel="stylesheet" href="/static/css/gestor_emprestimos.css">
+    <script src="/static/js/gestor_emprestimos.js" defer></script>
+</head>
+<body>
+    <div class="layout">
+
+        <aside class="menu-lateral">
+            <div class="identidade">
+                <img
+                    src="/static/imagens/compasso.svg"
+                    alt="Compasso The Iron Compass"
+                    class="logo"
+                >
+
+                <h2>THE IRON COMPASS</h2>
+                <p>Sistema de Empréstimos</p>
+            </div>
+
+            <nav class="navegacao">
+                <a href="/dashboard-gestor" class="item-menu">
+                    <span class="icone">⌂</span>
+                    <span>Dashboard</span>
+                </a>
+
+                <a href="/gestor_users" class="item-menu">
+                    <span class="icone">♙</span>
+                    <span>Usuários</span>
+                </a>
+
+                <a href="/gestor_pedidos" class="item-menu">
+                    <span class="icone">▤</span>
+                    <span>Pedidos</span>
+                </a>
+
+                <a href="/gestor_equipamentos" class="item-menu">
+                    <span class="icone">⚙</span>
+                    <span>Equipamentos</span>
+                </a>
+
+                <a href="/gestor_emprestimos" class="item-menu ativo" aria-current="page">
+                    <span class="icone">⚒</span>
+                    <span>Empréstimos</span>
+                </a>
+            </nav>
+
+            <div class="rodape-menu">
+                <a href="/login" class="item-menu sair">
+                    <span class="icone">⇥</span>
+                    <span>Sair</span>
+                </a>
+            </div>
+        </aside>
+
+        <main class="conteudo-principal">
+
+            <header class="cabecalho">
+                <div class="titulo-pagina">
+                    <p class="subtitulo">CENTRAL DE GESTÃO</p>
+                    <h1>Gestão de Empréstimos</h1>
+                    <p>
+                        Analise as solicitações, acompanhe os pedidos e
+                        gerencie as decisões de empréstimo.
+                    </p>
+                </div>
+
+                <div class="informacoes-usuario">
+                    <div class="avatar-usuario">♙</div>
+                    <div class="dados-usuario">
+                        <span id="nome-gestor">Gestor</span>
+                        <small>Gestor</small>
+                    </div>
+                </div>
+            </header>
+
+            <section class="indicadores" aria-label="Resumo das solicitações">
+
+                <article class="indicador">
+                    <div class="indicador-topo">
+                        <span>Total de solicitações</span>
+                        <span class="indicador-icone">▤</span>
+                    </div>
+                    <strong id="total-solicitacoes">0</strong>
+                    <small>Todos os pedidos cadastrados</small>
+                </article>
+
+                <article class="indicador pendentes">
+                    <div class="indicador-topo">
+                        <span>Aguardando análise</span>
+                        <span class="indicador-icone">◷</span>
+                    </div>
+                    <strong id="total-pendentes">0</strong>
+                    <small>Solicitações pendentes</small>
+                </article>
+
+                <article class="indicador aprovados">
+                    <div class="indicador-topo">
+                        <span>Aprovadas</span>
+                        <span class="indicador-icone">✓</span>
+                    </div>
+                    <strong id="total-aprovados">0</strong>
+                    <small>Solicitações aprovadas</small>
+                </article>
+
+                <article class="indicador negados">
+                    <div class="indicador-topo">
+                        <span>Negadas</span>
+                        <span class="indicador-icone">×</span>
+                    </div>
+                    <strong id="total-negados">0</strong>
+                    <small>Solicitações negadas</small>
+                </article>
+
+            </section>
+
+            <section class="painel-solicitacoes">
+
+                <div class="painel-cabecalho">
+                    <div>
+                        <h2>Solicitações recebidas</h2>
+                        <p>Consulte os pedidos e gerencie seus status.</p>
+                    </div>
+
+                    <button
+                        type="button"
+                        id="botao-atualizar"
+                        class="botao-secundario"
+                    >
+                        ↻ Atualizar
+                    </button>
+                </div>
+
+                <div class="filtros">
+                    <div class="campo-busca">
+                        <label for="busca">Pesquisar solicitações</label>
+                        <input
+                            type="search"
+                            id="busca"
+                            placeholder="Usuário, equipamento ou código..."
+                            autocomplete="off"
+                        >
+                    </div>
+
+                    <div class="campo-filtro">
+                        <label for="filtro-status">Filtrar por status</label>
+                        <select id="filtro-status">
+                            <option value="TODOS">Todos os status</option>
+                            <option value="PENDENTE">Pendente</option>
+                            <option value="APROVADO">Aprovado</option>
+                            <option value="NEGADO">Negado</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div
+                    id="mensagem"
+                    class="mensagem"
+                    role="status"
+                    aria-live="polite"
+                    hidden
+                ></div>
+
+                <div class="tabela-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th scope="col">Solicitação</th>
+                                <th scope="col">Solicitante</th>
+                                <th scope="col">Equipamento</th>
+                                <th scope="col">Data do pedido</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Ações</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="lista-solicitacoes">
+                            <tr>
+                                <td colspan="6" class="estado-tabela">
+                                    Carregando solicitações...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="rodape-tabela">
+                    <span id="contador-resultados">
+                        Carregando registros...
+                    </span>
+                </div>
+
+            </section>
+
+            <footer class="rodape-pagina">
+                <p>THE IRON COMPASS — Sistema de Gerenciamento de Empréstimos</p>
+            </footer>
+
+        </main>
+    </div>
+
+    <div
+        id="modal-confirmacao"
+        class="modal"
+        aria-hidden="true"
+        hidden
+    >
+        <div
+            class="modal-conteudo"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="titulo-modal"
+            aria-describedby="texto-modal"
+        >
+            <div class="modal-icone" id="icone-modal">?</div>
+
+            <h2 id="titulo-modal">Confirmar decisão</h2>
+
+            <p id="texto-modal">
+                Deseja realmente alterar o status desta solicitação?
+            </p>
+
+            <div class="modal-acoes">
+                <button
+                    type="button"
+                    id="cancelar-acao"
+                    class="botao-secundario"
+                >
+                    Cancelar
+                </button>
+
+                <button
+                    type="button"
+                    id="confirmar-acao"
+                    class="botao-principal"
+                >
+                    Confirmar
+                </button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
