@@ -1,3 +1,6 @@
+
+import logging
+
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.responses import JSONResponse
 from sqlmodel import Session
@@ -10,6 +13,8 @@ from utils.validacao_senha import validar_senha
 from dependencies.autenticacao import criar_sessao
 from config.Config import settings
 
+
+logger = logging.getLogger(__name__)
 
 login_rota = APIRouter(tags=["Autenticação"])
 
@@ -94,13 +99,27 @@ def realizar_login(
         raise
 
     except ValueError:
+        logger.warning(
+            "Falha de validação durante o login.",
+            exc_info=True,
+        )
+        db.rollback()
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Não foi possível autenticar com as credenciais informadas.",
         )
 
     except (RuntimeError, SQLAlchemyError):
-        db.rollback()
+        logger.exception(
+            "Erro ao concluir o login ou criar a sessão do usuário %s.",
+            dados.usuario,
+        )
+
+        try:
+            db.rollback()
+        except SQLAlchemyError:
+            logger.exception("Falha adicional ao executar rollback do login.")
+
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="Não foi possível concluir a autenticação. Tente novamente.",

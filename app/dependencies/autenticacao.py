@@ -76,6 +76,7 @@ def validar_token_acesso(token: str) -> dict:
     return payload
 
 
+
 def criar_sessao(
     db: Session,
     id_usuario: int,
@@ -102,8 +103,8 @@ def criar_sessao(
         nova_sessao = Sessoes(
             id_sessao=id_sessao,
             id_usuario=id_usuario,
-            dt_criacao=agora.replace(tzinfo=None),
-            dt_expiracao=expiracao.replace(tzinfo=None),
+            dt_criacao=agora,
+            dt_expiracao=expiracao,
             ativa=True,
         )
 
@@ -118,6 +119,10 @@ def criar_sessao(
     except SQLAlchemyError:
         db.rollback()
         raise
+
+from datetime import datetime, timezone
+from sqlalchemy.exc import SQLAlchemyError
+from sqlmodel import Session
 
 
 def obter_sessao_ativa(
@@ -134,9 +139,15 @@ def obter_sessao_ativa(
         if sessao.id_usuario != id_usuario:
             return None
 
-        agora = datetime.now(timezone.utc).replace(tzinfo=None)
+        agora = datetime.now(timezone.utc)
+        expiracao = sessao.dt_expiracao
 
-        if sessao.dt_expiracao <= agora:
+        # Se o banco retornar uma data sem fuso horário,
+        # interpreta-a como UTC.
+        if expiracao.tzinfo is None:
+            expiracao = expiracao.replace(tzinfo=timezone.utc)
+
+        if expiracao <= agora:
             sessao.ativa = False
             db.add(sessao)
             db.commit()
@@ -147,8 +158,6 @@ def obter_sessao_ativa(
     except SQLAlchemyError:
         db.rollback()
         raise
-
-
 def encerrar_sessao(
     db: Session,
     id_sessao: str,
