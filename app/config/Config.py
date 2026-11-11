@@ -1,5 +1,13 @@
+from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+BASE_DIR = Path(__file__).resolve().parents[1]
+ENV_FILE = BASE_DIR / ".env"
+
+print("Caminho do .env:", ENV_FILE)
+print("Arquivo existe:", ENV_FILE.is_file())
+
 
 class Settings(BaseSettings):
     ssh_host: str
@@ -7,14 +15,12 @@ class Settings(BaseSettings):
     ssh_user: str
     ssh_password: str | None = None
 
-    # MySQL
     db_host: str = "127.0.0.1"
     db_port: int = 3306
     db_name: str
     db_user: str
     db_password: str
 
-    # Autenticação JWT
     JWT_SECRET_KEY: str
     JWT_ALGORITHM: str = "HS256"
     JWT_ACCESS_EXPIRE_MINUTES: int = 15
@@ -22,10 +28,10 @@ class Settings(BaseSettings):
     JWT_ISSUER: str = "sistema-emprestimo"
 
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=ENV_FILE,
         env_file_encoding="utf-8",
-        extra="ignore"
+        extra="ignore",
     )
 
-# Carrega as configurações do arquivo .env
+
 settings = Settings()

@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from fastapi import (
     APIRouter,
     Request,
@@ -20,8 +22,16 @@ from entities.models import (
 )
 
 
+# =========================================================
+# CONFIGURAÇÃO DO ROUTER E DOS TEMPLATES
+# =========================================================
+
 gestor_rota = APIRouter(tags=["Gestor"])
-templates = Jinja2Templates(directory="templates")
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+TEMPLATES_DIR = BASE_DIR / "templates"
+
+templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 
 
 # =========================================================
@@ -33,7 +43,9 @@ def redirecionar_para_login():
         url="/login",
         status_code=status.HTTP_303_SEE_OTHER,
     )
+
     resposta.delete_cookie("access_token", path="/")
+
     return resposta
 
 

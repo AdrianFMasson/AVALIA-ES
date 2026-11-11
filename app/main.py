@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from fastapi import FastAPI, Request, Depends, HTTPException, status
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -27,13 +29,34 @@ from dependencies.autenticacao import (
 
 
 # =========================================================
+# CAMINHOS DO PROJETO
+# =========================================================
+BASE_DIR = Path(__file__).resolve().parent
+
+STATIC_DIR = BASE_DIR / "static"
+TEMPLATES_DIR = BASE_DIR / "templates"
+
+templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
+
+print("MAIN.PY:", Path(__file__).resolve())
+print("PASTA TEMPLATES:", TEMPLATES_DIR)
+print(
+    "DASHBOARD GESTOR EXISTE:",
+    (TEMPLATES_DIR / "dashboard_gestor.html").is_file()
+)
+# Cria a pasta static caso ainda não exista
+
+STATIC_DIR.mkdir(parents=True, exist_ok=True)
+
+
+# =========================================================
 # CONFIGURAÇÃO DA APLICAÇÃO
 # =========================================================
 
 app = FastAPI(
     title="THE IRON COMPASS",
-    description="Sistema de gerenciamento de equipamentos e empréstimos",
-    version="1.0.0",
+    description="Sistema de gerenciamento de empréstimos",
+    version="1.0.0"
 )
 
 
@@ -41,14 +64,14 @@ app = FastAPI(
 # ARQUIVOS ESTÁTICOS E TEMPLATES
 # =========================================================
 
+
 app.mount(
     "/static",
-    StaticFiles(directory="static"),
-    name="static",
+    StaticFiles(directory=str(STATIC_DIR)),
+    name="static"
 )
 
-templates = Jinja2Templates(directory="templates")
-
+templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 
 # =========================================================
 # REGISTRO DAS ROTAS
@@ -80,6 +103,7 @@ def resposta_sem_cache(resposta):
     resposta.headers["Cache-Control"] = (
         "no-store, no-cache, must-revalidate, private, max-age=0"
     )
+
     resposta.headers["Pragma"] = "no-cache"
     resposta.headers["Expires"] = "0"
 
@@ -147,8 +171,10 @@ def pagina_login(
     if token:
         try:
             encerrar_sessao_por_token(db, token)
+
         except SQLAlchemyError:
             db.rollback()
+
             raise HTTPException(
                 status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
                 detail="Não foi possível encerrar a sessão. Tente novamente.",
