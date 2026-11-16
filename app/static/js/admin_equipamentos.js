@@ -2,6 +2,7 @@
 
 document.addEventListener("DOMContentLoaded", () => {
     const API_EQUIPAMENTOS = "/api/admin/equipamentos";
+    const API_CATEGORIAS = "/api/admin/categorias";
 
     const el = {
         lista: document.getElementById("listaEquipamentos"),
@@ -24,13 +25,11 @@ document.addEventListener("DOMContentLoaded", () => {
         botaoNovo: document.getElementById("novoEquipamento"),
         botaoSalvar: document.getElementById("salvarEquipamento"),
         botaoFechar: document.getElementById("fecharModal"),
-        botaoCancelar: document.getElementById("cancelarEquipamento"),
-
-        botaoCategorias: document.getElementById("abrirListaCategorias"),
-        listaCategorias: document.getElementById("listaCategorias")
+        botaoCancelar: document.getElementById("cancelarEquipamento")
     };
 
     let equipamentos = [];
+    let categorias = [];
     let salvando = false;
 
     // =========================================================
@@ -65,7 +64,9 @@ document.addEventListener("DOMContentLoaded", () => {
             "INATIVO"
         ];
 
-        return permitidos.includes(valor) ? valor : "DISPONIVEL";
+        return permitidos.includes(valor)
+            ? valor
+            : "DISPONIVEL";
     }
 
     function nomeStatus(status) {
@@ -97,134 +98,118 @@ document.addEventListener("DOMContentLoaded", () => {
             : "mensagem";
     }
 
+    async function obterDetalheErro(resposta) {
+        try {
+            const erroAPI = await resposta.json();
+
+            if (erroAPI.detail) {
+                if (Array.isArray(erroAPI.detail)) {
+                    return erroAPI.detail
+                        .map(item => item.msg || JSON.stringify(item))
+                        .join("; ");
+                }
+
+                return String(erroAPI.detail);
+            }
+        } catch {
+            // A resposta pode não conter JSON.
+        }
+
+        return `O servidor retornou o erro HTTP ${resposta.status}.`;
+    }
+
     // =========================================================
     // CATEGORIAS
     // =========================================================
 
-    function obterCategorias() {
-        return [
-            ...new Set(
-                equipamentos
-                    .map(item => String(item.categoria ?? "").trim())
-                    .filter(Boolean)
-            )
-        ].sort((a, b) => a.localeCompare(b, "pt-BR"));
-    }
-
-    function fecharListaCategorias() {
-        if (el.listaCategorias) {
-            el.listaCategorias.hidden = true;
-        }
-
-        el.botaoCategorias?.setAttribute("aria-expanded", "false");
-    }
-
-    function selecionarCategoria(categoria) {
+    function preencherCategorias(idSelecionado = "") {
         if (!el.categoria) return;
 
-        el.categoria.value = categoria;
-        fecharListaCategorias();
-        el.categoria.focus();
-    }
+        const valorAnterior = String(idSelecionado || "");
 
-    function renderizarListaCategorias() {
-        if (!el.categoria || !el.listaCategorias) return;
+        el.categoria.replaceChildren();
 
-        const termo = el.categoria.value
-            .trim()
-            .toLocaleLowerCase("pt-BR");
+        const opcaoInicial = document.createElement("option");
+        opcaoInicial.value = "";
+        opcaoInicial.textContent = "Selecione uma categoria";
 
-        const categorias = obterCategorias();
+        el.categoria.appendChild(opcaoInicial);
 
-        const filtradas = categorias.filter(categoria =>
-            categoria.toLocaleLowerCase("pt-BR").includes(termo)
-        );
+        categorias.forEach(categoria => {
+            const opcao = document.createElement("option");
 
-        el.listaCategorias.replaceChildren();
+            opcao.value = String(categoria.id_categoria);
+            opcao.textContent = categoria.nome;
 
-        if (filtradas.length === 0) {
-            const item = document.createElement("li");
+            el.categoria.appendChild(opcao);
+        });
 
-            item.className = "categoria-sem-resultado";
-            item.textContent = termo
-                ? "Nenhuma categoria encontrada. Podes cadastrar uma nova."
-                : "Nenhuma categoria cadastrada.";
-
-            item.setAttribute("role", "option");
-            el.listaCategorias.appendChild(item);
-        } else {
-            filtradas.forEach(categoria => {
-                const item = document.createElement("li");
-
-                item.textContent = categoria;
-                item.setAttribute("role", "option");
-                item.tabIndex = 0;
-
-                item.addEventListener("mousedown", evento => {
-                    evento.preventDefault();
-                    selecionarCategoria(categoria);
-                });
-
-                item.addEventListener("keydown", evento => {
-                    if (evento.key === "Enter" || evento.key === " ") {
-                        evento.preventDefault();
-                        selecionarCategoria(categoria);
-                    }
-                });
-
-                el.listaCategorias.appendChild(item);
-            });
-        }
-
-        el.listaCategorias.hidden = false;
-        el.botaoCategorias?.setAttribute("aria-expanded", "true");
-    }
-
-    function configurarListaCategorias() {
         if (
-            !el.categoria ||
-            !el.listaCategorias ||
-            !el.botaoCategorias
+            valorAnterior &&
+            categorias.some(
+                categoria =>
+                    String(categoria.id_categoria) === valorAnterior
+            )
         ) {
-            console.warn(
-                "Não foi possível configurar a lista de categorias. Confira o HTML."
-            );
-            return;
+            el.categoria.value = valorAnterior;
+        } else {
+            el.categoria.value = "";
         }
+    }
 
-        el.botaoCategorias.addEventListener("click", () => {
-            if (el.listaCategorias.hidden) {
-                renderizarListaCategorias();
-            } else {
-                fecharListaCategorias();
-            }
-        });
+    async function carregarCategorias(idSelecionado = "") {
+        if (!el.categoria) return false;
 
-        el.categoria.addEventListener("focus", () => {
-            renderizarListaCategorias();
-        });
+        try {
+            const resposta = await fetch(API_CATEGORIAS, {
+                method: "GET",
+                headers: {
+                    Accept: "application/json"
+                }
+            });
 
-        el.categoria.addEventListener("input", () => {
-            renderizarListaCategorias();
-        });
-
-        el.categoria.addEventListener("keydown", evento => {
-            if (evento.key === "Escape") {
-                fecharListaCategorias();
+            if (!resposta.ok) {
+                throw new Error(
+                    await obterDetalheErro(resposta)
+                );
             }
 
-            if (evento.key === "ArrowDown" && el.listaCategorias.hidden) {
-                evento.preventDefault();
-                renderizarListaCategorias();
-                el.listaCategorias.querySelector('[role="option"]:not(.categoria-sem-resultado)')?.focus();
-            }
-        });
+            const dados = await resposta.json();
 
-        document.addEventListener("click", evento => {
-            if (!evento.target.closest(".categoria-container")) {
-                fecharListaCategorias();
+            if (!Array.isArray(dados)) {
+                throw new Error(
+                    "A API não retornou uma lista válida de categorias."
+                );
             }
-        });
+
+            categorias = dados.filter(categoria =>
+                categoria.ativo === true
+            );
+
+            categorias.sort((a, b) =>
+                String(a.nome).localeCompare(
+                    String(b.nome),
+                    "pt-BR"
+                )
+            );
+
+            preencherCategorias(idSelecionado);
+
+            return true;
+
+        } catch (erro) {
+            console.error("Erro ao carregar categorias:", erro);
+
+            categorias = [];
+            preencherCategorias();
+
+            mostrarMensagemFormulario(
+                "Não foi possível carregar as categorias. Verifique se existem categorias cadastradas e ativas.",
+                "mensagem-erro"
+            );
+
+            return false;
+        }
     }
 
     // =========================================================
@@ -244,7 +229,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 equipamento.nome,
                 equipamento.categoria,
                 equipamento.descricao,
-                equipamento.id_estoque
+                equipamento.id_estoque,
+                equipamento.id_categoria
             ]
                 .map(valor => String(valor ?? ""))
                 .join(" ")
@@ -272,6 +258,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const vazio = document.createElement("div");
 
             vazio.className = "estado-vazio";
+
             vazio.textContent = equipamentos.length
                 ? "Nenhum equipamento corresponde aos filtros."
                 : "Nenhum equipamento cadastrado.";
@@ -285,6 +272,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const status = normalizarStatus(equipamento.status_equip);
 
             const card = document.createElement("article");
+
             card.className = "card-equipamento";
 
             card.innerHTML = `
@@ -294,7 +282,9 @@ document.addEventListener("DOMContentLoaded", () => {
                             Equipamento #${escaparHTML(id)}
                         </span>
 
-                        <h3>${escaparHTML(equipamento.nome || "Sem nome")}</h3>
+                        <h3>
+                            ${escaparHTML(equipamento.nome || "Sem nome")}
+                        </h3>
                     </div>
 
                     <span class="status status-${status.toLowerCase()}">
@@ -303,23 +293,32 @@ document.addEventListener("DOMContentLoaded", () => {
                 </div>
 
                 <div class="detalhes-equipamento">
+
                     <p>
                         <strong>Estoque:</strong>
-                        ${escaparHTML(equipamento.id_estoque ?? "Não informado")}
+                        ${escaparHTML(
+                            equipamento.id_estoque ?? "Não informado"
+                        )}
                     </p>
 
                     <p>
                         <strong>Categoria:</strong>
-                        ${escaparHTML(equipamento.categoria || "Não informada")}
+                        ${escaparHTML(
+                            equipamento.categoria || "Não informada"
+                        )}
                     </p>
 
                     <p>
                         <strong>Descrição:</strong>
-                        ${escaparHTML(equipamento.descricao || "Não informada")}
+                        ${escaparHTML(
+                            equipamento.descricao || "Não informada"
+                        )}
                     </p>
+
                 </div>
 
                 <div class="acoes-card">
+
                     <button
                         type="button"
                         class="botao botao-editar"
@@ -328,12 +327,17 @@ document.addEventListener("DOMContentLoaded", () => {
                     >
                         Editar equipamento
                     </button>
+
                 </div>
             `;
 
             el.lista.appendChild(card);
         });
     }
+
+    // =========================================================
+    // CARREGAR EQUIPAMENTOS
+    // =========================================================
 
     async function carregarEquipamentos() {
         mostrarMensagem("Carregando equipamentos...");
@@ -342,6 +346,7 @@ document.addEventListener("DOMContentLoaded", () => {
             el.lista.replaceChildren();
 
             const carregando = document.createElement("div");
+
             carregando.className = "estado-vazio";
             carregando.textContent = "Carregando equipamentos...";
 
@@ -358,7 +363,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (!resposta.ok) {
                 throw new Error(
-                    `Erro ao consultar equipamentos: HTTP ${resposta.status}.`
+                    await obterDetalheErro(resposta)
                 );
             }
 
@@ -374,13 +379,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
             aplicarFiltros();
             mostrarMensagem();
+
         } catch (erro) {
-            console.error(erro);
+            console.error("Erro ao carregar equipamentos:", erro);
 
             if (el.lista) {
                 el.lista.replaceChildren();
 
                 const aviso = document.createElement("div");
+
                 aviso.className = "estado-vazio";
                 aviso.textContent =
                     "Não foi possível carregar os equipamentos.";
@@ -399,22 +406,45 @@ document.addEventListener("DOMContentLoaded", () => {
     // MODAL
     // =========================================================
 
-    function abrirModal(equipamento = null) {
+    async function abrirModal(equipamento = null) {
         if (!el.modal || !el.formulario) return;
 
+        if (salvando) return;
+
         el.formulario.reset();
+
         mostrarMensagemFormulario();
-        fecharListaCategorias();
+
+        const idCategoria = equipamento
+            ? equipamento.id_categoria
+            : "";
+
+        const categoriasCarregadas = await carregarCategorias(
+            idCategoria
+        );
+
+        if (!categoriasCarregadas) {
+            return;
+        }
 
         if (equipamento) {
             el.id.value = obterId(equipamento) ?? "";
+
             el.nome.value = equipamento.nome ?? "";
-            el.estoque.value = String(equipamento.id_estoque ?? "");
-            el.categoria.value = equipamento.categoria ?? "";
+
+            el.estoque.value = String(
+                equipamento.id_estoque ?? ""
+            );
+
+            el.categoria.value = String(
+                equipamento.id_categoria ?? ""
+            );
+
             el.descricao.value = equipamento.descricao ?? "";
+
             el.status.value = normalizarStatus(
                 equipamento.status_equip
-            ).toLowerCase();
+            );
 
             if (el.tituloModal) {
                 el.tituloModal.textContent = "Editar equipamento";
@@ -423,6 +453,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (el.botaoSalvar) {
                 el.botaoSalvar.textContent = "Salvar alterações";
             }
+
         } else {
             el.id.value = "";
 
@@ -437,47 +468,70 @@ document.addEventListener("DOMContentLoaded", () => {
 
         el.modal.hidden = false;
         el.modal.setAttribute("aria-hidden", "false");
+
         el.nome?.focus();
     }
 
     function fecharModal() {
         if (!el.modal) return;
 
+        if (salvando) return;
+
         el.modal.hidden = true;
+
         el.modal.setAttribute("aria-hidden", "true");
 
-        fecharListaCategorias();
         mostrarMensagemFormulario();
     }
 
     // =========================================================
-    // CADASTRO E EDIÇÃO
+    // CADASTRAR E EDITAR EQUIPAMENTOS
     // =========================================================
 
     async function salvarEquipamento(evento) {
         evento.preventDefault();
 
-        if (salvando || !el.formulario?.reportValidity()) return;
+        if (salvando || !el.formulario) return;
+
+        if (!el.formulario.reportValidity()) return;
 
         const id = el.id.value.trim();
 
+        const idEstoque = Number(el.estoque.value);
+        const idCategoria = Number(el.categoria.value);
+
         const dados = {
-            id_estoque: Number(el.estoque.value),
+            id_estoque: idEstoque,
+            id_categoria: idCategoria,
             nome: el.nome.value.trim(),
-            categoria: el.categoria.value.trim(),
             descricao: el.descricao.value.trim() || null,
             status_equip: normalizarStatus(el.status.value)
         };
 
         if (
             !dados.id_estoque ||
-            !dados.nome ||
-            !dados.categoria
+            !dados.id_categoria ||
+            !dados.nome
         ) {
             mostrarMensagemFormulario(
-                "Preencha o nome, o estoque e a categoria.",
+                "Preencha o nome, o estoque e selecione uma categoria.",
                 "mensagem-erro"
             );
+
+            return;
+        }
+
+        const categoriaExiste = categorias.some(
+            categoria =>
+                Number(categoria.id_categoria) === dados.id_categoria
+        );
+
+        if (!categoriaExiste) {
+            mostrarMensagemFormulario(
+                "Selecione uma categoria cadastrada e ativa.",
+                "mensagem-erro"
+            );
+
             return;
         }
 
@@ -488,6 +542,14 @@ document.addEventListener("DOMContentLoaded", () => {
             el.botaoSalvar.textContent = "Salvando...";
         }
 
+        if (el.botaoCancelar) {
+            el.botaoCancelar.disabled = true;
+        }
+
+        if (el.botaoFechar) {
+            el.botaoFechar.disabled = true;
+        }
+
         try {
             const url = id
                 ? `${API_EQUIPAMENTOS}/${encodeURIComponent(id)}`
@@ -495,35 +557,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const resposta = await fetch(url, {
                 method: id ? "PUT" : "POST",
+
                 headers: {
                     "Content-Type": "application/json",
                     Accept: "application/json"
                 },
+
                 body: JSON.stringify(dados)
             });
 
             if (!resposta.ok) {
-                let mensagemErro =
-                    "Não foi possível salvar o equipamento.";
-
-                try {
-                    const erroAPI = await resposta.json();
-
-                    if (erroAPI.detail) {
-                        mensagemErro = Array.isArray(erroAPI.detail)
-                            ? erroAPI.detail
-                                .map(item => item.msg || JSON.stringify(item))
-                                .join("; ")
-                            : String(erroAPI.detail);
-                    }
-                } catch {
-                    // A resposta pode não conter JSON.
-                }
-
-                throw new Error(mensagemErro);
+                throw new Error(
+                    await obterDetalheErro(resposta)
+                );
             }
 
-            fecharModal();
+            fecharModalAposSalvar();
+
             await carregarEquipamentos();
 
             mostrarMensagem(
@@ -532,23 +582,44 @@ document.addEventListener("DOMContentLoaded", () => {
                     : "Equipamento cadastrado com sucesso.",
                 "mensagem-sucesso"
             );
+
         } catch (erro) {
-            console.error(erro);
+            console.error("Erro ao salvar equipamento:", erro);
 
             mostrarMensagemFormulario(
                 erro.message || "Erro ao salvar o equipamento.",
                 "mensagem-erro"
             );
+
         } finally {
             salvando = false;
 
             if (el.botaoSalvar) {
                 el.botaoSalvar.disabled = false;
+
                 el.botaoSalvar.textContent = id
                     ? "Salvar alterações"
                     : "Cadastrar equipamento";
             }
+
+            if (el.botaoCancelar) {
+                el.botaoCancelar.disabled = false;
+            }
+
+            if (el.botaoFechar) {
+                el.botaoFechar.disabled = false;
+            }
         }
+    }
+
+    function fecharModalAposSalvar() {
+        if (!el.modal) return;
+
+        el.modal.hidden = true;
+
+        el.modal.setAttribute("aria-hidden", "true");
+
+        mostrarMensagemFormulario();
     }
 
     // =========================================================
@@ -556,18 +627,27 @@ document.addEventListener("DOMContentLoaded", () => {
     // =========================================================
 
     function configurarEventos() {
-        el.botaoNovo?.addEventListener("click", () => abrirModal());
+        el.botaoNovo?.addEventListener("click", () => {
+            abrirModal();
+        });
 
         el.botaoFechar?.addEventListener("click", fecharModal);
+
         el.botaoCancelar?.addEventListener("click", fecharModal);
 
-        el.formulario?.addEventListener("submit", salvarEquipamento);
+        el.formulario?.addEventListener(
+            "submit",
+            salvarEquipamento
+        );
 
         el.busca?.addEventListener("input", aplicarFiltros);
+
         el.filtro?.addEventListener("change", aplicarFiltros);
 
         el.lista?.addEventListener("click", evento => {
-            const botao = evento.target.closest('[data-acao="editar"]');
+            const botao = evento.target.closest(
+                '[data-acao="editar"]'
+            );
 
             if (!botao) return;
 
@@ -581,21 +661,32 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         el.modal?.addEventListener("click", evento => {
-            if (evento.target === el.modal) {
+            if (
+                evento.target === el.modal &&
+                !salvando
+            ) {
                 fecharModal();
             }
         });
 
         document.addEventListener("keydown", evento => {
-            if (evento.key === "Escape" && el.modal && !el.modal.hidden) {
+            if (
+                evento.key === "Escape" &&
+                el.modal &&
+                !el.modal.hidden &&
+                !salvando
+            ) {
                 fecharModal();
             }
         });
     }
 
-    configurarListaCategorias();
+    // =========================================================
+    // INICIALIZAÇÃO
+    // =========================================================
+
     configurarEventos();
+
     carregarEquipamentos();
 
-    window.abrirModalEquipamento = () => abrirModal();
 });

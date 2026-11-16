@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Gerenciar Categorias | THE IRON COMPASS</title>
+
+    <link rel="stylesheet" href="/static/css/admin_categorias.css">
+
+    <script src="/static/js/admin_categorias.js" defer></script>
+</head>
+
+<body>
+
+<div class="layout">
+
+    <!-- MENU LATERAL -->
+    <aside class="menu-lateral">
+
+        <div class="identidade">
+            <img
+                    src="/static/imagens/compasso.svg"
+                    alt="Compasso The Iron Compass"
+                    class="logo"
+                >
+            <h2>THE IRON COMPASS</h2>
+            
+        </div>
+
+        <nav class="navegacao">
+
+            <a href="/dashboard-admin" class="item-menu">
+                <span class="icone">⌂</span>
+                Dashboard
+            </a>
+
+            <a href="/admin_users" class="item-menu">
+                <span class="icone">♙</span>
+                Usuários
+            </a>
+
+            <a href="/admin_equipamentos" class="item-menu">
+                <span class="icone">▣</span>
+                Equipamentos
+            </a>
+
+            <a href="/admin_categorias" class="item-menu ativo">
+                <span class="icone">▤</span>
+                Categorias
+            </a>
+
+            <a href="/admin_pedidos" class="item-menu">
+                <span class="icone">▧</span>
+                Pedidos
+            </a>
+
+        </nav>
+
+        <div class="rodape-menu">
+            <form action="/logout" method="POST">
+                <button type="submit" class="item-menu sair">
+                    <span class="icone">↪</span>
+                    Sair do sistema
+                </button>
+            </form>
+        </div>
+
+    </aside>
+
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="conteudo-principal">
+
+        <!-- CABEÇALHO -->
+        <header class="cabecalho">
+
+            <div class="titulo-pagina">
+                <p class="subtitulo">ADMINISTRAÇÃO / ORGANIZAÇÃO</p>
+
+                <h1>Gerenciar Categorias</h1>
+
+                <p>
+                    Cadastre, organize e gerencie as categorias utilizadas
+                    na classificação dos equipamentos.
+                </p>
+            </div>
+
+            <div class="informacoes-usuario">
+
+                <div class="avatar-usuario">
+                    ♙
+                </div>
+
+                <div class="dados-usuario">
+                    <span>
+                        {{ usuario.nome if usuario.nome is defined else usuario }}
+                    </span>
+
+                    <small>Administrador</small>
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- INDICADORES -->
+        <section class="secao-indicadores">
+
+            <article class="cartao-indicador">
+
+                <div class="indicador-topo">
+                    Total de categorias
+
+                    <span class="icone-indicador">▤</span>
+                </div>
+
+                <strong id="total-categorias">0</strong>
+
+                <p>Categorias cadastradas no sistema</p>
+
+            </article>
+
+
+            <article class="cartao-indicador">
+
+                <div class="indicador-topo">
+                    Categorias ativas
+
+                    <span class="icone-indicador">✓</span>
+                </div>
+
+                <strong id="categorias-ativas">0</strong>
+
+                <p>Disponíveis para utilização</p>
+
+            </article>
+
+
+            <article class="cartao-indicador">
+
+                <div class="indicador-topo">
+                    Categorias inativas
+
+                    <span class="icone-indicador">⊘</span>
+                </div>
+
+                <strong id="categorias-inativas">0</strong>
+
+                <p>Temporariamente desativadas</p>
+
+            </article>
+
+
+            <article class="cartao-indicador">
+
+                <div class="indicador-topo">
+                    Resultado da consulta
+
+                    <span class="icone-indicador">⌕</span>
+                </div>
+
+                <strong id="categorias-exibidas">0</strong>
+
+                <p>Categorias exibidas na tabela</p>
+
+            </article>
+
+        </section>
+
+
+        <!-- MENSAGEM DO SISTEMA -->
+        <div
+            id="mensagem-categorias"
+            class="mensagem-sistema"
+            role="status"
+            aria-live="polite"
+            hidden
+        ></div>
+
+
+        <!-- ÁREA DE CONTEÚDO -->
+        <section class="secao-conteudo">
+
+            <!-- FORMULÁRIO -->
+            <section class="painel painel-formulario">
+
+                <div class="cabecalho-painel">
+
+                    <div>
+                        <h2 id="titulo-formulario">Nova categoria</h2>
+
+                        <p>
+                            Preencha os dados para cadastrar uma categoria.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <form id="formulario-categoria" class="formulario-categoria">
+
+                    <input
+                        type="hidden"
+                        id="id-categoria"
+                    >
+
+                    <div class="campo-formulario">
+
+                        <label for="nome-categoria">
+                            Nome da categoria
+                            <span>*</span>
+                        </label>
+
+                        <input
+                            type="text"
+                            id="nome-categoria"
+                            name="nome"
+                            maxlength="100"
+                            placeholder="Ex.: Informática"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="campo-formulario">
+
+                        <label for="descricao-categoria">
+                            Descrição
+                        </label>
+
+                        <textarea
+                            id="descricao-categoria"
+                            name="descricao"
+                            maxlength="255"
+                            rows="4"
+                            placeholder="Descreva a finalidade desta categoria..."
+                        ></textarea>
+
+                        <small>
+                            Máximo de 255 caracteres.
+                        </small>
+
+                    </div>
+
+
+                    <div class="acoes-formulario">
+
+                        <button
+                            type="submit"
+                            id="botao-salvar"
+                            class="botao-principal"
+                        >
+                            <span>＋</span>
+                            Cadastrar categoria
+                        </button>
+
+                        <button
+                            type="button"
+                            id="botao-cancelar"
+                            class="botao-secundario"
+                            hidden
+                        >
+                            Cancelar edição
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </section>
+
+
+            <!-- LISTAGEM -->
+            <section class="painel painel-listagem">
+
+                <div class="cabecalho-painel">
+
+                    <div>
+                        <h2>Categorias cadastradas</h2>
+
+                        <p>
+                            Consulte e gerencie as categorias existentes.
+                        </p>
+                    </div>
+
+                    <button
+                        type="button"
+                        id="botao-atualizar"
+                        class="botao-atualizar"
+                        title="Atualizar listagem"
+                    >
+                        ↻ Atualizar
+                    </button>
+
+                </div>
+
+
+                <!-- FILTROS -->
+                <div class="filtros-categorias">
+
+                    <div class="campo-pesquisa">
+
+                        <span>⌕</span>
+
+                        <input
+                            type="search"
+                            id="pesquisa-categoria"
+                            placeholder="Pesquisar categoria..."
+                            autocomplete="off"
+                        >
+
+                    </div>
+
+
+                    <select
+                        id="filtro-status"
+                        aria-label="Filtrar por situação"
+                    >
+                        <option value="todos">Todas as categorias</option>
+                        <option value="ativas">Somente ativas</option>
+                        <option value="inativas">Somente inativas</option>
+                    </select>
+
+                </div>
+
+
+                <!-- TABELA -->
+                <div class="area-tabela">
+
+                    <table>
+
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Categoria</th>
+                                <th>Descrição</th>
+                                <th>Situação</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="lista-categorias">
+
+                            <tr>
+                                <td colspan="5" class="mensagem-vazia">
+                                    Carregando categorias...
+                                </td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+
+                <div class="rodape-listagem">
+                    <span id="contador-listagem">
+                        0 categorias encontradas
+                    </span>
+                </div>
+
+            </section>
+
+        </section>
+
+
+        <!-- RODAPÉ -->
+        <footer class="rodape-pagina">
+
+            <p>
+                THE IRON COMPASS © 2026 — Sistema de gerenciamento de equipamentos.
+            </p>
+
+        </footer>
+
+    </main>
+
+</div>
+
+</body>
+</html>

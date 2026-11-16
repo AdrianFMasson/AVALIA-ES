@@ -11,17 +11,62 @@
 <div class="layout">
     <aside class="menu-lateral">
         <div class="identidade">
-            <img src="/static/imagens/compasso.svg" alt="Compasso" class="logo">
+            <img
+                    src="/static/imagens/compasso.svg"
+                    alt="Compasso The Iron Compass"
+                    class="logo"
+                >
             <h2>THE IRON COMPASS</h2>
-            <p>Sistema de Empréstimos</p>
+            
         </div>
 
-        <nav class="navegacao">
-            <a class="item-menu" href="/dashboard-admin"><span class="icone">⌂</span> Dashboard</a>
-            <a class="item-menu ativo" href="/admin_users"><span class="icone">♙</span> Usuários</a>
-            <a class="item-menu" href="/admin_equipamentos"><span class="icone">▣</span> Equipamentos</a>
-            <a class="item-menu" href="/admin_pedidos"><span class="icone">▤</span> Pedidos</a>
-        </nav>
+        <nav class="navegacao" aria-label="Menu administrativo">
+
+                <a
+                    href="/dashboard-admin"
+                    class="item-menu"
+                    aria-current="page"
+                >
+                    <span class="icone">⌂</span>
+                    <span>Dashboard</span>
+                </a>
+
+                <a
+                    href="/admin_users"
+                    class="item-menu ativo"
+                >
+                    <span class="icone">♙</span>
+                    <span>Usuários</span>
+                </a>
+
+                <a
+                    href="/admin_equipamentos"
+                    class="item-menu"
+                >
+                    <span class="icone">⚙</span>
+                    <span>Equipamentos</span>
+                </a>
+
+                <a
+                    href="/admin_categorias"
+                    class="item-menu"
+                >
+                    <span class="icone">▦</span>
+                    <span>Categorias</span>
+                </a>
+
+
+                <a
+                    href="/admin_pedidos"
+                    class="item-menu"
+                >
+                    <span class="icone">▤</span>
+                    <span>Pedidos</span>
+                </a>
+
+
+
+            </nav>
 
         <div class="rodape-menu">
             <form action="/encerrar-sessao" method="post">

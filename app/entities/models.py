@@ -1,43 +1,144 @@
+
 from sqlmodel import SQLModel, Field
 from datetime import datetime
 from enum import Enum
 from pydantic import BaseModel, EmailStr
+
+
+# ==========================================
+# PERFIS DE USUÁRIO
+# ==========================================
 
 class StatusPerfil(str, Enum):
     DISCENTE = "DISCENTE"
     GESTOR = "GESTOR"
     ADMINISTRADOR = "ADMINISTRADOR"
 
+
 class Perfil(SQLModel, table=True):
     __tablename__ = "perfil"
-    id_perfil: int | None = Field(default=None, primary_key=True)
-    perfil: StatusPerfil = Field(default=StatusPerfil.DISCENTE)
+
+    id_perfil: int | None = Field(
+        default=None,
+        primary_key=True
+    )
+
+    perfil: StatusPerfil = Field(
+        default=StatusPerfil.DISCENTE
+    )
+
     descricao_adicional: str = Field(max_length=100)
+
+
+# ==========================================
+# USUÁRIOS
+# ==========================================
 
 class Usuarios(SQLModel, table=True):
     __tablename__ = "usuarios"
-    id_usuario: int | None = Field(default=None, primary_key=True)
+
+    id_usuario: int | None = Field(
+        default=None,
+        primary_key=True
+    )
+
     nome: str = Field(max_length=100)
-    contato: str | None = Field(default=None, max_length=20)
-    email: str = Field(max_length=100, unique=True)
+
+    contato: str | None = Field(
+        default=None,
+        max_length=20
+    )
+
+    email: str = Field(
+        max_length=100,
+        unique=True
+    )
+
     senha_hash: str = Field(max_length=255)
-    id_perfil: int = Field(foreign_key="perfil.id_perfil")
+
+    id_perfil: int = Field(
+        foreign_key="perfil.id_perfil"
+    )
+
     ativo: bool = Field(default=True)
-    dt_cad_user: datetime = Field(default_factory=datetime.now)
+
+    dt_cad_user: datetime = Field(
+        default_factory=datetime.now
+    )
+
 
 class UsuarioAtualizacao(SQLModel):
     nome: str = Field(max_length=100)
-    contato: str | None = Field(default=None, max_length=20)
+
+    contato: str | None = Field(
+        default=None,
+        max_length=20
+    )
+
     email: EmailStr
-    senha: str | None = Field(default=None, min_length=6, max_length=255)
+
+    senha: str | None = Field(
+        default=None,
+        min_length=6,
+        max_length=255
+    )
+
     id_perfil: int
+
     ativo: bool = True
+
+
+# ==========================================
+# ESTOQUE
+# ==========================================
 
 class Estoque(SQLModel, table=True):
     __tablename__ = "estoque"
-    id_estoque: int | None = Field(default=None, primary_key=True)
+
+    id_estoque: int | None = Field(
+        default=None,
+        primary_key=True
+    )
+
     descricao: str = Field(max_length=100)
-    dt_cad_estoque: datetime = Field(default_factory=datetime.now)
+
+    dt_cad_estoque: datetime = Field(
+        default_factory=datetime.now
+    )
+
+
+# ==========================================
+# CATEGORIAS
+# ==========================================
+
+class Categoria(SQLModel, table=True):
+    __tablename__ = "categorias"
+
+    id_categoria: int | None = Field(
+        default=None,
+        primary_key=True
+    )
+
+    nome: str = Field(
+        max_length=100,
+        unique=True
+    )
+
+    descricao: str | None = Field(
+        default=None,
+        max_length=255
+    )
+
+    ativo: bool = Field(default=True)
+
+    dt_cad_categoria: datetime = Field(
+        default_factory=datetime.now
+    )
+
+
+# ==========================================
+# EQUIPAMENTOS
+# ==========================================
 
 class StatusEquip(str, Enum):
     DISPONIVEL = "DISPONIVEL"
@@ -45,55 +146,135 @@ class StatusEquip(str, Enum):
     MANUTENCAO = "MANUTENCAO"
     INATIVO = "INATIVO"
 
+
 class Equipamentos(SQLModel, table=True):
     __tablename__ = "equipamentos"
-    id_equipamento: int | None = Field(default=None, primary_key=True)
-    id_estoque: int = Field(foreign_key="estoque.id_estoque")
+
+    id_equipamento: int | None = Field(
+        default=None,
+        primary_key=True
+    )
+
+    id_estoque: int = Field(
+        foreign_key="estoque.id_estoque"
+    )
+
+    id_categoria: int = Field(
+        foreign_key="categorias.id_categoria"
+    )
+
     nome: str = Field(max_length=100)
+
+    # Campo antigo mantido temporariamente
+    # para compatibilidade com o banco de dados.
     categoria: str = Field(max_length=100)
+
     descricao: str | None = Field(default=None)
-    status_equip: StatusEquip = Field(default=StatusEquip.DISPONIVEL)
-    dt_cad_equip: datetime = Field(default_factory=datetime.now)
+
+    status_equip: StatusEquip = Field(
+        default=StatusEquip.DISPONIVEL
+    )
+
+    dt_cad_equip: datetime = Field(
+        default_factory=datetime.now
+    )
+
 
 class EquipamentoPublico(SQLModel):
     id_estoque: int
+
+    id_categoria: int
+
     nome: str = Field(max_length=100)
-    categoria: str = Field(max_length=100)
+
     descricao: str | None = None
+
     status_equip: StatusEquip = StatusEquip.DISPONIVEL
+
+
+# ==========================================
+# PEDIDOS
+# ==========================================
 
 class StatusPedido(str, Enum):
     ABERTO = "ABERTO"
     EM_ANALISE = "EM_ANALISE"
     ENCERRADO = "ENCERRADO"
 
+
 class Pedido(SQLModel, table=True):
     __tablename__ = "pedido"
-    id_pedido: int | None = Field(default=None, primary_key=True)
-    status: StatusPedido = Field(default=StatusPedido.ABERTO)
-    id_usuario: int = Field(foreign_key="usuarios.id_usuario")
-    id_equipamento: int = Field(foreign_key="equipamentos.id_equipamento")
-    data_pedido: datetime = Field(default_factory=datetime.now)
+
+    id_pedido: int | None = Field(
+        default=None,
+        primary_key=True
+    )
+
+    status: StatusPedido = Field(
+        default=StatusPedido.ABERTO
+    )
+
+    id_usuario: int = Field(
+        foreign_key="usuarios.id_usuario"
+    )
+
+    id_equipamento: int = Field(
+        foreign_key="equipamentos.id_equipamento"
+    )
+
+    data_pedido: datetime = Field(
+        default_factory=datetime.now
+    )
+
+
+# ==========================================
+# EMPRÉSTIMOS
+# ==========================================
 
 class StatusSolicitacao(str, Enum):
     SOLICITADO = "SOLICITADO"
     APROVADO = "APROVADO"
     NEGADO = "NEGADO"
 
+
 class Emprestimos(SQLModel, table=True):
     __tablename__ = "emprestimos"
-    id_emprestimo: int | None = Field(default=None, primary_key=True)
-    id_gestor: int = Field(foreign_key="usuarios.id_usuario")
-    id_pedido: int = Field(foreign_key="pedido.id_pedido", unique=True)
+
+    id_emprestimo: int | None = Field(
+        default=None,
+        primary_key=True
+    )
+
+    id_gestor: int = Field(
+        foreign_key="usuarios.id_usuario"
+    )
+
+    id_pedido: int = Field(
+        foreign_key="pedido.id_pedido",
+        unique=True
+    )
+
     data_aprovacao: datetime | None = None
+
     data_retirada: datetime | None = None
+
     data_prevista_devolucao: datetime | None = None
+
     data_devolucao: datetime | None = None
-    status_solicitacao: StatusSolicitacao = Field(default=StatusSolicitacao.SOLICITADO)
+
+    status_solicitacao: StatusSolicitacao = Field(
+        default=StatusSolicitacao.SOLICITADO
+    )
+
+
+# ==========================================
+# LOGIN E SESSÃO
+# ==========================================
 
 class UsuarioLogin(BaseModel):
     usuario: EmailStr
     senha: str
+
 
 class UsuarioLogado(BaseModel):
     id: int

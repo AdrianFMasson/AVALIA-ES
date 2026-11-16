@@ -1,9 +1,12 @@
+
 from fastapi import APIRouter, Request, Depends, HTTPException, status
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
 from sqlmodel import Session, select
 from sqlalchemy import func
+from sqlalchemy.exc import IntegrityError
+from pathlib import Path
 
 from dependencies.dependencies import database
 from dependencies.autenticacao import obter_usuario_autenticado
@@ -12,6 +15,7 @@ from entities.models import (
     Usuarios,
     Perfil,
     Estoque,
+    Categoria,
     Equipamentos,
     Pedido,
     Emprestimos,
@@ -20,11 +24,14 @@ from entities.models import (
     StatusPedido,
 )
 
-from config.Config import settings
-
 
 admin_rota = APIRouter(tags=["Administrador"])
-templates = Jinja2Templates(directory="templates")
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+templates = Jinja2Templates(
+    directory=str(BASE_DIR / "templates")
+)
 
 
 # =========================================================
@@ -33,14 +40,23 @@ templates = Jinja2Templates(directory="templates")
 
 class EquipamentoEntrada(BaseModel):
     id_estoque: int
+    id_categoria: int
     nome: str
-    categoria: str
     descricao: str | None = None
     status_equip: StatusEquip = StatusEquip.DISPONIVEL
 
 
 class PedidoStatusEntrada(BaseModel):
     status: StatusPedido
+
+
+class CategoriaEntrada(BaseModel):
+    nome: str
+    descricao: str | None = None
+
+
+class CategoriaStatusEntrada(BaseModel):
+    ativo: bool
 
 
 # =========================================================
@@ -52,7 +68,12 @@ def redirecionar_para_login():
         url="/login",
         status_code=status.HTTP_303_SEE_OTHER,
     )
-    resposta.delete_cookie(key="access_token", path="/")
+
+    resposta.delete_cookie(
+        key="access_token",
+        path="/",
+    )
+
     return resposta
 
 
@@ -84,7 +105,10 @@ def exigir_admin_api(request: Request, db: Session):
 
 
 def contexto_admin(autenticacao, **dados):
-    return {"usuario": autenticacao["usuario"], **dados}
+    return {
+        "usuario": autenticacao["usuario"],
+        **dados,
+    }
 
 
 # =========================================================
@@ -116,20 +140,29 @@ def dashboard_admin(
     emprestimos_ativos = db.exec(
         select(func.count())
         .select_from(Emprestimos)
-        .where(Emprestimos.status_solicitacao == StatusSolicitacao.APROVADO)
+        .where(
+            Emprestimos.status_solicitacao
+            == StatusSolicitacao.APROVADO
+        )
         .where(Emprestimos.data_devolucao.is_(None))
     ).one()
 
     pedidos_recentes = db.exec(
-        select(Pedido).order_by(Pedido.data_pedido.desc()).limit(5)
+        select(Pedido)
+        .order_by(Pedido.data_pedido.desc())
+        .limit(5)
     ).all()
 
     usuarios_recentes = db.exec(
-        select(Usuarios).order_by(Usuarios.dt_cad_user.desc()).limit(5)
+        select(Usuarios)
+        .order_by(Usuarios.dt_cad_user.desc())
+        .limit(5)
     ).all()
 
     equipamentos_recentes = db.exec(
-        select(Equipamentos).order_by(Equipamentos.dt_cad_equip.desc()).limit(5)
+        select(Equipamentos)
+        .order_by(Equipamentos.dt_cad_equip.desc())
+        .limit(5)
     ).all()
 
     return templates.TemplateResponse(
@@ -162,8 +195,13 @@ def pagina_admin_usuarios(
     if autenticacao is None:
         return redirecionar_para_login()
 
-    usuarios = db.exec(select(Usuarios).order_by(Usuarios.nome)).all()
-    perfis = db.exec(select(Perfil).order_by(Perfil.id_perfil)).all()
+    usuarios = db.exec(
+        select(Usuarios).order_by(Usuarios.nome)
+    ).all()
+
+    perfis = db.exec(
+        select(Perfil).order_by(Perfil.id_perfil)
+    ).all()
 
     return templates.TemplateResponse(
         request=request,
@@ -185,7 +223,10 @@ def api_admin_usuarios(
 
     resultados = db.exec(
         select(Usuarios, Perfil)
-        .join(Perfil, Usuarios.id_perfil == Perfil.id_perfil)
+        .join(
+            Perfil,
+            Usuarios.id_perfil == Perfil.id_perfil,
+        )
         .order_by(Usuarios.nome)
     ).all()
 
@@ -216,11 +257,19 @@ def pagina_admin_equipamentos(
         return redirecionar_para_login()
 
     equipamentos = db.exec(
-        select(Equipamentos).order_by(Equipamentos.nome)
+        select(Equipamentos)
+        .order_by(Equipamentos.nome)
     ).all()
 
     estoques = db.exec(
-        select(Estoque).order_by(Estoque.descricao)
+        select(Estoque)
+        .order_by(Estoque.descricao)
+    ).all()
+
+    categorias = db.exec(
+        select(Categoria)
+        .where(Categoria.ativo == True)
+        .order_by(Categoria.nome)
     ).all()
 
     return templates.TemplateResponse(
@@ -230,6 +279,7 @@ def pagina_admin_equipamentos(
             autenticacao,
             equipamentos=equipamentos,
             estoques=estoques,
+            categorias=categorias,
         ),
     )
 
@@ -246,14 +296,40 @@ def validar_estoque(db: Session, id_estoque: int):
     return estoque
 
 
-def serializar_equipamento(equipamento, estoque):
+def validar_categoria(
+    db: Session,
+    id_categoria: int,
+):
+    categoria = db.get(Categoria, id_categoria)
+
+    if categoria is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="A categoria informada não existe.",
+        )
+
+    if not categoria.ativo:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="A categoria selecionada está inativa.",
+        )
+
+    return categoria
+
+
+def serializar_equipamento(
+    equipamento,
+    estoque,
+    categoria,
+):
     return {
         "id": equipamento.id_equipamento,
         "id_equipamento": equipamento.id_equipamento,
         "id_estoque": equipamento.id_estoque,
         "estoque": estoque.descricao,
+        "id_categoria": equipamento.id_categoria,
+        "categoria": categoria.nome,
         "nome": equipamento.nome,
-        "categoria": equipamento.categoria,
         "descricao": equipamento.descricao,
         "status_equip": equipamento.status_equip.value,
     }
@@ -267,14 +343,29 @@ def api_listar_equipamentos(
     exigir_admin_api(request, db)
 
     resultados = db.exec(
-        select(Equipamentos, Estoque)
-        .join(Estoque, Equipamentos.id_estoque == Estoque.id_estoque)
+        select(
+            Equipamentos,
+            Estoque,
+            Categoria,
+        )
+        .join(
+            Estoque,
+            Equipamentos.id_estoque == Estoque.id_estoque,
+        )
+        .join(
+            Categoria,
+            Equipamentos.id_categoria == Categoria.id_categoria,
+        )
         .order_by(Equipamentos.nome)
     ).all()
 
     return [
-        serializar_equipamento(equipamento, estoque)
-        for equipamento, estoque in resultados
+        serializar_equipamento(
+            equipamento,
+            estoque,
+            categoria,
+        )
+        for equipamento, estoque, categoria in resultados
     ]
 
 
@@ -288,22 +379,41 @@ def api_criar_equipamento(
     db: Session = Depends(database.get_db),
 ):
     exigir_admin_api(request, db)
-    validar_estoque(db, dados.id_estoque)
+
+    validar_estoque(
+        db,
+        dados.id_estoque,
+    )
+
+    categoria = validar_categoria(
+        db,
+        dados.id_categoria,
+    )
 
     nome = dados.nome.strip()
-    categoria = dados.categoria.strip()
 
-    if not nome or not categoria:
+    if not nome:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail="Nome e categoria são obrigatórios.",
+            detail="O nome do equipamento é obrigatório.",
         )
 
     equipamento = Equipamentos(
         id_estoque=dados.id_estoque,
+        id_categoria=dados.id_categoria,
+
+        # Mantém compatibilidade com a coluna antiga
+        # enquanto a migração não for concluída.
+        categoria=categoria.nome,
+
         nome=nome,
-        categoria=categoria,
-        descricao=dados.descricao.strip() if dados.descricao and dados.descricao.strip() else None,
+
+        descricao=(
+            dados.descricao.strip()
+            if dados.descricao and dados.descricao.strip()
+            else None
+        ),
+
         status_equip=dados.status_equip,
     )
 
@@ -312,14 +422,33 @@ def api_criar_equipamento(
         db.commit()
         db.refresh(equipamento)
 
-        estoque = db.get(Estoque, equipamento.id_estoque)
-        return serializar_equipamento(equipamento, estoque)
+        estoque = db.get(
+            Estoque,
+            equipamento.id_estoque,
+        )
+
+        return serializar_equipamento(
+            equipamento,
+            estoque,
+            categoria,
+        )
+
+    except IntegrityError:
+        db.rollback()
+
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Não foi possível cadastrar o equipamento. Verifique os dados informados.",
+        )
+
     except Exception:
         db.rollback()
         raise
 
 
-@admin_rota.put("/api/admin/equipamentos/{id_equipamento}")
+@admin_rota.put(
+    "/api/admin/equipamentos/{id_equipamento}"
+)
 def api_editar_equipamento(
     id_equipamento: int,
     dados: EquipamentoEntrada,
@@ -328,7 +457,10 @@ def api_editar_equipamento(
 ):
     exigir_admin_api(request, db)
 
-    equipamento = db.get(Equipamentos, id_equipamento)
+    equipamento = db.get(
+        Equipamentos,
+        id_equipamento,
+    )
 
     if equipamento is None:
         raise HTTPException(
@@ -336,31 +468,37 @@ def api_editar_equipamento(
             detail="Equipamento não encontrado.",
         )
 
-    estoque = db.get(Estoque, dados.id_estoque)
+    validar_estoque(
+        db,
+        dados.id_estoque,
+    )
 
-    if estoque is None:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="O estoque informado não existe.",
-        )
+    categoria = validar_categoria(
+        db,
+        dados.id_categoria,
+    )
 
     nome = dados.nome.strip()
-    categoria = dados.categoria.strip()
 
-    if not nome or not categoria:
+    if not nome:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail="Nome e categoria são obrigatórios.",
+            detail="O nome do equipamento é obrigatório.",
         )
 
     equipamento.id_estoque = dados.id_estoque
+    equipamento.id_categoria = dados.id_categoria
     equipamento.nome = nome
-    equipamento.categoria = categoria
+
+    # Atualiza também a coluna antiga.
+    equipamento.categoria = categoria.nome
+
     equipamento.descricao = (
         dados.descricao.strip()
         if dados.descricao and dados.descricao.strip()
         else None
     )
+
     equipamento.status_equip = dados.status_equip
 
     try:
@@ -368,18 +506,279 @@ def api_editar_equipamento(
         db.commit()
         db.refresh(equipamento)
 
-        estoque_atual = db.get(Estoque, equipamento.id_estoque)
+        estoque_atual = db.get(
+            Estoque,
+            equipamento.id_estoque,
+        )
 
         return serializar_equipamento(
             equipamento,
             estoque_atual,
+            categoria,
+        )
+
+    except IntegrityError:
+        db.rollback()
+
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Não foi possível atualizar o equipamento. Verifique os dados informados.",
         )
 
     except Exception:
         db.rollback()
         raise
 
-    # =========================================================
+
+# =========================================================
+# CATEGORIAS
+# =========================================================
+
+def validar_nome_categoria(
+    db: Session,
+    nome: str,
+    id_categoria: int | None = None,
+):
+    nome = nome.strip()
+
+    if not nome:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="O nome da categoria é obrigatório.",
+        )
+
+    consulta = select(Categoria).where(
+        func.lower(Categoria.nome) == nome.lower()
+    )
+
+    if id_categoria is not None:
+        consulta = consulta.where(
+            Categoria.id_categoria != id_categoria
+        )
+
+    categoria_existente = db.exec(
+        consulta
+    ).first()
+
+    if categoria_existente is not None:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Já existe uma categoria com esse nome.",
+        )
+
+    return nome
+
+
+def serializar_categoria(categoria):
+    return {
+        "id": categoria.id_categoria,
+        "id_categoria": categoria.id_categoria,
+        "nome": categoria.nome,
+        "descricao": categoria.descricao,
+        "ativo": categoria.ativo,
+        "dt_cad_categoria": (
+            categoria.dt_cad_categoria.isoformat()
+            if categoria.dt_cad_categoria
+            else None
+        ),
+    }
+
+
+@admin_rota.get("/api/admin/categorias")
+def api_listar_categorias(
+    request: Request,
+    db: Session = Depends(database.get_db),
+):
+    exigir_admin_api(request, db)
+
+    categorias = db.exec(
+        select(Categoria)
+        .order_by(Categoria.nome)
+    ).all()
+
+    return [
+        serializar_categoria(categoria)
+        for categoria in categorias
+    ]
+
+
+@admin_rota.post(
+    "/api/admin/categorias",
+    status_code=status.HTTP_201_CREATED,
+)
+def api_criar_categoria(
+    dados: CategoriaEntrada,
+    request: Request,
+    db: Session = Depends(database.get_db),
+):
+    exigir_admin_api(request, db)
+
+    nome = validar_nome_categoria(
+        db,
+        dados.nome,
+    )
+
+    descricao = (
+        dados.descricao.strip()
+        if dados.descricao and dados.descricao.strip()
+        else None
+    )
+
+    categoria = Categoria(
+        nome=nome,
+        descricao=descricao,
+        ativo=True,
+    )
+
+    try:
+        db.add(categoria)
+        db.commit()
+        db.refresh(categoria)
+
+        return serializar_categoria(categoria)
+
+    except IntegrityError:
+        db.rollback()
+
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Já existe uma categoria com esse nome.",
+        )
+
+    except Exception:
+        db.rollback()
+        raise
+
+
+@admin_rota.put(
+    "/api/admin/categorias/{id_categoria}"
+)
+def api_editar_categoria(
+    id_categoria: int,
+    dados: CategoriaEntrada,
+    request: Request,
+    db: Session = Depends(database.get_db),
+):
+    exigir_admin_api(request, db)
+
+    categoria = db.get(
+        Categoria,
+        id_categoria,
+    )
+
+    if categoria is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Categoria não encontrada.",
+        )
+
+    nome = validar_nome_categoria(
+        db,
+        dados.nome,
+        id_categoria=id_categoria,
+    )
+
+    categoria.nome = nome
+
+    categoria.descricao = (
+        dados.descricao.strip()
+        if dados.descricao and dados.descricao.strip()
+        else None
+    )
+
+    try:
+        # Atualiza o campo antigo dos equipamentos
+        # vinculados a esta categoria.
+        equipamentos_vinculados = db.exec(
+            select(Equipamentos).where(
+                Equipamentos.id_categoria == id_categoria
+            )
+        ).all()
+
+        for equipamento in equipamentos_vinculados:
+            equipamento.categoria = nome
+
+        db.add(categoria)
+        db.commit()
+        db.refresh(categoria)
+
+        return serializar_categoria(categoria)
+
+    except IntegrityError:
+        db.rollback()
+
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Já existe uma categoria com esse nome.",
+        )
+
+    except Exception:
+        db.rollback()
+        raise
+
+
+@admin_rota.patch(
+    "/api/admin/categorias/{id_categoria}/status"
+)
+def api_alterar_status_categoria(
+    id_categoria: int,
+    dados: CategoriaStatusEntrada,
+    request: Request,
+    db: Session = Depends(database.get_db),
+):
+    exigir_admin_api(request, db)
+
+    categoria = db.get(
+        Categoria,
+        id_categoria,
+    )
+
+    if categoria is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Categoria não encontrada.",
+        )
+
+    categoria.ativo = dados.ativo
+
+    try:
+        db.add(categoria)
+        db.commit()
+        db.refresh(categoria)
+
+        return {
+            "id": categoria.id_categoria,
+            "ativo": categoria.ativo,
+            "mensagem": (
+                "Categoria ativada com sucesso."
+                if categoria.ativo
+                else "Categoria desativada com sucesso."
+            ),
+        }
+
+    except Exception:
+        db.rollback()
+        raise
+
+
+@admin_rota.get("/admin_categorias")
+def pagina_admin_categorias(
+    request: Request,
+    db: Session = Depends(database.get_db),
+):
+    autenticacao = exigir_admin(request, db)
+
+    if autenticacao is None:
+        return redirecionar_para_login()
+
+    return templates.TemplateResponse(
+        request=request,
+        name="admin_categorias.html",
+        context=contexto_admin(autenticacao),
+    )
+
+
+# =========================================================
 # PÁGINA DE PEDIDOS
 # =========================================================
 
@@ -394,7 +793,8 @@ def pagina_admin_pedidos(
         return redirecionar_para_login()
 
     pedidos = db.exec(
-        select(Pedido).order_by(Pedido.data_pedido.desc())
+        select(Pedido)
+        .order_by(Pedido.data_pedido.desc())
     ).all()
 
     return templates.TemplateResponse(
@@ -419,7 +819,11 @@ def api_listar_pedidos(
     exigir_admin_api(request, db)
 
     resultados = db.exec(
-        select(Pedido, Usuarios, Equipamentos)
+        select(
+            Pedido,
+            Usuarios,
+            Equipamentos,
+        )
         .join(
             Usuarios,
             Pedido.id_usuario == Usuarios.id_usuario,
@@ -450,7 +854,9 @@ def api_listar_pedidos(
     ]
 
 
-@admin_rota.patch("/api/admin/pedidos/{id_pedido}")
+@admin_rota.patch(
+    "/api/admin/pedidos/{id_pedido}"
+)
 def api_atualizar_status_pedido(
     id_pedido: int,
     dados: PedidoStatusEntrada,
@@ -459,7 +865,10 @@ def api_atualizar_status_pedido(
 ):
     exigir_admin_api(request, db)
 
-    pedido = db.get(Pedido, id_pedido)
+    pedido = db.get(
+        Pedido,
+        id_pedido,
+    )
 
     if pedido is None:
         raise HTTPException(
@@ -479,6 +888,7 @@ def api_atualizar_status_pedido(
             "status": pedido.status.value,
             "mensagem": "Status do pedido atualizado com sucesso.",
         }
+
     except Exception:
         db.rollback()
         raise
