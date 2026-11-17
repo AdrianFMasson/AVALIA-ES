@@ -2,7 +2,7 @@
 from fastapi import APIRouter, Request, Depends, HTTPException, status
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import RedirectResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from sqlmodel import Session, select
 from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
@@ -14,6 +14,7 @@ from dependencies.autenticacao import obter_usuario_autenticado
 from entities.models import (
     Usuarios,
     Perfil,
+    StatusPerfil,
     Estoque,
     Categoria,
     Equipamentos,
@@ -23,6 +24,9 @@ from entities.models import (
     StatusEquip,
     StatusPedido,
 )
+
+from utils.validacao_senha import validar_senha
+from utils.seguranca_senha import gerar_hash_senha
 
 
 admin_rota = APIRouter(tags=["Administrador"])
@@ -37,6 +41,18 @@ templates = Jinja2Templates(
 # =========================================================
 # ESQUEMAS DA API
 # =========================================================
+
+class UsuarioEntrada(BaseModel):
+    nome: str
+    email: EmailStr
+    perfil: StatusPerfil
+    ativo: bool = True
+    senha: str | None = None
+
+
+class UsuarioStatusEntrada(BaseModel):
+    ativo: bool
+
 
 class EquipamentoEntrada(BaseModel):
     id_estoque: int
@@ -185,6 +201,74 @@ def dashboard_admin(
 # USUÁRIOS
 # =========================================================
 
+def serializar_usuario(usuario: Usuarios, perfil: Perfil):
+    return {
+        "id": usuario.id_usuario,
+        "nome": usuario.nome,
+        "email": usuario.email,
+        "perfil": perfil.perfil.value,
+        "ativo": usuario.ativo,
+    }
+
+
+def validar_dados_usuario(
+    db: Session,
+    dados: UsuarioEntrada,
+    id_usuario: int | None = None,
+):
+    nome = dados.nome.strip()
+    email = str(dados.email).strip().lower()
+
+    if not nome:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="O nome do usuário é obrigatório.",
+        )
+
+    if len(nome) > 100:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="O nome deve possuir no máximo 100 caracteres.",
+        )
+
+    if len(email) > 100:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="O e-mail deve possuir no máximo 100 caracteres.",
+        )
+
+    consulta_email = select(Usuarios).where(
+        func.lower(Usuarios.email) == email
+    )
+
+    if id_usuario is not None:
+        consulta_email = consulta_email.where(
+            Usuarios.id_usuario != id_usuario
+        )
+
+    email_existente = db.exec(consulta_email).first()
+
+    if email_existente is not None:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Já existe um usuário cadastrado com esse e-mail.",
+        )
+
+    perfil = db.exec(
+        select(Perfil).where(
+            Perfil.perfil == dados.perfil
+        )
+    ).first()
+
+    if perfil is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="O perfil selecionado não está cadastrado no sistema.",
+        )
+
+    return nome, email, perfil
+
+
 @admin_rota.get("/admin_users")
 def pagina_admin_usuarios(
     request: Request,
@@ -231,15 +315,185 @@ def api_admin_usuarios(
     ).all()
 
     return [
-        {
-            "id": usuario.id_usuario,
-            "nome": usuario.nome,
-            "email": usuario.email,
-            "perfil": perfil.perfil.value,
-            "ativo": usuario.ativo,
-        }
+        serializar_usuario(usuario, perfil)
         for usuario, perfil in resultados
     ]
+
+
+@admin_rota.post(
+    "/api/admin/usuarios",
+    status_code=status.HTTP_201_CREATED,
+)
+def api_criar_usuario(
+    dados: UsuarioEntrada,
+    request: Request,
+    db: Session = Depends(database.get_db),
+):
+    exigir_admin_api(request, db)
+
+    if not dados.senha:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="A senha é obrigatória para cadastrar um usuário.",
+        )
+
+    senha_valida, mensagem = validar_senha(dados.senha)
+
+    if not senha_valida:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=mensagem,
+        )
+
+    nome, email, perfil = validar_dados_usuario(
+        db,
+        dados,
+    )
+
+    usuario = Usuarios(
+        nome=nome,
+        email=email,
+        senha_hash=gerar_hash_senha(dados.senha),
+        id_perfil=perfil.id_perfil,
+        ativo=dados.ativo,
+    )
+
+    try:
+        db.add(usuario)
+        db.commit()
+        db.refresh(usuario)
+
+        return serializar_usuario(usuario, perfil)
+
+    except IntegrityError:
+        db.rollback()
+
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Não foi possível cadastrar o usuário. Verifique se o e-mail já está em uso.",
+        )
+
+    except Exception:
+        db.rollback()
+        raise
+
+
+@admin_rota.put("/api/admin/usuarios/{id_usuario}")
+def api_editar_usuario(
+    id_usuario: int,
+    dados: UsuarioEntrada,
+    request: Request,
+    db: Session = Depends(database.get_db),
+):
+    exigir_admin_api(request, db)
+
+    usuario = db.get(
+        Usuarios,
+        id_usuario,
+    )
+
+    if usuario is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Usuário não encontrado.",
+        )
+
+    nome, email, perfil = validar_dados_usuario(
+        db,
+        dados,
+        id_usuario=id_usuario,
+    )
+
+    usuario.nome = nome
+    usuario.email = email
+    usuario.id_perfil = perfil.id_perfil
+    usuario.ativo = dados.ativo
+
+    # A senha só é alterada quando o administrador informa
+    # uma nova senha no formulário.
+    if dados.senha:
+        senha_valida, mensagem = validar_senha(dados.senha)
+
+        if not senha_valida:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=mensagem,
+            )
+
+        usuario.senha_hash = gerar_hash_senha(dados.senha)
+
+    try:
+        db.add(usuario)
+        db.commit()
+        db.refresh(usuario)
+
+        return serializar_usuario(usuario, perfil)
+
+    except IntegrityError:
+        db.rollback()
+
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Não foi possível atualizar o usuário. Verifique se o e-mail já está em uso.",
+        )
+
+    except Exception:
+        db.rollback()
+        raise
+
+
+@admin_rota.patch("/api/admin/usuarios/{id_usuario}")
+def api_alterar_status_usuario(
+    id_usuario: int,
+    dados: UsuarioStatusEntrada,
+    request: Request,
+    db: Session = Depends(database.get_db),
+):
+    autenticacao = exigir_admin_api(request, db)
+
+    usuario = db.get(
+        Usuarios,
+        id_usuario,
+    )
+
+    if usuario is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Usuário não encontrado.",
+        )
+
+    usuario_atual = autenticacao["usuario"]
+
+    # Impede que o administrador desative a própria conta.
+    if (
+        usuario_atual.id_usuario == id_usuario
+        and dados.ativo is False
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Você não pode desativar sua própria conta.",
+        )
+
+    usuario.ativo = dados.ativo
+
+    try:
+        db.add(usuario)
+        db.commit()
+        db.refresh(usuario)
+
+        return {
+            "id": usuario.id_usuario,
+            "ativo": usuario.ativo,
+            "mensagem": (
+                "Usuário ativado com sucesso."
+                if usuario.ativo
+                else "Usuário desativado com sucesso."
+            ),
+        }
+
+    except Exception:
+        db.rollback()
+        raise
 
 
 # =========================================================
@@ -401,19 +655,13 @@ def api_criar_equipamento(
     equipamento = Equipamentos(
         id_estoque=dados.id_estoque,
         id_categoria=dados.id_categoria,
-
-        # Mantém compatibilidade com a coluna antiga
-        # enquanto a migração não for concluída.
         categoria=categoria.nome,
-
         nome=nome,
-
         descricao=(
             dados.descricao.strip()
             if dados.descricao and dados.descricao.strip()
             else None
         ),
-
         status_equip=dados.status_equip,
     )
 
@@ -489,8 +737,6 @@ def api_editar_equipamento(
     equipamento.id_estoque = dados.id_estoque
     equipamento.id_categoria = dados.id_categoria
     equipamento.nome = nome
-
-    # Atualiza também a coluna antiga.
     equipamento.categoria = categoria.nome
 
     equipamento.descricao = (
@@ -687,8 +933,6 @@ def api_editar_categoria(
     )
 
     try:
-        # Atualiza o campo antigo dos equipamentos
-        # vinculados a esta categoria.
         equipamentos_vinculados = db.exec(
             select(Equipamentos).where(
                 Equipamentos.id_categoria == id_categoria

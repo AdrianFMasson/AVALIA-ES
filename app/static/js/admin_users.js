@@ -27,7 +27,7 @@ function escapar(valor) {
         "<": "&lt;",
         ">": "&gt;",
         '"': "&quot;",
-        "'": "&#39;"
+        "'": "'"
     })[caractere]);
 }
 
@@ -122,24 +122,23 @@ function renderizarUsuarios() {
 async function carregarUsuarios() {
     if (!elementos.lista || !elementos.mensagem) {
         console.error("Tabela ou mensagem de usuários não encontrada.");
-        return;
+        return Promise.resolve();
     }
 
     elementos.mensagem.textContent = "Carregando usuários...";
     elementos.lista.innerHTML = "";
 
-    try {
-        const resposta = await fetch(API_USUARIOS, {
-            method: "GET",
-            credentials: "same-origin",
-            headers: {
-                "Accept": "application/json"
-            }
-        });
-
+    return fetch(API_USUARIOS, {
+        method: "GET",
+        credentials: "same-origin",
+        headers: {
+            "Accept": "application/json"
+        }
+    })
+    .then(resposta => {
         if (resposta.status === 401 || resposta.status === 403) {
             window.location.assign("/login");
-            return;
+            return null;
         }
 
         if (!resposta.ok) {
@@ -148,7 +147,10 @@ async function carregarUsuarios() {
             );
         }
 
-        const dados = await resposta.json();
+        return resposta.json();
+    })
+    .then(dados => {
+        if (!dados) return;
 
         if (!Array.isArray(dados)) {
             throw new Error("A API retornou uma lista inválida.");
@@ -163,14 +165,126 @@ async function carregarUsuarios() {
         }));
 
         renderizarUsuarios();
-
-    } catch (erro) {
+    })
+    .catch(erro => {
         console.error("Erro ao carregar usuários:", erro);
 
         elementos.lista.innerHTML = "";
         elementos.mensagem.textContent =
             "Não foi possível carregar os usuários. Verifique a conexão com o servidor.";
+
+            throw erro;
+    });
+}
+
+async function salvarUsuario(evento) {
+    evento.preventDefault();
+    mostrarErroFormulario("");
+
+    const id = elementos.id.value.trim();
+    const editando = Boolean(id);
+
+    const payload = {
+        nome: elementos.nome.value.trim(),
+        email: elementos.email.value.trim(),
+        perfil: elementos.perfil.value.trim().toUpperCase(),
+        ativo: elementos.ativo.value === "true"
+    };
+
+    if (elementos.senha.value) {
+        payload.senha = elementos.senha.value;
     }
+
+    const perfisValidos = ["DISCENTE", "GESTOR", "ADMINISTRADOR"];
+
+    if (!perfisValidos.includes(payload.perfil)) {
+        mostrarErroFormulario("Selecione um perfil válido.");
+        elementos.perfil.focus();
+        return;
+    }
+
+    const url = editando
+        ? `${API_USUARIOS}/${id}`
+        : API_USUARIOS;
+
+    const metodo = editando ? "PUT" : "POST";
+
+    try {
+        const resposta = await fetch(url, {
+            method: metodo,
+            credentials: "same-origin",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            body: JSON.stringify(payload)
+        });
+
+        const dados = await resposta.json().catch(() => null);
+
+        if (resposta.status === 401 || resposta.status === 403) {
+            window.location.assign("/login");
+            return;
+        }
+
+        if (!resposta.ok) {
+            console.error("Resposta da API:", dados);
+
+            const detalhe = Array.isArray(dados?.detail)
+                ? dados.detail.map(item => item.msg).join(" | ")
+                : dados?.detail || dados?.mensagem;
+
+            throw new Error(
+                detalhe || `Falha ao salvar usuário (HTTP ${resposta.status}).`
+            );
+        }
+
+        elementos.modal?.close();
+        elementos.formulario.reset();
+
+        await carregarUsuarios();
+
+    } catch (erro) {
+        console.error("Erro ao salvar usuário:", erro);
+
+        mostrarErroFormulario(
+            erro.message || "Não foi possível salvar o usuário."
+        );
+    }
+}
+
+function alternarStatusUsuario(id) {
+    const usuario = usuarios.find(
+        item => String(item.id) === String(id)
+    );
+
+    if (!usuario) return;
+
+    fetch(`${API_USUARIOS}/${id}`, {
+        method: "PATCH",
+        credentials: "same-origin",
+        headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+        },
+        body: JSON.stringify({ ativo: !usuario.ativo })
+    })
+    .then(resposta => {
+        if (resposta.status === 401 || resposta.status === 403) {
+            window.location.assign("/login");
+            return null;
+        }
+
+        if (!resposta.ok) {
+            throw new Error(`Falha ao alterar status (HTTP ${resposta.status}).`);
+        }
+
+        carregarUsuarios();
+    })
+    .catch(erro => {
+        console.error("Erro ao alterar status:", erro);
+        alert("Não foi possível alterar o status do usuário.");
+    });
 }
 
 function abrirNovoUsuario() {
@@ -241,7 +355,7 @@ if (elementos.filtro) {
 }
 
 if (elementos.lista) {
-    elementos.lista.addEventListener("click", async evento => {
+    elementos.lista.addEventListener("click", evento => {
         const botaoEditar = evento.target.closest("[data-editar]");
         const botaoAlternar = evento.target.closest("[data-alternar]");
 
@@ -251,24 +365,13 @@ if (elementos.lista) {
         }
 
         if (botaoAlternar) {
-            mostrarErroFormulario("");
-
-            alert(
-                "A alteração de status ainda não está conectada à API. " +
-                "Nenhuma alteração foi salva no banco de dados."
-            );
+            alternarStatusUsuario(botaoAlternar.dataset.alternar);
         }
     });
 }
 
 if (elementos.formulario) {
-    elementos.formulario.addEventListener("submit", async evento => {
-        evento.preventDefault();
-
-        mostrarErroFormulario(
-            "O cadastro e a edição precisam de endpoints de gravação no backend. Nenhuma alteração foi salva."
-        );
-    });
+    elementos.formulario.addEventListener("submit", salvarUsuario);
 }
 
 carregarUsuarios();

@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -28,7 +29,6 @@
                 >
 
                 <h2>THE IRON COMPASS</h2>
-                
             </div>
 
             <nav class="navegacao" aria-label="Menu administrativo">
@@ -42,40 +42,25 @@
                     <span>Dashboard</span>
                 </a>
 
-                <a
-                    href="/admin_users"
-                    class="item-menu"
-                >
+                <a href="/admin_users" class="item-menu">
                     <span class="icone">♙</span>
                     <span>Usuários</span>
                 </a>
 
-                <a
-                    href="/admin_equipamentos"
-                    class="item-menu"
-                >
+                <a href="/admin_equipamentos" class="item-menu">
                     <span class="icone">⚙</span>
                     <span>Equipamentos</span>
                 </a>
 
-                <a
-                    href="/admin_categorias"
-                    class="item-menu"
-                >
+                <a href="/admin_categorias" class="item-menu">
                     <span class="icone">▦</span>
                     <span>Categorias</span>
                 </a>
 
-
-                <a
-                    href="/admin_pedidos"
-                    class="item-menu"
-                >
+                <a href="/admin_pedidos" class="item-menu">
                     <span class="icone">▤</span>
                     <span>Pedidos</span>
                 </a>
-
-
 
             </nav>
 
@@ -87,8 +72,8 @@
                         class="item-menu sair"
                         aria-label="Encerrar sessão"
                     >
-                        <span class="icone">⇥</span>
-                        <span>Sair</span>
+                        <span class="icone">↪</span>
+                        <span>Encerrar Sessão</span>
                     </button>
                 </form>
             </div>
@@ -135,52 +120,64 @@
             <!-- Indicadores administrativos -->
             <section class="secao-indicadores">
 
+                <!-- Total de usuários -->
                 <article class="cartao-indicador">
                     <div class="indicador-topo">
                         <span>Usuários cadastrados</span>
                         <span class="icone-indicador">♙</span>
                     </div>
 
-                    <strong id="totalUsuarios">—</strong>
+                    <strong id="totalUsuarios">
+                        {{ total_usuarios }}
+                    </strong>
 
                     <p>
                         Total de usuários registrados no sistema
                     </p>
                 </article>
 
+                <!-- Total de equipamentos -->
                 <article class="cartao-indicador">
                     <div class="indicador-topo">
                         <span>Equipamentos cadastrados</span>
                         <span class="icone-indicador">⚙</span>
                     </div>
 
-                    <strong id="totalEquipamentos">—</strong>
+                    <strong id="totalEquipamentos">
+                        {{ total_equipamentos }}
+                    </strong>
 
                     <p>
                         Total de equipamentos registrados
                     </p>
                 </article>
 
+                <!-- Total de pedidos -->
                 <article class="cartao-indicador">
                     <div class="indicador-topo">
                         <span>Pedidos registrados</span>
                         <span class="icone-indicador">▤</span>
                     </div>
 
-                    <strong id="totalPedidos">—</strong>
+                    <strong id="totalPedidos">
+                        {{ total_pedidos }}
+                    </strong>
 
                     <p>
                         Total de solicitações registradas
                     </p>
                 </article>
 
+                <!-- Empréstimos ativos -->
                 <article class="cartao-indicador">
                     <div class="indicador-topo">
                         <span>Empréstimos ativos</span>
                         <span class="icone-indicador">⚒</span>
                     </div>
 
-                    <strong id="emprestimosAtivos">—</strong>
+                    <strong id="emprestimosAtivos">
+                        {{ emprestimos_ativos }}
+                    </strong>
 
                     <p>
                         Equipamentos atualmente emprestados
@@ -204,10 +201,7 @@
                             </p>
                         </div>
 
-                        <a
-                            href="/admin_pedidos"
-                            class="link-painel"
-                        >
+                        <a href="/admin_pedidos" class="link-painel">
                             Ver todos
                         </a>
                     </div>
@@ -249,10 +243,7 @@
                             </p>
                         </div>
 
-                        <a
-                            href="/admin_users"
-                            class="link-painel"
-                        >
+                        <a href="/admin_users" class="link-painel">
                             Gerenciar usuários
                         </a>
                     </div>
@@ -291,10 +282,7 @@
                             </p>
                         </div>
 
-                        <a
-                            href="/admin_equipamentos"
-                            class="link-painel"
-                        >
+                        <a href="/admin_equipamentos" class="link-painel">
                             Gerenciar equipamentos
                         </a>
                     </div>

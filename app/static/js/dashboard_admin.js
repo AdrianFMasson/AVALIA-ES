@@ -1,122 +1,372 @@
+
 "use strict";
 
 document.addEventListener("DOMContentLoaded", () => {
-    const botoesNavegacao = document.querySelectorAll("[data-tab]");
-    const paineis = document.querySelectorAll(".tab-panel");
-    const tituloPagina = document.getElementById("page-title");
-    const mensagem = document.getElementById("feedback-message");
 
-    const titulos = {
-        "visao-geral": "Visão geral",
-        "usuarios": "Usuários",
-        "equipamentos": "Equipamentos",
-        "pedidos": "Pedidos"
+    // =====================================================
+    // ELEMENTOS DO DASHBOARD
+    // =====================================================
+
+    const listaPedidos = document.getElementById("listaPedidos");
+    const listaUsuarios = document.getElementById("listaUsuarios");
+    const listaEquipamentos = document.getElementById("listaEquipamentos");
+
+    // =====================================================
+    // CONFIGURAÇÕES
+    // =====================================================
+
+    const API = {
+        pedidos: "/api/admin/pedidos",
+        usuarios: "/api/admin/usuarios",
+        equipamentos: "/api/admin/equipamentos"
     };
 
-    function mostrarMensagem(texto, tipo = "") {
-        if (!mensagem) {
+    // =====================================================
+    // FUNÇÕES AUXILIARES
+    // =====================================================
+
+    async function buscarDados(url) {
+
+        const resposta = await fetch(url, {
+            method: "GET",
+            credentials: "same-origin",
+            headers: {
+                "Accept": "application/json"
+            },
+            cache: "no-store"
+        });
+
+        if (resposta.status === 401) {
+            window.location.href = "/login";
+            throw new Error("Sessão expirada.");
+        }
+
+        if (resposta.status === 403) {
+            throw new Error("Você não tem permissão para acessar estes dados.");
+        }
+
+        if (!resposta.ok) {
+            throw new Error(`Erro ao consultar ${url}: ${resposta.status}`);
+        }
+
+        return await resposta.json();
+    }
+
+    function criarCelula(texto) {
+        const td = document.createElement("td");
+        td.textContent = texto ?? "—";
+        return td;
+    }
+
+    function criarMensagem(tbody, texto, quantidadeColunas) {
+
+        if (!tbody) return;
+
+        tbody.replaceChildren();
+
+        const linha = document.createElement("tr");
+        const celula = document.createElement("td");
+
+        celula.colSpan = quantidadeColunas;
+        celula.className = "mensagem-vazia";
+        celula.textContent = texto;
+
+        linha.appendChild(celula);
+        tbody.appendChild(linha);
+    }
+
+    function formatarData(data) {
+
+        if (!data) return "—";
+
+        const dataConvertida = new Date(data);
+
+        if (Number.isNaN(dataConvertida.getTime())) {
+            return "—";
+        }
+
+        return dataConvertida.toLocaleDateString("pt-BR");
+    }
+
+    function normalizarTexto(valor) {
+        return String(valor ?? "")
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, "-")
+            .replace(/^-|-$/g, "");
+    }
+
+    function criarStatus(status) {
+
+        const span = document.createElement("span");
+
+        const valor = String(status ?? "Não informado");
+        const classe = normalizarTexto(valor);
+
+        span.className = `status-badge status-${classe}`;
+        span.textContent = valor.replaceAll("_", " ");
+
+        return span;
+    }
+
+    // =====================================================
+    // PEDIDOS RECENTES
+    // =====================================================
+
+    function renderizarPedidos(pedidos) {
+
+        if (!listaPedidos) return;
+
+        listaPedidos.replaceChildren();
+
+        if (!Array.isArray(pedidos) || pedidos.length === 0) {
+            criarMensagem(
+                listaPedidos,
+                "Nenhum pedido encontrado.",
+                6
+            );
             return;
         }
 
-        mensagem.textContent = texto;
-        mensagem.className = "feedback-message";
+        pedidos.slice(0, 5).forEach(pedido => {
 
-        if (tipo) {
-            mensagem.classList.add(tipo);
-        }
+            const linha = document.createElement("tr");
 
-        mensagem.hidden = false;
+            linha.appendChild(
+                criarCelula(
+                    pedido.id_pedido ?? pedido.id ?? "—"
+                )
+            );
+
+            linha.appendChild(
+                criarCelula(pedido.usuario)
+            );
+
+            linha.appendChild(
+                criarCelula(pedido.equipamento)
+            );
+
+            linha.appendChild(
+                criarCelula(formatarData(pedido.data_pedido))
+            );
+
+            const celulaStatus = document.createElement("td");
+            celulaStatus.appendChild(
+                criarStatus(pedido.status)
+            );
+
+            linha.appendChild(celulaStatus);
+
+            const celulaAcoes = document.createElement("td");
+
+            const link = document.createElement("a");
+            link.href = "/admin_pedidos";
+            link.className = "link-painel";
+            link.textContent = "Ver pedidos";
+            link.setAttribute(
+                "aria-label",
+                `Ver gerenciamento de pedidos`
+            );
+
+            celulaAcoes.appendChild(link);
+            linha.appendChild(celulaAcoes);
+
+            listaPedidos.appendChild(linha);
+        });
     }
 
-    function abrirAba(nomeAba) {
-        const painelAlvo = document.getElementById(`tab-${nomeAba}`);
+    // =====================================================
+    // USUÁRIOS RECENTES
+    // =====================================================
 
-        if (!painelAlvo) {
+    function renderizarUsuarios(usuarios) {
+
+        if (!listaUsuarios) return;
+
+        listaUsuarios.replaceChildren();
+
+        if (!Array.isArray(usuarios) || usuarios.length === 0) {
+            criarMensagem(
+                listaUsuarios,
+                "Nenhum usuário cadastrado.",
+                3
+            );
             return;
         }
 
-        paineis.forEach((painel) => {
-            const ativo = painel === painelAlvo;
+        usuarios.slice(0, 5).forEach(usuario => {
 
-            painel.classList.toggle("active", ativo);
-            painel.hidden = !ativo;
+            const linha = document.createElement("tr");
+
+            linha.appendChild(
+                criarCelula(usuario.nome)
+            );
+
+            linha.appendChild(
+                criarCelula(usuario.perfil)
+            );
+
+            const celulaStatus = document.createElement("td");
+
+            celulaStatus.appendChild(
+                criarStatus(
+                    usuario.ativo ? "Ativo" : "Inativo"
+                )
+            );
+
+            linha.appendChild(celulaStatus);
+
+            listaUsuarios.appendChild(linha);
         });
-
-        botoesNavegacao.forEach((botao) => {
-            const ativo = botao.dataset.tab === nomeAba;
-
-            botao.classList.toggle("active", ativo);
-            botao.setAttribute("aria-selected", String(ativo));
-        });
-
-        if (tituloPagina) {
-            tituloPagina.textContent = titulos[nomeAba] || "Painel administrativo";
-        }
-
-        if (mensagem) {
-            mensagem.hidden = true;
-            mensagem.textContent = "";
-        }
     }
 
-    // Navegação pelas abas.
-    botoesNavegacao.forEach((botao) => {
-        botao.addEventListener("click", () => {
-            abrirAba(botao.dataset.tab);
-        });
-    });
+    // =====================================================
+    // EQUIPAMENTOS RECENTES
+    // =====================================================
 
-    // Atalhos da visão geral.
-    document.querySelectorAll("[data-open-tab]").forEach((botao) => {
-        botao.addEventListener("click", () => {
-            abrirAba(botao.dataset.openTab);
-        });
-    });
+    function renderizarEquipamentos(equipamentos) {
 
-    // Pesquisa local nas tabelas.
-    document.querySelectorAll("[data-search]").forEach((campo) => {
-        campo.addEventListener("input", () => {
-            const tabelaId = campo.dataset.search;
-            const tabela = document.getElementById(tabelaId);
+        if (!listaEquipamentos) return;
 
-            if (!tabela) {
-                return;
+        listaEquipamentos.replaceChildren();
+
+        if (!Array.isArray(equipamentos) || equipamentos.length === 0) {
+            criarMensagem(
+                listaEquipamentos,
+                "Nenhum equipamento cadastrado.",
+                3
+            );
+            return;
+        }
+
+        // Agrupa equipamentos com o mesmo nome.
+        const agrupados = new Map();
+
+        equipamentos.forEach(equipamento => {
+
+            const nome = equipamento.nome || "Sem nome";
+
+            if (!agrupados.has(nome)) {
+                agrupados.set(nome, {
+                    nome: nome,
+                    quantidade: 0,
+                    status: {}
+                });
             }
 
-            const termo = campo.value.trim().toLocaleLowerCase("pt-BR");
-            const linhas = tabela.querySelectorAll("tbody tr");
+            const grupo = agrupados.get(nome);
 
-            linhas.forEach((linha) => {
-                // Mantém visíveis as linhas informativas sem registros.
-                if (linha.querySelector(".empty-state")) {
-                    linha.hidden = true;
-                    return;
-                }
+            grupo.quantidade++;
 
-                const conteudo = linha.textContent.toLocaleLowerCase("pt-BR");
-                linha.hidden = !conteudo.includes(termo);
-            });
+            const status = equipamento.status_equip || "Não informado";
+
+            grupo.status[status] = (grupo.status[status] || 0) + 1;
         });
-    });
 
-    // Os cadastros serão ligados às rotas administrativas depois.
-    document.querySelectorAll("[data-action]").forEach((botao) => {
-        botao.addEventListener("click", () => {
-            const acoes = {
-                "criar-usuario":
-                    "O cadastro de usuários será habilitado após a implementação da rota administrativa.",
-                "criar-equipamento":
-                    "O cadastro de equipamentos será habilitado após a implementação da rota administrativa."
-            };
+        const registros = Array.from(agrupados.values()).slice(0, 5);
 
-            mostrarMensagem(
-                acoes[botao.dataset.action] ||
-                    "Esta operação ainda não está disponível.",
-                "error"
+        registros.forEach(equipamento => {
+
+            const linha = document.createElement("tr");
+
+            linha.appendChild(
+                criarCelula(equipamento.nome)
             );
-        });
-    });
 
-    // Inicializa a interface.
-    abrirAba("visao-geral");
+            linha.appendChild(
+                criarCelula(
+                    `${equipamento.quantidade} ${
+                        equipamento.quantidade === 1 ? "unidade" : "unidades"
+                    }`
+                )
+            );
+
+            const celulaStatus = document.createElement("td");
+
+            const resumoStatus = Object.entries(equipamento.status)
+                .map(([status, quantidade]) => {
+                    return `${quantidade} ${status.replaceAll("_", " ")}`;
+                })
+                .join(" / ");
+
+            celulaStatus.textContent = resumoStatus;
+
+            linha.appendChild(celulaStatus);
+
+            listaEquipamentos.appendChild(linha);
+        });
+    }
+
+    // =====================================================
+    // CARREGAMENTO DOS DADOS
+    // =====================================================
+
+    async function carregarPedidos() {
+
+        try {
+            const pedidos = await buscarDados(API.pedidos);
+            renderizarPedidos(pedidos);
+
+        } catch (erro) {
+            console.error("Erro ao carregar pedidos:", erro);
+
+            criarMensagem(
+                listaPedidos,
+                "Não foi possível carregar os pedidos.",
+                6
+            );
+        }
+    }
+
+    async function carregarUsuarios() {
+
+        try {
+            const usuarios = await buscarDados(API.usuarios);
+            renderizarUsuarios(usuarios);
+
+        } catch (erro) {
+            console.error("Erro ao carregar usuários:", erro);
+
+            criarMensagem(
+                listaUsuarios,
+                "Não foi possível carregar os usuários.",
+                3
+            );
+        }
+    }
+
+    async function carregarEquipamentos() {
+
+        try {
+            const equipamentos = await buscarDados(API.equipamentos);
+            renderizarEquipamentos(equipamentos);
+
+        } catch (erro) {
+            console.error("Erro ao carregar equipamentos:", erro);
+
+            criarMensagem(
+                listaEquipamentos,
+                "Não foi possível carregar os equipamentos.",
+                3
+            );
+        }
+    }
+
+    // =====================================================
+    // INICIALIZAÇÃO
+    // =====================================================
+
+    async function inicializarDashboard() {
+
+        await Promise.all([
+            carregarPedidos(),
+            carregarUsuarios(),
+            carregarEquipamentos()
+        ]);
+
+    }
+
+    inicializarDashboard();
+
 });
