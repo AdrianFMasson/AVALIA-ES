@@ -23,6 +23,7 @@ from entities.models import (
     StatusSolicitacao,
     StatusEquip,
     StatusPedido,
+
 )
 
 from utils.validacao_senha import validar_senha
@@ -1136,3 +1137,25 @@ def api_atualizar_status_pedido(
     except Exception:
         db.rollback()
         raise
+
+@admin_rota.get("/admin_perfil")
+
+def pagina_admin_perfis(
+        request: Request,
+        db: Session = Depends(database.get_db),
+        ):
+
+    autenticacao = exigir_admin(request,db)
+    if autenticacao is None:
+        return redirecionar_para_login()
+
+    perfil = db.exec(
+        select(Perfil)
+        .order_by(Perfil.id_perfil)
+    ).all()
+    return templates.TemplateResponse(
+            request=request,
+            name="admin_perfil.html",
+            context=contexto_admin(autenticacao),
+        )
+
