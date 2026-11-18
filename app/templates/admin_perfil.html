@@ -1,106 +1,39 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PERFIS | THE IRON COMPASS</title>
+<section class="painel">
+    <div class="barra-acoes">
+        <div>
+            <h2>Lista de Perfis</h2>
+            <p>Consulte e gerencie os perfis.</p>
+        </div>
+        <button type="button" class="botao-principal" id="novoPerfil">+ Novo Perfil</button>
+    </div>
 
-    <link rel="stylesheet" href="static/css/admin_perfil.css">
-    <script src="static/js/admin_perfil.js" defer></script>
-</head>
-<body>
-    <div class="layout">
-        <aside class="menu-lateral">
-            <div class="identidade">
-                <img 
-                        src=""
-                        alt="Compasso The Iron Compass"
-                        class="logo"
-                    >
-                    <h2>THE IRON COMPASS</h2>
+    <div id="listaPerfis"></div>
+</section>
+
+<div class="cadastro-perfil">
+    <form id="campos-perfil">
+        <div class="modal-cabecalho">
+            <div>
+                <p class="subtitulo">Cadastro</p>
+                <h2 id="tituloModal">Novo Perfil</h2>
             </div>
+        </div>
 
+        <input type="hidden" id="perfilId">
 
+        <label for="perfilUsuario">Perfil</label><br>
+        <select id="perfilUsuario" name="perfil" required>
+            <option value="">Selecione um tipo de Perfil</option>
+            <option value="DISCENTE">DISCENTE</option>
+            <option value="GESTOR">GESTOR</option>
+            <option value="ADMINISTRADOR">ADMINISTRADOR</option>
+        </select><br>
 
-            <nav class = "navegacao" aria-label="Menu administrativo">
-
-                <a href="/dashboard-admin"
-                class="item menu">
-                <span class="icone">⌂</span>
-                <span>Dashboard</span>
-                </a>
-
-
-
-
-
-            </nav>
+        <label for="descricaoPerfil">Descrição</label><br>
+        <input type="text" id="descricaoPerfil" name="descricao" minlength="10" maxlength="100" required>
         
-
-            <div class="rodape-menu">
-                <form action="/encerrar-sessao" method="post">
-                    <button class="item-menu sair" type="submit">-> Encerrar Sessão</button>
-                </form>
-
-            </div>
-        </aside>
-
-        <main class="conteudo-principal">
-            <header class="cabecalho">
-
-
-            </header>
-
-            
-            <div class="cadastro-perfil">
-                <form id="campos-perfil">
-                    <div class="modal-cabecalho">
-                        <div>
-                            <p class="subtitulo">Cadastro</p>
-                            <h2 id="tituloModal">Novo Perfil</h2>
-                            <button class="botao-principal" id="novoPerfil">+ Novo Perfil</button>
-                        </div>
-                        
-                    </div>
-                    <section class="painel">
-                        <div class="barra-acoes">
-                            <h2>Lista de Perfis</h2>
-                            <p>Consulte e gerencie os perfis.</p>
-                        </div>
-                        
-                    </section>
-
-                    <input type="hidden" id="perfilId">
-
-                    <label for="perfil">Perfil</label><br>
-                    <select id="perfilUsuario" name="perfil" required>
-                            <option value="">Selecione um tipo de Perfil </option>
-                            <option value="DISCENTE">DISCENTE</option>
-                            <option value="GESTOR">GESTOR</option>
-                            <option value="ADMINISTRADOR">ADMINISTRADOR</option>
-                    </select><br>
-
-                    <label for="descricao">Descrição</label><br>
-                    <input id="descricaoPerfil" minlength="10" maxlength="100">
-                    <div class="botoes">
-                        <button type="submit" class="botao-salvar">Salvar Perfil</button>
-                    </div>  
-
-
-                </form>
-
-            </div>
-
-
-            
-
-
-
-        </main>
-    </div>        
-
-
-
-
-</body>
-</html>
+        <div class="botoes">
+            <button type="submit" class="botao-salvar">Salvar Perfil</button>
+        </div>  
+    </form>
+</div>
